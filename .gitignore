@@ -11,6 +11,12 @@ odoo-filestore/
 
 # Environment
 .env
+.env.*
+
+# Virtual environments
+.venv/
+venv/
+env/
 
 # OS
 .DS_Store
