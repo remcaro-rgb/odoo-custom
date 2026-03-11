@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:15-alpine
+    env_file: .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  odoo:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    volumes:
+      - ./odoo:/odoo
+      - ./addons/jorels-odoo-addons:/mnt/jorels-addons
+      - ./custom-addons:/mnt/custom-addons
+      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
+      - odoo-filestore:/var/lib/odoo
+    ports:
+      - "8069:8069"
+    restart: unless-stopped
+
+volumes:
+  odoo-db-data:
+  odoo-filestore:
