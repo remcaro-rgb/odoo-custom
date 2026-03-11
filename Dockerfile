@@ -34,9 +34,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # wkhtmltopdf — patched-Qt build from wkhtmltopdf/packaging (NOT distro package)
 # apt-get update required again here because lists were cleared in the prior layer
 ARG WKHTMLTOPDF_VERSION=0.12.6.1-3
-RUN apt-get update \
+RUN ARCH=$(dpkg --print-architecture) \
+    && apt-get update \
     && curl -sSL -o /tmp/wkhtmltox.deb \
-    "https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.bookworm_amd64.deb" \
+    "https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.bookworm_${ARCH}.deb" \
     && apt-get install -y --no-install-recommends /tmp/wkhtmltox.deb \
     && rm /tmp/wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/*
