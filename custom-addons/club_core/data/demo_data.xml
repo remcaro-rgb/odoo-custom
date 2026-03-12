@@ -139,14 +139,14 @@
         <record id="membership_carlos" model="club.membership">
             <field name="affiliate_id" ref="affiliate_001"/>
             <field name="plan_id" ref="plan_individual_annual"/>
-            <field name="start_date" eval="(datetime.date.today()).strftime('%Y-01-01')"/>
+            <field name="start_date" eval="DateTime.now().strftime('%Y-01-01')"/>
             <field name="status">active</field>
         </record>
 
         <record id="membership_jorge" model="club.membership">
             <field name="affiliate_id" ref="affiliate_003"/>
             <field name="plan_id" ref="plan_family_annual"/>
-            <field name="start_date" eval="(datetime.date.today()).strftime('%Y-01-01')"/>
+            <field name="start_date" eval="DateTime.now().strftime('%Y-01-01')"/>
             <field name="status">active</field>
         </record>
 
