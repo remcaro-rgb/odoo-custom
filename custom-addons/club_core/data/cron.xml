@@ -1,1 +1,28 @@
-<odoo/>
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="cron_membership_renewals" model="ir.cron">
+            <field name="name">Club: Generate Renewal Invoices</field>
+            <field name="model_id" ref="model_club_membership"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_renewals()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="cron_membership_late_fees" model="ir.cron">
+            <field name="name">Club: Apply Late Fees</field>
+            <field name="model_id" ref="model_club_membership"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_apply_late_fees()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>
