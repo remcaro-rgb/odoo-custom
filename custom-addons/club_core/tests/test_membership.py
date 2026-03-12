@@ -151,7 +151,7 @@ class TestClubMembership(TransactionCase):
         today = datetime.date.today()
         expiring_soon = today + datetime.timedelta(days=3)
         # Use end_date - billing_period as the start to land end_date near today
-        start = expiring_soon - datetime.timedelta(days=365)
+        start = expiring_soon - relativedelta(years=1)
         membership = self.env['club.membership'].create({
             'affiliate_id': self.affiliate.id,
             'plan_id': self.plan_annual.id,
@@ -172,7 +172,7 @@ class TestClubMembership(TransactionCase):
         """Renewal cron does not create a second invoice if already created today."""
         today = datetime.date.today()
         expiring_soon = today + datetime.timedelta(days=3)
-        start = expiring_soon - datetime.timedelta(days=365)
+        start = expiring_soon - relativedelta(years=1)
         membership = self.env['club.membership'].create({
             'affiliate_id': self.affiliate.id,
             'plan_id': self.plan_annual.id,
@@ -189,7 +189,8 @@ class TestClubMembership(TransactionCase):
 
     def test_cron_apply_late_fees_suspends_membership(self):
         """Late fee cron suspends membership with unpaid invoice past grace period."""
-        past_date = datetime.date(2025, 1, 1)
+        today = datetime.date.today()
+        past_date = today - relativedelta(years=1) - relativedelta(days=30)
         membership = self.env['club.membership'].create({
             'affiliate_id': self.affiliate.id,
             'plan_id': self.plan_annual.id,
@@ -200,7 +201,7 @@ class TestClubMembership(TransactionCase):
         invoice = membership._generate_membership_invoice()
         invoice.action_post()
 
-        # end_date is 2026-01-01, grace is 15 days → past grace today (2026-03-12)
+        # end_date = past_date + 1 year, grace is 15 days → well past grace relative to today
         self.assertTrue(datetime.date.today() > membership.end_date)
 
         self.env['club.membership']._cron_apply_late_fees()
