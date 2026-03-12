@@ -50,7 +50,6 @@ class ClubAffiliate(models.Model):
         store=True,
         string='Membership Status',
     )
-    photo = fields.Binary(string='Photo', attachment=True)
 
     _sql_constraints = [
         ('affiliate_number_uniq', 'unique(affiliate_number)',
