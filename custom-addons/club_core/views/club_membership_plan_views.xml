@@ -1,1 +1,60 @@
-<odoo/>
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_club_membership_plan_list" model="ir.ui.view">
+        <field name="name">club.membership.plan.list</field>
+        <field name="model">club.membership.plan</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="billing_period"/>
+                <field name="fee" widget="monetary"/>
+                <field name="grace_period_days"/>
+                <field name="golf_access" widget="boolean_toggle"/>
+                <field name="equestrian_access" widget="boolean_toggle"/>
+                <field name="tennis_access" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_club_membership_plan_form" model="ir.ui.view">
+        <field name="name">club.membership.plan.form</field>
+        <field name="model">club.membership.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived"
+                        invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Billing">
+                            <field name="billing_period"/>
+                            <field name="fee" widget="monetary"/>
+                            <field name="grace_period_days"/>
+                            <field name="late_fee_amount" widget="monetary"/>
+                        </group>
+                        <group string="Sport Access">
+                            <field name="golf_access"/>
+                            <field name="equestrian_access"/>
+                            <field name="tennis_access"/>
+                        </group>
+                    </group>
+                    <group string="Products (for invoicing)">
+                        <field name="product_id"/>
+                        <field name="late_fee_product_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_club_membership_plan" model="ir.actions.act_window">
+        <field name="name">Membership Plans</field>
+        <field name="res_model">club.membership.plan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

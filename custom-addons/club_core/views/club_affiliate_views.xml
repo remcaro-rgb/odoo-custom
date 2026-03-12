@@ -1,1 +1,141 @@
-<odoo/>
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_affiliate_kanban" model="ir.ui.view">
+        <field name="name">club.affiliate.kanban</field>
+        <field name="model">club.affiliate</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="affiliate_number"/>
+                <field name="membership_type"/>
+                <field name="membership_status"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong><br/>
+                            <span class="text-muted"><field name="affiliate_number"/></span><br/>
+                            <field name="membership_status" widget="badge"
+                                decoration-success="membership_status == 'active'"
+                                decoration-warning="membership_status == 'suspended'"
+                                decoration-danger="membership_status == 'expired'"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_affiliate_list" model="ir.ui.view">
+        <field name="name">club.affiliate.list</field>
+        <field name="model">club.affiliate</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="affiliate_number"/>
+                <field name="name"/>
+                <field name="membership_type"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="membership_status" widget="badge"
+                    decoration-success="membership_status == 'active'"
+                    decoration-warning="membership_status == 'suspended'"
+                    decoration-danger="membership_status == 'expired'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_affiliate_form" model="ir.ui.view">
+        <field name="name">club.affiliate.form</field>
+        <field name="model">club.affiliate</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                        <h4 class="text-muted">
+                            <field name="affiliate_number" readonly="1"/>
+                        </h4>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="membership_type"/>
+                            <field name="membership_status" readonly="1" widget="badge"
+                                decoration-success="membership_status == 'active'"
+                                decoration-warning="membership_status == 'suspended'"
+                                decoration-danger="membership_status == 'expired'"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                        </group>
+                        <group>
+                            <field name="family_group_id"
+                                invisible="membership_type not in ('family_dependent',)"/>
+                            <field name="corporate_group_id"
+                                invisible="membership_type not in ('corporate_employee',)"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Memberships" name="memberships">
+                            <field name="membership_ids">
+                                <list>
+                                    <field name="plan_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status == 'active'"
+                                        decoration-warning="status == 'suspended'"
+                                        decoration-danger="status in ('expired', 'cancelled')"/>
+                                    <field name="invoice_count"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Contact Info" name="contact">
+                            <group>
+                                <field name="street"/>
+                                <field name="city"/>
+                                <field name="country_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_affiliate_search" model="ir.ui.view">
+        <field name="name">club.affiliate.search</field>
+        <field name="model">club.affiliate</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="affiliate_number"/>
+                <filter name="active_members" string="Active"
+                    domain="[('membership_status','=','active')]"/>
+                <filter name="suspended" string="Suspended"
+                    domain="[('membership_status','=','suspended')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Membership Type"
+                        context="{'group_by': 'membership_type'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'membership_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_affiliate" model="ir.actions.act_window">
+        <field name="name">Affiliates</field>
+        <field name="res_model">club.affiliate</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_affiliate_search"/>
+        <field name="context">{'search_default_active_members': 1}</field>
+    </record>
+
+</odoo>
