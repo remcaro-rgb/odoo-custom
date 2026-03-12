@@ -1,0 +1,27 @@
+{
+    'name': 'Club Core',
+    'version': '18.0.1.0.0',
+    'summary': 'Social Country Club — Affiliates & Memberships',
+    'description': 'Core module for social country club management: affiliates, membership plans, billing.',
+    'category': 'Club Management',
+    'author': 'Manuel Caro',
+    'license': 'LGPL-3',
+    'depends': ['base', 'mail', 'account', 'portal'],
+    'data': [
+        'security/club_security.xml',
+        'security/ir.model.access.csv',
+        'data/sequences.xml',
+        'data/cron.xml',
+        'views/club_membership_plan_views.xml',
+        'views/club_affiliate_views.xml',
+        'views/club_membership_views.xml',
+        'views/club_family_group_views.xml',
+        'views/club_corporate_group_views.xml',
+        'views/club_menus.xml',
+    ],
+    'demo': [
+        'data/demo_data.xml',
+    ],
+    'installable': True,
+    'application': True,
+}
