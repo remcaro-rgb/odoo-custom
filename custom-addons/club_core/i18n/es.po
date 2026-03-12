@@ -1,0 +1,246 @@
+# Spanish translation for club_core
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the club_core module.
+#
+# Translators:
+# Manuel Caro, 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Club Core 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-12 00:00+0000\n"
+"PO-Revision-Date: 2026-03-12 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_core
+#: model:res.groups,name:club_core.group_club_admin
+msgid "Club Administrator"
+msgstr "Administrador del Club"
+
+#. module: club_core
+#: model:res.groups,name:club_core.group_club_staff
+msgid "Club Staff"
+msgstr "Personal del Club"
+
+#. module: club_core
+#: model:res.groups,name:club_core.group_club_member
+msgid "Club Member (Portal)"
+msgstr "Socio del Club (Portal)"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_affiliate__affiliate_number
+msgid "Affiliate Number"
+msgstr "Número de Socio"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_affiliate__membership_type
+msgid "Membership Type"
+msgstr "Tipo de Membresía"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_type__individual
+msgid "Individual"
+msgstr "Individual"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_type__family_primary
+msgid "Family - Primary"
+msgstr "Familia - Titular"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_type__family_dependent
+msgid "Family - Dependent"
+msgstr "Familia - Beneficiario"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_type__corporate_admin
+msgid "Corporate - Admin"
+msgstr "Corporativo - Administrador"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_type__corporate_employee
+msgid "Corporate - Employee"
+msgstr "Corporativo - Empleado"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_affiliate__membership_status
+msgid "Membership Status"
+msgstr "Estado de Membresía"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_status__none
+msgid "No Membership"
+msgstr "Sin Membresía"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_status__active
+#: model:ir.model.fields.selection,name:club_core.selection__club_membership__status__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_status__suspended
+#: model:ir.model.fields.selection,name:club_core.selection__club_membership__status__suspended
+msgid "Suspended"
+msgstr "Suspendido"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_affiliate__membership_status__expired
+#: model:ir.model.fields.selection,name:club_core.selection__club_membership__status__expired
+msgid "Expired"
+msgstr "Vencido"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__name
+msgid "Plan Name"
+msgstr "Nombre del Plan"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__fee_amount
+msgid "Fee Amount"
+msgstr "Monto de Cuota"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__billing_period
+msgid "Billing Period"
+msgstr "Período de Facturación"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_membership_plan__billing_period__monthly
+msgid "Monthly"
+msgstr "Mensual"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_membership_plan__billing_period__annual
+msgid "Annual"
+msgstr "Anual"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__grace_period_days
+msgid "Grace Period (days)"
+msgstr "Período de Gracia (días)"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__late_fee_amount
+msgid "Late Fee Amount"
+msgstr "Monto de Mora"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__golf_access
+msgid "Golf Access"
+msgstr "Acceso al Golf"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__equestrian_access
+msgid "Equestrian Access"
+msgstr "Acceso a Equitación"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__tennis_access
+msgid "Tennis Access"
+msgstr "Acceso al Tenis"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__membership_product_id
+msgid "Membership Product"
+msgstr "Producto de Membresía"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership_plan__late_fee_product_id
+msgid "Late Fee Product"
+msgstr "Producto de Mora"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership__start_date
+msgid "Start Date"
+msgstr "Fecha de Inicio"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership__end_date
+msgid "End Date"
+msgstr "Fecha de Vencimiento"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_membership__status__draft
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: club_core
+#: model:ir.model.fields.selection,name:club_core.selection__club_membership__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_membership__invoice_ids
+msgid "Invoices"
+msgstr "Facturas"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_family_group__primary_member_id
+msgid "Primary Member"
+msgstr "Socio Titular"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_family_group__dependent_ids
+msgid "Dependents"
+msgstr "Beneficiarios"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_family_group__billing_member_id
+msgid "Billing Member"
+msgstr "Socio Facturado"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_corporate_group__admin_id
+msgid "Corporate Admin"
+msgstr "Administrador Corporativo"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_corporate_group__member_ids
+msgid "Authorized Members"
+msgstr "Miembros Autorizados"
+
+#. module: club_core
+#: model:ir.model.fields,field_description:club_core.field_club_corporate_group__max_members
+msgid "Max Authorized Members"
+msgstr "Máximo de Miembros Autorizados"
+
+#. module: club_core
+#: code:addons/club_core/models/club_membership.py:0
+#, python-format
+msgid "Only draft memberships can be activated."
+msgstr "Solo las membresías en borrador pueden activarse."
+
+#. module: club_core
+#: code:addons/club_core/models/club_corporate_group.py:0
+#, python-format
+msgid "Corporate group \"%s\" has exceeded the maximum of %d authorized members."
+msgstr "El grupo corporativo \"%s\" ha superado el máximo de %d miembros autorizados."
+
+#. module: club_core
+#: code:addons/club_core/models/club_membership.py:0
+#, python-format
+msgid "Late Fee — %s"
+msgstr "Mora — %s"
+
+#. module: club_core
+#: model:ir.ui.menu,name:club_core.menu_club_root
+msgid "Club"
+msgstr "Club"
+
+#. module: club_core
+#: model:ir.ui.menu,name:club_core.menu_club_config
+msgid "Configuration"
+msgstr "Configuración"
+
+#. module: club_core
+#: model:ir.ui.menu,name:club_core.menu_club_membership_plans
+msgid "Membership Plans"
+msgstr "Planes de Membresía"
