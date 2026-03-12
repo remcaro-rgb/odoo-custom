@@ -4,6 +4,7 @@ from odoo import api, fields, models, _
 class ClubAffiliate(models.Model):
     _name = 'club.affiliate'
     _inherits = {'res.partner': 'partner_id'}
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Club Affiliate'
     _rec_name = 'name'  # 'name' is inherited from res.partner
 
