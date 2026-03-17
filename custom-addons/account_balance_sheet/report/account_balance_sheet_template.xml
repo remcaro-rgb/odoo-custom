@@ -11,16 +11,16 @@
                         <thead><tr><th>Code</th><th>Account</th><th class="text-end">Balance</th></tr></thead>
                         <tbody>
                             <t t-foreach="section['accounts']" t-as="acct">
-                                <tr><td><t t-out="acct['account_code']"/></td><td><t t-out="acct['account_name']"/></td><td class="text-end"><t t-out="formatLang(acct['saldo'], currency_obj=company_currency)"/></td></tr>
+                                <tr><td><t t-out="acct['account_code']"/></td><td><t t-out="acct['account_name']"/></td><td class="text-end"><span t-out="acct['saldo']" t-options='{"widget": "monetary", "display_currency": company_currency}'/></td></tr>
                             </t>
                         </tbody>
-                        <tfoot><tr><td colspan="2"><strong>Total <t t-out="section['label'].title()"/></strong></td><td class="text-end"><strong><t t-out="formatLang(section['total'], currency_obj=company_currency)"/></strong></td></tr></tfoot>
+                        <tfoot><tr><td colspan="2"><strong>Total <t t-out="section['label'].title()"/></strong></td><td class="text-end"><strong><span t-out="section['total']" t-options='{"widget": "monetary", "display_currency": company_currency}'/></strong></td></tr></tfoot>
                     </table>
                 </t>
                 <table class="table table-sm mt-4">
                     <tbody>
-                        <tr><td><strong>Total Pasivo + Patrimonio</strong></td><td class="text-end"><strong><t t-out="formatLang(total_pasivo_patrimonio, currency_obj=company_currency)"/></strong></td></tr>
-                        <tr><td colspan="2"><t t-if="equation_ok"><strong class="text-success">✓ Activo = Pasivo + Patrimonio</strong></t><t t-else=""><strong class="text-danger">✗ Activo ≠ Pasivo + Patrimonio (diferencia: <t t-out="formatLang(equation_diff, currency_obj=company_currency)"/>)</strong></t></td></tr>
+                        <tr><td><strong>Total Pasivo + Patrimonio</strong></td><td class="text-end"><strong><span t-out="total_pasivo_patrimonio" t-options='{"widget": "monetary", "display_currency": company_currency}'/></strong></td></tr>
+                        <tr><td colspan="2"><t t-if="equation_ok"><strong class="text-success">✓ Activo = Pasivo + Patrimonio</strong></t><t t-else=""><strong class="text-danger">✗ Activo ≠ Pasivo + Patrimonio (diferencia: <span t-out="equation_diff" t-options='{"widget": "monetary", "display_currency": company_currency}'/>)</strong></t></td></tr>
                     </tbody>
                 </table>
             </div>
