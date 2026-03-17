@@ -107,11 +107,11 @@ msgid "Total Balance"
 msgstr "Total Saldo"
 
 #. module: account_balance_sheet
-#: report:account_balance_sheet.account_balance_sheet_document
+#: model:ir.actions.report,name:account_balance_sheet.action_report_account_balance_sheet
 msgid "Balance General"
 msgstr "Balance General"
 
 #. module: account_balance_sheet
-#: report:account_balance_sheet.account_balance_sheet_document
+#: model:ir.ui.view,arch_db:account_balance_sheet.account_balance_sheet_document
 msgid "Total Pasivo + Patrimonio"
 msgstr "Total Pasivo + Patrimonio"
