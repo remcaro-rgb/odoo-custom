@@ -25,25 +25,10 @@
             <div class="article">
             <div class="page">
 
-                <!-- Company identity + metadata -->
-                <div class="row mb-2" style="align-items: center;">
-                    <div class="col-2" style="text-align: left;">
-                        <img t-if="company.logo"
-                             t-attf-src="/web/image/res.company/{{ company.id }}/logo"
-                             style="max-height: 64px; max-width: 140px; object-fit: contain;"/>
-                    </div>
-                    <div class="col-6" style="padding-left: 12px;">
-                        <div style="font-size: 20px; font-weight: 700; color: #2c3e50; line-height: 1.2;">
-                            <t t-out="company.name"/>
-                        </div>
-                        <div t-if="company.vat" style="font-size: 11px; color: #555;">
-                            NIT: <t t-out="company.vat"/>
-                        </div>
-                    </div>
-                    <div class="col-4 text-end" style="font-size: 11px; color: #555; line-height: 1.6;">
-                        <div>Impreso por: <strong><t t-out="user.name"/></strong></div>
-                        <div>Fecha impresión: <t t-out="print_date" t-options='{"widget": "datetime"}'/></div>
-                    </div>
+                <!-- Print metadata -->
+                <div class="text-end mb-2" style="font-size: 11px; color: #555; line-height: 1.6;">
+                    <div>Impreso por: <strong><t t-out="user.name"/></strong></div>
+                    <div>Fecha impresión: <t t-out="print_date" t-options='{"widget": "datetime"}'/></div>
                 </div>
 
                 <!-- Report title banner -->
