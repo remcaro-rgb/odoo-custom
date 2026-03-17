@@ -156,7 +156,7 @@ class TestAccountBalanceSheet(TransactionCase):
         ])
         lines = self.env['account.balance.sheet'].search([('move_id', '=', move.id)])
         classes = set(lines.mapped('account_class'))
-        self.assertTrue(
-            classes.issubset({'1', '2', '3'}),
-            f"Unexpected account classes: {classes - {'1', '2', '3'}}",
+        self.assertEqual(
+            classes, {'1', '2', '3'},
+            f"Expected all three classes {{1, 2, 3}}, got: {classes}",
         )
