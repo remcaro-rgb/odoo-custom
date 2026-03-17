@@ -1,3 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <template id="account_ledger_report_document">
+        <t t-call="web.internal_layout">
+            <div class="page">
+                <h2>Account Ledger</h2>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Code</th>
+                            <th>Account</th>
+                            <th>Reference</th>
+                            <th>Partner</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="docs" t-as="line">
+                            <tr>
+                                <td><t t-out="line.date"/></td>
+                                <td><t t-out="line.account_code"/></td>
+                                <td><t t-out="line.account_id.name"/></td>
+                                <td><t t-out="line.move_name"/></td>
+                                <td><t t-out="line.partner_id.name or ''"/></td>
+                                <td class="text-end">
+                                    <t t-if="line.debit">
+                                        <t t-out="'%.2f' % line.debit"/>
+                                    </t>
+                                </td>
+                                <td class="text-end">
+                                    <t t-if="line.credit">
+                                        <t t-out="'%.2f' % line.credit"/>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5"><strong>Total</strong></td>
+                            <td class="text-end">
+                                <strong>
+                                    <t t-out="'%.2f' % sum(docs.mapped('debit'))"/>
+                                </strong>
+                            </td>
+                            <td class="text-end">
+                                <strong>
+                                    <t t-out="'%.2f' % sum(docs.mapped('credit'))"/>
+                                </strong>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <record id="action_account_ledger_report_pdf" model="ir.actions.report">
+        <field name="name">Account Ledger</field>
+        <field name="model">account.ledger.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">account_ledger_report.account_ledger_report_document</field>
+        <field name="report_file">account_ledger_report.account_ledger_report_document</field>
+        <field name="binding_model_id" ref="model_account_ledger_report"/>
+        <field name="binding_type">report</field>
+    </record>
+
 </odoo>
