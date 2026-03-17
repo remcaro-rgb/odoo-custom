@@ -1,0 +1,117 @@
+# Spanish (Latin America) translation for account_balance_sheet
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the account_balance_sheet module.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Balance Sheet Report 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-17 00:00+0000\n"
+"PO-Revision-Date: 2026-03-17 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish (Latin America)\n"
+"Language: es_419\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: account_balance_sheet
+#: model:ir.model,name:account_balance_sheet.model_account_balance_sheet
+msgid "Balance Sheet"
+msgstr "Balance General"
+
+#. module: account_balance_sheet
+#: model:ir.actions.act_window,name:account_balance_sheet.action_account_balance_sheet
+#: model:ir.actions.report,name:account_balance_sheet.action_report_account_balance_sheet
+#: model:ir.ui.menu,name:account_balance_sheet.menu_account_balance_sheet
+#: model:ir.ui.view,arch_db:account_balance_sheet.account_balance_sheet_view_list
+#: model:ir.ui.view,arch_db:account_balance_sheet.account_balance_sheet_view_pivot
+msgid "Balance General"
+msgstr "Balance General"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__account_id
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__account_name
+msgid "Account"
+msgstr "Cuenta"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__account_code
+msgid "Code"
+msgstr "Código"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__account_class
+msgid "Class"
+msgstr "Clase"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__move_id
+msgid "Journal Entry"
+msgstr "Asiento Contable"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__move_name
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__partner_id
+msgid "Partner"
+msgstr "Contacto"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__debit
+msgid "Debit"
+msgstr "Debe"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__credit
+msgid "Credit"
+msgstr "Haber"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__balance
+msgid "Balance"
+msgstr "Saldo"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__company_id
+msgid "Company"
+msgstr "Compañía"
+
+#. module: account_balance_sheet
+#: model:ir.model.fields,field_description:account_balance_sheet.field_account_balance_sheet__currency_id
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: account_balance_sheet
+#: model:ir.ui.view,arch_db:account_balance_sheet.account_balance_sheet_view_list
+msgid "Total Debit"
+msgstr "Total Debe"
+
+#. module: account_balance_sheet
+#: model:ir.ui.view,arch_db:account_balance_sheet.account_balance_sheet_view_list
+msgid "Total Credit"
+msgstr "Total Haber"
+
+#. module: account_balance_sheet
+#: model:ir.ui.view,arch_db:account_balance_sheet.account_balance_sheet_view_list
+msgid "Total Balance"
+msgstr "Total Saldo"
+
+#. module: account_balance_sheet
+#: report:account_balance_sheet.account_balance_sheet_document
+msgid "Balance General"
+msgstr "Balance General"
+
+#. module: account_balance_sheet
+#: report:account_balance_sheet.account_balance_sheet_document
+msgid "Total Pasivo + Patrimonio"
+msgstr "Total Pasivo + Patrimonio"
