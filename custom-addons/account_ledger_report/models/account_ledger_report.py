@@ -14,7 +14,7 @@ class AccountLedgerReport(models.Model):
             'move_id', 'account_id', 'partner_id',
             'debit', 'credit', 'company_id', 'parent_state',
         ],
-        'account.account': ['code_store'],
+        'account.account': ['code_store'],  # code_store is the JSONB column backing the virtual `code` field
         'res.company': ['currency_id'],
     }
 
@@ -36,7 +36,7 @@ class AccountLedgerReport(models.Model):
                 aml.id              AS id,
                 am.date             AS date,
                 aml.account_id      AS account_id,
-                aa.code_store->>(rco.id::text) AS account_code,
+                aa.code_store->>(SPLIT_PART(rco.parent_path, '/', 1)::text) AS account_code,
                 aml.move_id         AS move_id,
                 am.name             AS move_name,
                 aml.partner_id      AS partner_id,
