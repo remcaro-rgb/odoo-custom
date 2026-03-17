@@ -2,10 +2,30 @@
 <odoo>
     <template id="account_balance_sheet_document">
         <t t-call="web.html_container">
-            <t t-call="web.internal_layout">
+
+            <!-- Custom repeating page header: logo + company name + page numbers -->
+            <div class="header">
+                <div class="row" style="align-items: center; padding: 4px 0;">
+                    <div class="col-2" style="text-align: left;">
+                        <img t-if="company.logo"
+                             t-attf-src="/web/image/res.company/{{ company.id }}/logo"
+                             style="max-height: 48px; max-width: 120px; object-fit: contain;"/>
+                    </div>
+                    <div class="col-7" style="padding-left: 8px;">
+                        <span style="font-size: 15px; font-weight: 700; color: #2c3e50;">
+                            <t t-out="company.name"/>
+                        </span>
+                    </div>
+                    <div class="col-3 text-end" style="font-size: 11px; color: #555;">
+                        Página <span class="page"/> de <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
             <div class="page">
 
-                <!-- Company identity bar -->
+                <!-- Company identity + metadata -->
                 <div class="row mb-2" style="align-items: center;">
                     <div class="col-2" style="text-align: left;">
                         <img t-if="company.logo"
@@ -26,7 +46,7 @@
                     </div>
                 </div>
 
-                <!-- Report title -->
+                <!-- Report title banner -->
                 <div style="background-color: #2c3e50; color: #ffffff; padding: 8px 12px; margin-bottom: 4px;">
                     <div style="font-size: 18px; font-weight: 700; letter-spacing: 1px; text-align: center;">
                         BALANCE GENERAL
@@ -90,7 +110,8 @@
                 </table>
 
             </div>
-            </t>
+            </div>
+
         </t>
     </template>
 
