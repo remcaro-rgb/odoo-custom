@@ -67,4 +67,5 @@ class AccountBalanceSheetReport(models.AbstractModel):
             'total_pasivo_patrimonio': total_pasivo_patrimonio,
             'equation_diff': equation_diff,
             'equation_ok': equation_ok,
+            'company_currency': self.env.company.currency_id,
         }
