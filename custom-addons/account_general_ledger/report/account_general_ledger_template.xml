@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="account_general_ledger_document">
+        <t t-call="web.html_container">
+
+            <!-- Custom repeating page header: logo + company name + page numbers -->
+            <div class="header">
+                <div class="row" style="align-items: center; padding: 4px 0;">
+                    <div class="col-2" style="text-align: left;">
+                        <img t-if="company.logo"
+                             t-attf-src="/web/image/res.company/{{ company.id }}/logo"
+                             style="max-height: 48px; max-width: 120px; object-fit: contain;"/>
+                    </div>
+                    <div class="col-7" style="padding-left: 8px;">
+                        <span style="font-size: 15px; font-weight: 700; color: #2c3e50;">
+                            <t t-out="company.name"/>
+                        </span>
+                    </div>
+                    <div class="col-3 text-end" style="font-size: 11px; color: #555;">
+                        Página <span class="page"/> de <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+            <div class="page">
+
+                <!-- Print metadata -->
+                <div class="text-end mb-2" style="font-size: 11px; color: #555; line-height: 1.6;">
+                    <div>Impreso por: <strong><t t-out="user.name"/></strong></div>
+                    <div>Fecha impresión: <t t-out="print_date" t-options='{"widget": "datetime"}'/></div>
+                </div>
+
+                <!-- Report title banner -->
+                <div style="background-color: #2c3e50; color: #ffffff; padding: 8px 12px; margin-bottom: 4px;">
+                    <div style="font-size: 18px; font-weight: 700; letter-spacing: 1px; text-align: center;">
+                        LIBRO MAYOR
+                    </div>
+                    <div style="font-size: 12px; text-align: center; opacity: 0.85;">
+                        Período:
+                        <t t-out="date_from" t-options='{"widget": "date"}'/>
+                        al
+                        <t t-out="date_to" t-options='{"widget": "date"}'/>
+                    </div>
+                </div>
+                <div style="height: 12px;"/>
+
+                <!-- One section per account -->
+                <t t-foreach="accounts" t-as="account">
+
+                    <!-- Account header -->
+                    <div style="background-color: #4a6fa5; color: #ffffff; padding: 5px 10px; margin-bottom: 0; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;">
+                        <t t-out="account['account_code']"/> — <t t-out="account['account_name']"/>
+                    </div>
+
+                    <!-- Lines table -->
+                    <table class="table table-sm table-bordered mb-0" style="font-size: 11px;">
+                        <thead>
+                            <tr style="background-color: #d6e4f0; color: #1a252f; text-align: center; font-weight: 600;">
+                                <th style="width: 10%; text-align: center;">Fecha</th>
+                                <th style="width: 18%; text-align: left;">Referencia</th>
+                                <th style="text-align: left;">Contacto</th>
+                                <th style="width: 15%; text-align: right;">Debe</th>
+                                <th style="width: 15%; text-align: right;">Haber</th>
+                                <th style="width: 15%; text-align: right;">Saldo Acum.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="account['lines']" t-as="line">
+                                <tr>
+                                    <td style="text-align: center; white-space: nowrap;">
+                                        <t t-out="line['date']" t-options='{"widget": "date"}'/>
+                                    </td>
+                                    <td style="font-family: monospace; font-size: 10px;">
+                                        <t t-out="line['move_name']"/>
+                                    </td>
+                                    <td><t t-out="line['partner_name']"/></td>
+                                    <td style="text-align: right; font-family: monospace; white-space: nowrap;">
+                                        <t t-out="line['debit_fmt']"/>
+                                    </td>
+                                    <td style="text-align: right; font-family: monospace; white-space: nowrap;">
+                                        <t t-out="line['credit_fmt']"/>
+                                    </td>
+                                    <td style="text-align: right; font-family: monospace; white-space: nowrap;">
+                                        <t t-out="line['cumulative_balance_fmt']"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #eaf2fb; font-weight: 700;">
+                                <td colspan="3" style="text-align: right;">Total cuenta</td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; border-top: 2px solid #2c3e50;">
+                                    <t t-out="account['total_debit_fmt']"/>
+                                </td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; border-top: 2px solid #2c3e50;">
+                                    <t t-out="account['total_credit_fmt']"/>
+                                </td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; border-top: 2px solid #2c3e50;">
+                                    <t t-out="account['final_balance_fmt']"/>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div style="height: 16px;"/>
+
+                </t>
+
+            </div>
+            </div>
+
+        </t>
+    </template>
+
+    <record id="action_report_account_general_ledger" model="ir.actions.report">
+        <field name="name">Libro Mayor</field>
+        <field name="model">account.general.ledger</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">account_general_ledger.account_general_ledger_document</field>
+        <field name="report_file">account_general_ledger.account_general_ledger_document</field>
+        <field name="binding_model_id" ref="model_account_general_ledger"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

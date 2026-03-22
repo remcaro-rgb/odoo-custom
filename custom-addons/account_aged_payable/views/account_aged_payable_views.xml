@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="account_aged_payable_view_list" model="ir.ui.view">
+        <field name="name">account.aged.payable.list</field>
+        <field name="model">account.aged.payable</field>
+        <field name="arch" type="xml">
+            <list string="Cartera por Pagar"
+                  create="false" edit="false" delete="false">
+                <field name="partner_id" string="Proveedor"/>
+                <field name="move_name" string="Referencia"/>
+                <field name="date" string="Fecha"/>
+                <field name="date_maturity" string="Vencimiento"/>
+                <field name="days_overdue" string="Días Vencido"/>
+                <field name="aging_bucket" string="Rango"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="amount_total" string="Monto Original"/>
+                <field name="amount_residual" string="Saldo Pendiente" sum="Total Pendiente"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="account_aged_payable_view_pivot" model="ir.ui.view">
+        <field name="name">account.aged.payable.pivot</field>
+        <field name="model">account.aged.payable</field>
+        <field name="arch" type="xml">
+            <pivot string="Cartera por Pagar" disable_linking="True">
+                <field name="partner_id" type="row"/>
+                <field name="aging_bucket" type="col"/>
+                <field name="amount_residual" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="account_aged_payable_view_search" model="ir.ui.view">
+        <field name="name">account.aged.payable.search</field>
+        <field name="model">account.aged.payable</field>
+        <field name="arch" type="xml">
+            <search string="Cartera por Pagar">
+                <field name="partner_id" string="Proveedor"/>
+                <field name="account_id" string="Cuenta"/>
+                <field name="move_name" string="Referencia"/>
+                <separator/>
+                <filter name="filter_overdue"
+                        string="Vencido"
+                        domain="[('days_overdue', '&gt;', 0)]"/>
+                <filter name="filter_current"
+                        string="Corriente"
+                        domain="[('aging_bucket', '=', 'current')]"/>
+                <filter name="filter_1_30"
+                        string="1-30 días"
+                        domain="[('aging_bucket', '=', '1_30')]"/>
+                <filter name="filter_31_60"
+                        string="31-60 días"
+                        domain="[('aging_bucket', '=', '31_60')]"/>
+                <filter name="filter_61_90"
+                        string="61-90 días"
+                        domain="[('aging_bucket', '=', '61_90')]"/>
+                <filter name="filter_91_120"
+                        string="91-120 días"
+                        domain="[('aging_bucket', '=', '91_120')]"/>
+                <filter name="filter_over_120"
+                        string="Más de 120 días"
+                        domain="[('aging_bucket', '=', 'over_120')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_by_partner" string="Proveedor"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_by_aging_bucket" string="Rango de Vencimiento"
+                            context="{'group_by': 'aging_bucket'}"/>
+                    <filter name="group_by_account" string="Cuenta"
+                            context="{'group_by': 'account_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_account_aged_payable" model="ir.actions.act_window">
+        <field name="name">Cartera por Pagar</field>
+        <field name="res_model">account.aged.payable</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="account_aged_payable_view_search"/>
+        <field name="context">{
+            'search_default_group_by_partner': 1,
+        }</field>
+    </record>
+
+    <!-- Menu: Accounting → Reporting → Cartera por Pagar -->
+    <menuitem id="menu_account_aged_payable"
+              name="Cartera por Pagar"
+              parent="account.menu_finance_reports"
+              action="action_account_aged_payable"
+              sequence="105"/>
+
+</odoo>

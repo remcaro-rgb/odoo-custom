@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="account_cash_flow_view_list" model="ir.ui.view">
+        <field name="name">account.cash.flow.list</field>
+        <field name="model">account.cash.flow</field>
+        <field name="arch" type="xml">
+            <list string="Flujo de Efectivo"
+                  create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="journal_id"/>
+                <field name="account_code" optional="show"/>
+                <field name="account_name" optional="show"/>
+                <field name="account_id" column_invisible="1"/>
+                <field name="move_name"/>
+                <field name="partner_id"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="cash_in" sum="Total Entradas"/>
+                <field name="cash_out" sum="Total Salidas"/>
+                <field name="net_flow" sum="Flujo Neto"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="account_cash_flow_view_pivot" model="ir.ui.view">
+        <field name="name">account.cash.flow.pivot</field>
+        <field name="model">account.cash.flow</field>
+        <field name="arch" type="xml">
+            <pivot string="Flujo de Efectivo" disable_linking="True">
+                <field name="journal_id" type="row"/>
+                <field name="date" type="col" interval="month"/>
+                <field name="cash_in" type="measure"/>
+                <field name="cash_out" type="measure"/>
+                <field name="net_flow" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="account_cash_flow_view_search" model="ir.ui.view">
+        <field name="name">account.cash.flow.search</field>
+        <field name="model">account.cash.flow</field>
+        <field name="arch" type="xml">
+            <search string="Flujo de Efectivo">
+                <field name="date" string="Desde"
+                       filter_domain="[('date', '&gt;=', self)]"/>
+                <field name="journal_id" string="Diario"/>
+                <field name="partner_id" string="Contacto"/>
+                <field name="account_id" string="Cuenta"/>
+                <field name="move_name" string="Referencia"/>
+                <separator/>
+                <filter name="date_from"
+                        string="Este Mes"
+                        domain="[
+                            ('date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                            ('date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))
+                        ]"/>
+                <filter name="date_this_year"
+                        string="Este Año"
+                        domain="[
+                            ('date', '&gt;=', context_today().strftime('%Y-01-01')),
+                            ('date', '&lt;=', context_today().strftime('%Y-12-31'))
+                        ]"/>
+                <separator/>
+                <filter name="journal_bank"
+                        string="Bancos"
+                        domain="[('journal_type', '=', 'bank')]"/>
+                <filter name="journal_cash"
+                        string="Caja"
+                        domain="[('journal_type', '=', 'cash')]"/>
+                <separator/>
+                <filter name="positive_flow"
+                        string="Entradas Netas"
+                        domain="[('net_flow', '&gt;', 0)]"/>
+                <filter name="negative_flow"
+                        string="Salidas Netas"
+                        domain="[('net_flow', '&lt;', 0)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_by_journal"
+                            string="Diario"
+                            context="{'group_by': 'journal_id'}"/>
+                    <filter name="group_by_partner"
+                            string="Contacto"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_by_account"
+                            string="Cuenta"
+                            context="{'group_by': 'account_id'}"/>
+                    <filter name="group_by_date_month"
+                            string="Mes"
+                            context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_account_cash_flow" model="ir.actions.act_window">
+        <field name="name">Flujo de Efectivo</field>
+        <field name="res_model">account.cash.flow</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="account_cash_flow_view_search"/>
+        <field name="context">{
+            'search_default_date_this_year': 1,
+            'search_default_group_by_journal': 1,
+        }</field>
+    </record>
+
+    <!-- Menu: Accounting → Reporting → Flujo de Efectivo -->
+    <menuitem id="menu_account_cash_flow"
+              name="Flujo de Efectivo"
+              parent="account.menu_finance_reports"
+              action="action_account_cash_flow"
+              sequence="106"/>
+
+</odoo>

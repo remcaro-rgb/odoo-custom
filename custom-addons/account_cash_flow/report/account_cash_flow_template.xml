@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="account_cash_flow_document">
+        <t t-call="web.html_container">
+
+            <!-- Custom repeating page header: logo + company name + page numbers -->
+            <div class="header">
+                <div class="row" style="align-items: center; padding: 4px 0;">
+                    <div class="col-2" style="text-align: left;">
+                        <img t-if="company.logo"
+                             t-attf-src="/web/image/res.company/{{ company.id }}/logo"
+                             style="max-height: 48px; max-width: 120px; object-fit: contain;"/>
+                    </div>
+                    <div class="col-7" style="padding-left: 8px;">
+                        <span style="font-size: 15px; font-weight: 700; color: #2c3e50;">
+                            <t t-out="company.name"/>
+                        </span>
+                    </div>
+                    <div class="col-3 text-end" style="font-size: 11px; color: #555;">
+                        Página <span class="page"/> de <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+            <div class="page">
+
+                <!-- Print metadata -->
+                <div class="text-end mb-2" style="font-size: 11px; color: #555; line-height: 1.6;">
+                    <div>Impreso por: <strong><t t-out="user.name"/></strong></div>
+                    <div>Fecha impresión: <t t-out="print_date" t-options='{"widget": "datetime"}'/></div>
+                </div>
+
+                <!-- Report title banner -->
+                <div style="background-color: #1a6b3a; color: #ffffff; padding: 8px 12px; margin-bottom: 4px;">
+                    <div style="font-size: 18px; font-weight: 700; letter-spacing: 1px; text-align: center;">
+                        ESTADO DE FLUJO DE EFECTIVO
+                    </div>
+                    <div style="font-size: 12px; text-align: center; opacity: 0.85;">
+                        Período: <t t-out="date_from" t-options='{"widget": "date"}'/> al <t t-out="date_to" t-options='{"widget": "date"}'/>
+                    </div>
+                </div>
+                <div style="height: 12px;"/>
+
+                <!-- Journal sections -->
+                <t t-foreach="journals" t-as="journal">
+
+                    <!-- Journal section header -->
+                    <div style="background-color: #2e7d52; color: #ffffff; padding: 5px 10px; margin-bottom: 0; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;">
+                        <t t-out="journal['journal_name']"/>
+                        <span style="font-size: 11px; font-weight: 400; opacity: 0.8; margin-left: 8px;">
+                            (<t t-out="journal['journal_type']"/>)
+                        </span>
+                    </div>
+
+                    <!-- Journal lines table -->
+                    <table class="table table-sm table-bordered mb-1" style="font-size: 11px;">
+                        <thead>
+                            <tr style="background-color: #d5eadd; color: #1a3d2b; text-align: center; font-weight: 600;">
+                                <th style="width: 10%; text-align: center;">Fecha</th>
+                                <th style="width: 18%; text-align: left;">Referencia</th>
+                                <th style="text-align: left;">Contacto</th>
+                                <th style="width: 16%; text-align: right;">Entradas</th>
+                                <th style="width: 16%; text-align: right;">Salidas</th>
+                                <th style="width: 16%; text-align: right;">Neto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="journal['lines']" t-as="line">
+                                <tr>
+                                    <td style="text-align: center; white-space: nowrap;">
+                                        <t t-out="line['date']" t-options='{"widget": "date"}'/>
+                                    </td>
+                                    <td style="font-family: monospace; font-size: 10px;"><t t-out="line['move_name']"/></td>
+                                    <td><t t-out="line['partner_name']"/></td>
+                                    <td style="text-align: right; font-family: monospace; white-space: nowrap;">
+                                        <t t-if="line['cash_in_raw']"><t t-out="line['cash_in_fmt']"/></t>
+                                        <t t-else=""><span style="color: #bbb;">—</span></t>
+                                    </td>
+                                    <td style="text-align: right; font-family: monospace; white-space: nowrap;">
+                                        <t t-if="line['cash_out_raw']"><t t-out="line['cash_out_fmt']"/></t>
+                                        <t t-else=""><span style="color: #bbb;">—</span></t>
+                                    </td>
+                                    <td style="text-align: right; font-family: monospace; white-space: nowrap;">
+                                        <t t-if="line['net_flow_raw'] >= 0">
+                                            <span style="color: #1a6b3a;"><t t-out="line['net_flow_fmt']"/></span>
+                                        </t>
+                                        <t t-else="">
+                                            <span style="color: #c0392b;">(<t t-out="line['net_flow_fmt']"/>)</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #eaf4ee; font-weight: 700;">
+                                <td colspan="3" style="text-align: right; font-size: 12px;">
+                                    Subtotal <t t-out="journal['journal_name']"/>
+                                </td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; border-top: 2px solid #1a6b3a;">
+                                    <t t-out="journal['total_cash_in_fmt']"/>
+                                </td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; border-top: 2px solid #1a6b3a;">
+                                    <t t-out="journal['total_cash_out_fmt']"/>
+                                </td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; border-top: 2px solid #1a6b3a;">
+                                    <t t-if="journal['total_net_flow_positive']">
+                                        <span style="color: #1a6b3a;"><t t-out="journal['total_net_flow_fmt']"/></span>
+                                    </t>
+                                    <t t-else="">
+                                        <span style="color: #c0392b;">(<t t-out="journal['total_net_flow_fmt']"/>)</span>
+                                    </t>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div style="height: 10px;"/>
+
+                </t>
+
+                <!-- Grand summary -->
+                <hr style="border-color: #1a6b3a; border-width: 2px; margin-top: 8px;"/>
+                <table class="table table-sm mb-2" style="font-size: 13px; width: 55%; margin-left: auto;">
+                    <tbody>
+                        <tr style="background-color: #d5eadd;">
+                            <td style="padding: 6px 10px; font-weight: 600;">Total Entradas</td>
+                            <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 6px 10px; color: #1a6b3a; font-weight: 700;">
+                                <t t-out="grand_total_in_fmt"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fde8e8;">
+                            <td style="padding: 6px 10px; font-weight: 600;">Total Salidas</td>
+                            <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 6px 10px; color: #c0392b; font-weight: 700;">
+                                <t t-out="grand_total_out_fmt"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #2c3e50; color: #ffffff;">
+                            <td style="padding: 8px 10px; font-weight: 700; font-size: 14px;">Flujo Neto</td>
+                            <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 8px 10px; font-size: 14px; font-weight: 700;">
+                                <t t-if="grand_net_flow_positive">
+                                    <span style="color: #2ecc71;"><t t-out="grand_net_flow_fmt"/></span>
+                                </t>
+                                <t t-else="">
+                                    <span style="color: #e74c3c;">(<t t-out="grand_net_flow_fmt"/>)</span>
+                                </t>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            </div>
+
+        </t>
+    </template>
+
+    <record id="action_report_account_cash_flow" model="ir.actions.report">
+        <field name="name">Flujo de Efectivo</field>
+        <field name="model">account.cash.flow</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">account_cash_flow.account_cash_flow_document</field>
+        <field name="report_file">account_cash_flow.account_cash_flow_document</field>
+        <field name="binding_model_id" ref="model_account_cash_flow"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

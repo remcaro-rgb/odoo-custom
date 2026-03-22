@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="account_profit_loss_document">
+        <t t-call="web.html_container">
+
+            <!-- Custom repeating page header: logo + company name + page numbers -->
+            <div class="header">
+                <div class="row" style="align-items: center; padding: 4px 0;">
+                    <div class="col-2" style="text-align: left;">
+                        <img t-if="company.logo"
+                             t-attf-src="/web/image/res.company/{{ company.id }}/logo"
+                             style="max-height: 48px; max-width: 120px; object-fit: contain;"/>
+                    </div>
+                    <div class="col-7" style="padding-left: 8px;">
+                        <span style="font-size: 15px; font-weight: 700; color: #2c3e50;">
+                            <t t-out="company.name"/>
+                        </span>
+                    </div>
+                    <div class="col-3 text-end" style="font-size: 11px; color: #555;">
+                        Página <span class="page"/> de <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+            <div class="page">
+
+                <!-- Print metadata -->
+                <div class="text-end mb-2" style="font-size: 11px; color: #555; line-height: 1.6;">
+                    <div>Impreso por: <strong><t t-out="user.name"/></strong></div>
+                    <div>Fecha impresión: <t t-out="print_date" t-options='{"widget": "datetime"}'/></div>
+                </div>
+
+                <!-- Report title banner -->
+                <div style="background-color: #2c3e50; color: #ffffff; padding: 8px 12px; margin-bottom: 4px;">
+                    <div style="font-size: 18px; font-weight: 700; letter-spacing: 1px; text-align: center;">
+                        ESTADO DE RESULTADOS
+                    </div>
+                    <div style="font-size: 12px; text-align: center; opacity: 0.85;">
+                        Período: <t t-out="date_from" t-options='{"widget": "date"}'/> al <t t-out="date_to" t-options='{"widget": "date"}'/>
+                    </div>
+                </div>
+                <div style="height: 12px;"/>
+
+                <!-- Sections: INGRESOS, COSTOS DE VENTAS, GASTOS -->
+                <t t-foreach="sections" t-as="section">
+                    <!-- Section header color by class -->
+                    <t t-if="section['class'] == '4'">
+                        <div style="background-color: #27ae60; color: #ffffff; padding: 5px 10px; margin-bottom: 0; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;">
+                            <t t-out="section['class']"/>. <t t-out="section['label']"/>
+                        </div>
+                    </t>
+                    <t t-elif="section['class'] == '6'">
+                        <div style="background-color: #e67e22; color: #ffffff; padding: 5px 10px; margin-bottom: 0; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;">
+                            <t t-out="section['class']"/>. <t t-out="section['label']"/>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div style="background-color: #c0392b; color: #ffffff; padding: 5px 10px; margin-bottom: 0; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;">
+                            <t t-out="section['class']"/>. <t t-out="section['label']"/>
+                        </div>
+                    </t>
+                    <table class="table table-sm table-bordered mb-4" style="font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #d6e4f0; color: #1a252f; text-align: center; font-weight: 600;">
+                                <th style="width: 12%; text-align: center;">Código</th>
+                                <th style="text-align: left;">Cuenta</th>
+                                <th style="width: 20%; text-align: center;">Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="section['accounts']" t-as="acct">
+                                <tr>
+                                    <td style="text-align: center; font-family: monospace;"><t t-out="acct['account_code']"/></td>
+                                    <td><t t-out="acct['account_name']"/></td>
+                                    <td style="text-align: right; font-family: monospace; white-space: nowrap;"><t t-out="acct['saldo_fmt']"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #eaf2fb; font-weight: 700;">
+                                <td colspan="2" style="text-align: right;">Total <t t-out="section['label'].title()"/></td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; border-top: 2px solid #2c3e50;"><t t-out="section['total_fmt']"/></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </t>
+
+                <!-- Summary table -->
+                <hr style="border-color: #2c3e50; border-width: 1px;"/>
+                <table class="table table-sm mb-2" style="font-size: 12px; width: 50%; margin-left: auto;">
+                    <tbody>
+                        <tr style="background-color: #d6e4f0; font-weight: 600;">
+                            <td style="padding: 6px 10px;">Total Ingresos</td>
+                            <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 6px 10px;"><t t-out="total_ingresos_fmt"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px 10px;">(-) Total Costos de Ventas</td>
+                            <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 6px 10px;"><t t-out="total_costos_fmt"/></td>
+                        </tr>
+                        <tr style="background-color: #eaf2fb; font-weight: 700;">
+                            <td style="padding: 6px 10px;">= Utilidad Bruta</td>
+                            <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 6px 10px; border-top: 2px solid #2c3e50;"><t t-out="utilidad_bruta_fmt"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px 10px;">(-) Total Gastos</td>
+                            <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 6px 10px;"><t t-out="total_gastos_fmt"/></td>
+                        </tr>
+                        <tr>
+                            <t t-if="utilidad_operacional_positive">
+                                <td style="padding: 6px 10px; font-weight: 700; color: #27ae60;">= Utilidad Operacional</td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 6px 10px; border-top: 2px solid #2c3e50; font-weight: 700; color: #27ae60;"><t t-out="utilidad_operacional_fmt"/></td>
+                            </t>
+                            <t t-else="">
+                                <td style="padding: 6px 10px; font-weight: 700; color: #c0392b;">= Utilidad Operacional</td>
+                                <td style="text-align: right; font-family: monospace; white-space: nowrap; padding: 6px 10px; border-top: 2px solid #2c3e50; font-weight: 700; color: #c0392b;"><t t-out="utilidad_operacional_fmt"/></td>
+                            </t>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            </div>
+
+        </t>
+    </template>
+
+    <record id="action_report_account_profit_loss" model="ir.actions.report">
+        <field name="name">Estado de Resultados</field>
+        <field name="model">account.profit.loss</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">account_profit_loss.account_profit_loss_document</field>
+        <field name="report_file">account_profit_loss.account_profit_loss_document</field>
+        <field name="binding_model_id" ref="model_account_profit_loss"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

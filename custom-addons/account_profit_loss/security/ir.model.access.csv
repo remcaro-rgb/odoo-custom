@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_profit_loss_readonly,account.profit.loss readonly,model_account_profit_loss,account.group_account_readonly,1,0,0,0
+access_account_profit_loss_user,account.profit.loss user,model_account_profit_loss,account.group_account_user,1,0,0,0
+access_account_profit_loss_manager,account.profit.loss manager,model_account_profit_loss,account.group_account_manager,1,0,0,0
+access_account_profit_loss_system,account.profit.loss system,model_account_profit_loss,base.group_system,1,0,0,0

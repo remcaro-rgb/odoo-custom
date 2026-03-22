@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="account_aged_receivable_view_list" model="ir.ui.view">
+        <field name="name">account.aged.receivable.list</field>
+        <field name="model">account.aged.receivable</field>
+        <field name="arch" type="xml">
+            <list string="Cartera por Cobrar"
+                  create="false" edit="false" delete="false">
+                <field name="partner_id" string="Contacto"/>
+                <field name="move_name" string="Factura"/>
+                <field name="date" string="Fecha"/>
+                <field name="date_maturity" string="Fecha Venc."/>
+                <field name="days_overdue" string="Días Vencido"/>
+                <field name="aging_bucket" string="Rango"/>
+                <field name="amount_total" string="Valor Factura"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="amount_residual" string="Saldo Pendiente" sum="Total Pendiente"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="account_aged_receivable_view_pivot" model="ir.ui.view">
+        <field name="name">account.aged.receivable.pivot</field>
+        <field name="model">account.aged.receivable</field>
+        <field name="arch" type="xml">
+            <pivot string="Cartera por Cobrar" disable_linking="True">
+                <field name="partner_id" type="row"/>
+                <field name="aging_bucket" type="col"/>
+                <field name="amount_residual" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="account_aged_receivable_view_search" model="ir.ui.view">
+        <field name="name">account.aged.receivable.search</field>
+        <field name="model">account.aged.receivable</field>
+        <field name="arch" type="xml">
+            <search string="Cartera por Cobrar">
+                <field name="partner_id" string="Contacto"/>
+                <field name="account_id" string="Cuenta"/>
+                <separator/>
+                <filter name="filter_current"
+                        string="No Vencido"
+                        domain="[('aging_bucket', '=', 'current')]"/>
+                <filter name="filter_overdue"
+                        string="Vencido"
+                        domain="[('days_overdue', '>', 0)]"/>
+                <filter name="filter_30"
+                        string="30+ días"
+                        domain="[('days_overdue', '>', 30)]"/>
+                <filter name="filter_60"
+                        string="60+ días"
+                        domain="[('days_overdue', '>', 60)]"/>
+                <filter name="filter_90"
+                        string="90+ días"
+                        domain="[('days_overdue', '>', 90)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_by_partner" string="Contacto"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_by_aging_bucket" string="Rango de Vencimiento"
+                            context="{'group_by': 'aging_bucket'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_account_aged_receivable" model="ir.actions.act_window">
+        <field name="name">Cartera por Cobrar</field>
+        <field name="res_model">account.aged.receivable</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="account_aged_receivable_view_search"/>
+        <field name="context">{
+            'search_default_group_by_partner': 1,
+            'search_default_group_by_aging_bucket': 1,
+        }</field>
+    </record>
+
+    <!-- Menu: Accounting → Reporting → Cartera por Cobrar -->
+    <menuitem id="menu_account_aged_receivable"
+              name="Cartera por Cobrar"
+              parent="account.menu_finance_reports"
+              action="action_account_aged_receivable"
+              sequence="104"/>
+
+</odoo>

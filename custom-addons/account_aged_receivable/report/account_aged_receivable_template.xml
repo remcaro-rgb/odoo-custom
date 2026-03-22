@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="account_aged_receivable_document">
+        <t t-call="web.html_container">
+
+            <!-- Custom repeating page header: logo + company name + page numbers -->
+            <div class="header">
+                <div class="row" style="align-items: center; padding: 4px 0;">
+                    <div class="col-2" style="text-align: left;">
+                        <img t-if="company.logo"
+                             t-attf-src="/web/image/res.company/{{ company.id }}/logo"
+                             style="max-height: 48px; max-width: 120px; object-fit: contain;"/>
+                    </div>
+                    <div class="col-7" style="padding-left: 8px;">
+                        <span style="font-size: 15px; font-weight: 700; color: #2c3e50;">
+                            <t t-out="company.name"/>
+                        </span>
+                    </div>
+                    <div class="col-3 text-end" style="font-size: 11px; color: #555;">
+                        Página <span class="page"/> de <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article">
+            <div class="page">
+
+                <!-- Print metadata -->
+                <div class="text-end mb-2" style="font-size: 11px; color: #555; line-height: 1.6;">
+                    <div>Impreso por: <strong><t t-out="user.name"/></strong></div>
+                    <div>Fecha impresión: <t t-out="print_date" t-options='{"widget": "datetime"}'/></div>
+                </div>
+
+                <!-- Report title banner -->
+                <div style="background-color: #1a5276; color: #ffffff; padding: 8px 12px; margin-bottom: 4px;">
+                    <div style="font-size: 18px; font-weight: 700; letter-spacing: 1px; text-align: center;">
+                        CARTERA POR EDADES - CUENTAS POR COBRAR
+                    </div>
+                    <div style="font-size: 12px; text-align: center; opacity: 0.85;">
+                        Al: <t t-out="report_date"/>
+                    </div>
+                </div>
+                <div style="height: 10px;"/>
+
+                <!-- Summary table -->
+                <table class="table table-sm table-bordered mb-2" style="font-size: 11px; width: 100%;">
+                    <thead>
+                        <tr style="background-color: #2980b9; color: #ffffff; font-weight: 600; text-align: center;">
+                            <th style="text-align: left; padding: 5px 8px; min-width: 160px;">Contacto</th>
+                            <t t-foreach="bucket_order" t-as="bkey">
+                                <th style="text-align: right; padding: 5px 8px; white-space: nowrap;">
+                                    <t t-out="bucket_labels[bkey]"/>
+                                </th>
+                            </t>
+                            <th style="text-align: right; padding: 5px 8px; white-space: nowrap; background-color: #1a5276;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="partner_rows" t-as="row">
+                            <tr t-attf-style="background-color: {{ 'white' if row_index % 2 == 0 else '#f4f6f7' }};">
+                                <td style="padding: 4px 8px; font-weight: 500;">
+                                    <t t-out="row['name']"/>
+                                </td>
+                                <t t-foreach="bucket_order" t-as="bkey">
+                                    <td style="text-align: right; padding: 4px 8px; font-family: monospace; white-space: nowrap;">
+                                        <t t-out="row['buckets_fmt'][bkey]"/>
+                                    </td>
+                                </t>
+                                <td style="text-align: right; padding: 4px 8px; font-family: monospace; white-space: nowrap; font-weight: 700; border-left: 2px solid #2980b9;">
+                                    <t t-out="row['total_fmt']"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #d6eaf8; font-weight: 700; border-top: 2px solid #1a5276;">
+                            <td style="padding: 5px 8px;">TOTAL</td>
+                            <t t-foreach="bucket_order" t-as="bkey">
+                                <td style="text-align: right; padding: 5px 8px; font-family: monospace; white-space: nowrap;">
+                                    <t t-out="bucket_totals_fmt[bkey]"/>
+                                </td>
+                            </t>
+                            <td style="text-align: right; padding: 5px 8px; font-family: monospace; white-space: nowrap; border-left: 2px solid #2980b9; font-size: 12px;">
+                                <t t-out="grand_total_fmt"/>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+            </div>
+
+        </t>
+    </template>
+
+    <record id="action_report_account_aged_receivable" model="ir.actions.report">
+        <field name="name">Cartera por Cobrar</field>
+        <field name="model">account.aged.receivable</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">account_aged_receivable.account_aged_receivable_document</field>
+        <field name="report_file">account_aged_receivable.account_aged_receivable_document</field>
+        <field name="binding_model_id" ref="model_account_aged_receivable"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

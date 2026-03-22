@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_aged_payable_readonly,account.aged.payable readonly,model_account_aged_payable,account.group_account_readonly,1,0,0,0
+access_account_aged_payable_user,account.aged.payable user,model_account_aged_payable,account.group_account_user,1,0,0,0
+access_account_aged_payable_manager,account.aged.payable manager,model_account_aged_payable,account.group_account_manager,1,0,0,0
+access_account_aged_payable_system,account.aged.payable system,model_account_aged_payable,base.group_system,1,0,0,0

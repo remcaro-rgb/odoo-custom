@@ -1,0 +1,53 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * account_aged_receivable
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-18 00:00+0000\n"
+"PO-Revision-Date: 2026-03-18 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es_419\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: account_aged_receivable
+#: model:ir.model,name:account_aged_receivable.model_account_aged_receivable
+msgid "Aged Receivable"
+msgstr "Cartera por Cobrar"
+
+#. module: account_aged_receivable
+#: model:ir.actions.act_window,name:account_aged_receivable.action_account_aged_receivable
+#: model:ir.ui.menu,name:account_aged_receivable.menu_account_aged_receivable
+msgid "Cartera por Cobrar"
+msgstr "Cartera por Cobrar"
+
+#. module: account_aged_receivable
+#: model:ir.model.fields,field_description:account_aged_receivable.field_account_aged_receivable__partner_id
+msgid "Partner"
+msgstr "Contacto"
+
+#. module: account_aged_receivable
+#: model:ir.model.fields,field_description:account_aged_receivable.field_account_aged_receivable__date_maturity
+msgid "Due Date"
+msgstr "Fecha Vencimiento"
+
+#. module: account_aged_receivable
+#: model:ir.model.fields,field_description:account_aged_receivable.field_account_aged_receivable__days_overdue
+msgid "Days Overdue"
+msgstr "Días Vencido"
+
+#. module: account_aged_receivable
+#: model:ir.model.fields,field_description:account_aged_receivable.field_account_aged_receivable__amount_residual
+msgid "Balance Due"
+msgstr "Saldo Pendiente"
+
+#. module: account_aged_receivable
+#: model:ir.model.fields,field_description:account_aged_receivable.field_account_aged_receivable__aging_bucket
+msgid "Aging Bucket"
+msgstr "Rango de Vencimiento"

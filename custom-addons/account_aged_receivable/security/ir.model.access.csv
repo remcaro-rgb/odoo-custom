@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_aged_receivable_readonly,account.aged.receivable readonly,model_account_aged_receivable,account.group_account_readonly,1,0,0,0
+access_account_aged_receivable_user,account.aged.receivable user,model_account_aged_receivable,account.group_account_user,1,0,0,0
+access_account_aged_receivable_manager,account.aged.receivable manager,model_account_aged_receivable,account.group_account_manager,1,0,0,0
+access_account_aged_receivable_system,account.aged.receivable system,model_account_aged_receivable,base.group_system,1,0,0,0

@@ -1,0 +1,112 @@
+# Spanish (Latin America) translation for account_profit_loss
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the account_profit_loss module.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Profit & Loss Report 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-18 00:00+0000\n"
+"PO-Revision-Date: 2026-03-18 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish (Latin America)\n"
+"Language: es_419\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: account_profit_loss
+#: model:ir.model,name:account_profit_loss.model_account_profit_loss
+msgid "Profit & Loss"
+msgstr "Estado de Resultados"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__name
+msgid "Profit & Loss Report"
+msgstr "Reporte de Estado de Resultados"
+
+#. module: account_profit_loss
+#: model:ir.actions.act_window,name:account_profit_loss.action_account_profit_loss
+#: model:ir.actions.report,name:account_profit_loss.action_report_account_profit_loss
+#: model:ir.ui.menu,name:account_profit_loss.menu_account_profit_loss
+#: model:ir.ui.view,arch_db:account_profit_loss.account_profit_loss_view_list
+#: model:ir.ui.view,arch_db:account_profit_loss.account_profit_loss_view_pivot
+msgid "Estado de Resultados"
+msgstr "Estado de Resultados"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__account_id
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__account_name
+msgid "Account"
+msgstr "Cuenta"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__account_code
+msgid "Code"
+msgstr "Código"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__account_class
+msgid "Class"
+msgstr "Clase"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__move_id
+msgid "Journal Entry"
+msgstr "Asiento Contable"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__move_name
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__partner_id
+msgid "Partner"
+msgstr "Contacto"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__debit
+msgid "Debit"
+msgstr "Debe"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__credit
+msgid "Credit"
+msgstr "Haber"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__balance
+msgid "Balance"
+msgstr "Saldo"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__company_id
+msgid "Company"
+msgstr "Compañía"
+
+#. module: account_profit_loss
+#: model:ir.model.fields,field_description:account_profit_loss.field_account_profit_loss__currency_id
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: account_profit_loss
+#: model:ir.ui.view,arch_db:account_profit_loss.account_profit_loss_view_list
+msgid "Total Debit"
+msgstr "Total Debe"
+
+#. module: account_profit_loss
+#: model:ir.ui.view,arch_db:account_profit_loss.account_profit_loss_view_list
+msgid "Total Credit"
+msgstr "Total Haber"
+
+#. module: account_profit_loss
+#: model:ir.ui.view,arch_db:account_profit_loss.account_profit_loss_view_list
+msgid "Total Balance"
+msgstr "Total Saldo"

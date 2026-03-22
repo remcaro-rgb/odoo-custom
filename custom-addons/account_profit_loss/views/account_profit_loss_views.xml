@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="account_profit_loss_view_list" model="ir.ui.view">
+        <field name="name">account.profit.loss.list</field>
+        <field name="model">account.profit.loss</field>
+        <field name="arch" type="xml">
+            <list string="Estado de Resultados"
+                  create="false" edit="false" delete="false">
+                <field name="account_class" optional="show"/>
+                <field name="account_code" optional="show"/>
+                <field name="account_name"/>
+                <field name="account_id" column_invisible="1"/>
+                <field name="move_name"/>
+                <field name="partner_id"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="debit" sum="Total Debit"/>
+                <field name="credit" sum="Total Credit"/>
+                <field name="balance" sum="Total Balance"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="account_profit_loss_view_pivot" model="ir.ui.view">
+        <field name="name">account.profit.loss.pivot</field>
+        <field name="model">account.profit.loss</field>
+        <field name="arch" type="xml">
+            <pivot string="Estado de Resultados" disable_linking="True">
+                <field name="account_class" type="row"/>
+                <field name="account_id" type="row"/>
+                <field name="debit" type="measure"/>
+                <field name="credit" type="measure"/>
+                <field name="balance" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="account_profit_loss_view_search" model="ir.ui.view">
+        <field name="name">account.profit.loss.search</field>
+        <field name="model">account.profit.loss</field>
+        <field name="arch" type="xml">
+            <search string="Estado de Resultados">
+                <field name="date" string="Desde"
+                       filter_domain="[('date', '&gt;=', self)]"/>
+                <field name="date" string="Hasta"
+                       filter_domain="[('date', '&lt;=', self)]"/>
+                <field name="account_id" string="Cuenta"/>
+                <field name="partner_id" string="Contacto"/>
+                <separator/>
+                <filter name="date_this_year"
+                        string="Año Actual"
+                        domain="[('date', '&gt;=', (context_today() + relativedelta(month=1, day=1)).strftime('%Y-%m-%d')), ('date', '&lt;=', (context_today() + relativedelta(month=12, day=31)).strftime('%Y-%m-%d'))]"/>
+                <filter name="date_this_month"
+                        string="Mes Actual"
+                        domain="[('date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')), ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="class_ingresos" string="Ingresos"
+                        domain="[('account_class', '=', '4')]"/>
+                <filter name="class_costos" string="Costos de Ventas"
+                        domain="[('account_class', '=', '6')]"/>
+                <filter name="class_gastos" string="Gastos"
+                        domain="[('account_class', '=', '5')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_by_account_class" string="Clase"
+                            context="{'group_by': 'account_class'}"/>
+                    <filter name="group_by_account" string="Cuenta"
+                            context="{'group_by': 'account_id'}"/>
+                    <filter name="group_by_partner" string="Contacto"
+                            context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_account_profit_loss" model="ir.actions.act_window">
+        <field name="name">Estado de Resultados</field>
+        <field name="res_model">account.profit.loss</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="account_profit_loss_view_search"/>
+        <field name="context">{
+            'search_default_group_by_account_class': 1,
+            'search_default_group_by_account': 1,
+        }</field>
+    </record>
+
+    <!-- Menu: Accounting → Reporting → Estado de Resultados -->
+    <menuitem id="menu_account_profit_loss"
+              name="Estado de Resultados"
+              parent="account.menu_finance_reports"
+              action="action_account_profit_loss"
+              sequence="102"/>
+
+</odoo>

@@ -1,0 +1,107 @@
+# Spanish translation for account_general_ledger
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the account_general_ledger module.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo General Ledger Report 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-18 00:00+0000\n"
+"PO-Revision-Date: 2026-03-18 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: account_general_ledger
+#: model:ir.model,name:account_general_ledger.model_account_general_ledger
+msgid "General Ledger"
+msgstr "Libro Mayor"
+
+#. module: account_general_ledger
+#: model:ir.actions.act_window,name:account_general_ledger.action_account_general_ledger
+#: model:ir.actions.report,name:account_general_ledger.action_report_account_general_ledger
+#: model:ir.ui.menu,name:account_general_ledger.menu_account_general_ledger
+#: model:ir.ui.view,arch_db:account_general_ledger.account_general_ledger_view_list
+#: model:ir.ui.view,arch_db:account_general_ledger.account_general_ledger_view_pivot
+msgid "Libro Mayor"
+msgstr "Libro Mayor"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__account_id
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__account_name
+msgid "Account"
+msgstr "Cuenta"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__account_code
+msgid "Code"
+msgstr "Código"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__move_id
+msgid "Journal Entry"
+msgstr "Asiento Contable"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__move_name
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__partner_id
+msgid "Partner"
+msgstr "Contacto"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__debit
+msgid "Debit"
+msgstr "Debe"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__credit
+msgid "Credit"
+msgstr "Haber"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__balance
+msgid "Balance"
+msgstr "Saldo"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__cumulative_balance
+msgid "Running Balance"
+msgstr "Saldo Acumulado"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__company_id
+msgid "Company"
+msgstr "Compañía"
+
+#. module: account_general_ledger
+#: model:ir.model.fields,field_description:account_general_ledger.field_account_general_ledger__currency_id
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: account_general_ledger
+#: model:ir.ui.view,arch_db:account_general_ledger.account_general_ledger_view_list
+msgid "Total Debe"
+msgstr "Total Debe"
+
+#. module: account_general_ledger
+#: model:ir.ui.view,arch_db:account_general_ledger.account_general_ledger_view_list
+msgid "Total Haber"
+msgstr "Total Haber"
+
+#. module: account_general_ledger
+#: model:ir.ui.view,arch_db:account_general_ledger.account_general_ledger_view_list
+msgid "Total Saldo"
+msgstr "Total Saldo"
