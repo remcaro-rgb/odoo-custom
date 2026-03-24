@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_horse_admin,club.horse admin,model_club_horse,club_core.group_club_admin,1,1,1,1
+access_club_horse_staff,club.horse staff,model_club_horse,club_equestrian.group_equestrian_staff,1,1,1,1
+access_club_horse_member,club.horse member,model_club_horse,club_core.group_club_member,1,0,0,0
+access_club_stall_admin,club.stall admin,model_club_stall,club_core.group_club_admin,1,1,1,1
+access_club_stall_staff,club.stall staff,model_club_stall,club_equestrian.group_equestrian_staff,1,1,1,1
+access_club_horse_feeding_admin,club.horse.feeding admin,model_club_horse_feeding,club_core.group_club_admin,1,1,1,1
+access_club_horse_feeding_staff,club.horse.feeding staff,model_club_horse_feeding,club_equestrian.group_equestrian_staff,1,1,1,1
+access_club_vet_record_admin,club.vet.record admin,model_club_vet_record,club_core.group_club_admin,1,1,1,1
+access_club_vet_record_staff,club.vet.record staff,model_club_vet_record,club_equestrian.group_equestrian_staff,1,1,1,1
+access_club_arena_admin,club.arena admin,model_club_arena,club_core.group_club_admin,1,1,1,1
+access_club_arena_staff,club.arena staff,model_club_arena,club_equestrian.group_equestrian_staff,1,1,1,1
+access_club_equestrian_booking_admin,club.equestrian.booking admin,model_club_equestrian_booking,club_core.group_club_admin,1,1,1,1
+access_club_equestrian_booking_staff,club.equestrian.booking staff,model_club_equestrian_booking,club_equestrian.group_equestrian_staff,1,1,1,1
+access_club_equestrian_booking_member,club.equestrian.booking member,model_club_equestrian_booking,club_core.group_club_member,1,0,0,0

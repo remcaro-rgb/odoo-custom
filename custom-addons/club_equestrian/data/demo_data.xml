@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Arenas ────────────────────────────────────────────────── -->
+
+        <record id="arena_main" model="club.arena">
+            <field name="name">Main Arena</field>
+            <field name="arena_type">multipurpose</field>
+            <field name="capacity">6</field>
+        </record>
+
+        <!-- ── Stalls ────────────────────────────────────────────────── -->
+
+        <record id="stall_a1" model="club.stall">
+            <field name="name">A-1</field>
+            <field name="barn_section">Barn A</field>
+        </record>
+
+        <record id="stall_a2" model="club.stall">
+            <field name="name">A-2</field>
+            <field name="barn_section">Barn A</field>
+        </record>
+
+        <record id="stall_a3" model="club.stall">
+            <field name="name">A-3</field>
+            <field name="barn_section">Barn A</field>
+        </record>
+
+        <record id="stall_b1" model="club.stall">
+            <field name="name">B-1</field>
+            <field name="barn_section">Barn B</field>
+        </record>
+
+        <record id="stall_b2" model="club.stall">
+            <field name="name">B-2</field>
+            <field name="barn_section">Barn B</field>
+        </record>
+
+        <!-- Stall under maintenance -->
+        <record id="stall_b3" model="club.stall">
+            <field name="name">B-3</field>
+            <field name="barn_section">Barn B</field>
+            <field name="under_maintenance" eval="True"/>
+            <field name="notes">Floor repair scheduled.</field>
+        </record>
+
+        <!-- ── Horses (owners reference existing club_core demo affiliates) ── -->
+
+        <record id="horse_eclipse" model="club.horse">
+            <field name="name">Eclipse</field>
+            <field name="breed">Thoroughbred</field>
+            <field name="color">Bay</field>
+            <field name="birth_date">2019-04-12</field>
+            <field name="owner_id" ref="club_core.affiliate_001"/>
+            <field name="stall_id" ref="stall_a1"/>
+        </record>
+
+        <record id="horse_luna" model="club.horse">
+            <field name="name">Luna</field>
+            <field name="breed">Andalusian</field>
+            <field name="color">Grey</field>
+            <field name="birth_date">2020-08-05</field>
+            <field name="owner_id" ref="club_core.affiliate_002"/>
+            <field name="stall_id" ref="stall_a2"/>
+        </record>
+
+        <record id="horse_tornado" model="club.horse">
+            <field name="name">Tornado</field>
+            <field name="breed">Quarter Horse</field>
+            <field name="color">Black</field>
+            <field name="birth_date">2018-01-20</field>
+            <field name="owner_id" ref="club_core.affiliate_003"/>
+            <field name="stall_id" ref="stall_b1"/>
+        </record>
+
+        <!-- ── Feeding schedules ─────────────────────────────────────── -->
+
+        <!-- Eclipse morning -->
+        <record id="feeding_eclipse_morning" model="club.horse.feeding">
+            <field name="horse_id" ref="horse_eclipse"/>
+            <field name="feed_type">Oats Mix</field>
+            <field name="quantity">3.0</field>
+            <field name="unit">kg</field>
+            <field name="schedule">morning</field>
+        </record>
+
+        <!-- Eclipse evening -->
+        <record id="feeding_eclipse_evening" model="club.horse.feeding">
+            <field name="horse_id" ref="horse_eclipse"/>
+            <field name="feed_type">Hay</field>
+            <field name="quantity">5.0</field>
+            <field name="unit">kg</field>
+            <field name="schedule">evening</field>
+        </record>
+
+        <!-- Luna morning -->
+        <record id="feeding_luna_morning" model="club.horse.feeding">
+            <field name="horse_id" ref="horse_luna"/>
+            <field name="feed_type">Grain Pellets</field>
+            <field name="quantity">2.5</field>
+            <field name="unit">kg</field>
+            <field name="schedule">morning</field>
+        </record>
+
+        <!-- Luna evening -->
+        <record id="feeding_luna_evening" model="club.horse.feeding">
+            <field name="horse_id" ref="horse_luna"/>
+            <field name="feed_type">Timothy Hay</field>
+            <field name="quantity">4.0</field>
+            <field name="unit">flakes</field>
+            <field name="schedule">evening</field>
+        </record>
+
+        <!-- Tornado morning -->
+        <record id="feeding_tornado_morning" model="club.horse.feeding">
+            <field name="horse_id" ref="horse_tornado"/>
+            <field name="feed_type">Sweet Feed</field>
+            <field name="quantity">3.5</field>
+            <field name="unit">kg</field>
+            <field name="schedule">morning</field>
+        </record>
+
+        <!-- Tornado evening -->
+        <record id="feeding_tornado_evening" model="club.horse.feeding">
+            <field name="horse_id" ref="horse_tornado"/>
+            <field name="feed_type">Alfalfa Hay</field>
+            <field name="quantity">6.0</field>
+            <field name="unit">flakes</field>
+            <field name="schedule">evening</field>
+        </record>
+
+        <!-- ── Vet records ───────────────────────────────────────────── -->
+
+        <record id="vet_record_eclipse" model="club.vet.record">
+            <field name="horse_id" ref="horse_eclipse"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="vet_name">Dr. Fernando Ruiz</field>
+            <field name="procedure">Annual vaccination and dental check.</field>
+            <field name="next_visit_date" eval="(DateTime.now() + timedelta(days=5)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <record id="vet_record_luna" model="club.vet.record">
+            <field name="horse_id" ref="horse_luna"/>
+            <field name="date" eval="(DateTime.now() - timedelta(days=30)).strftime('%Y-%m-%d')"/>
+            <field name="vet_name">Dr. Patricia Gómez</field>
+            <field name="procedure">Hoof trimming and shoeing.</field>
+            <field name="next_visit_date" eval="(DateTime.now() + timedelta(days=60)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <!-- ── Bookings ──────────────────────────────────────────────── -->
+
+        <record id="booking_eclipse_1" model="club.equestrian.booking">
+            <field name="arena_id" ref="arena_main"/>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="horse_id" ref="horse_eclipse"/>
+            <field name="date" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="time_slot">8.0</field>
+            <field name="duration">1.0</field>
+            <field name="status">booked</field>
+        </record>
+
+        <record id="booking_luna_1" model="club.equestrian.booking">
+            <field name="arena_id" ref="arena_main"/>
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="horse_id" ref="horse_luna"/>
+            <field name="date" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d')"/>
+            <field name="time_slot">10.0</field>
+            <field name="duration">1.5</field>
+            <field name="status">booked</field>
+        </record>
+
+        <record id="booking_tornado_1" model="club.equestrian.booking">
+            <field name="arena_id" ref="arena_main"/>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="horse_id" ref="horse_tornado"/>
+            <field name="date" eval="(DateTime.now() + timedelta(days=2)).strftime('%Y-%m-%d')"/>
+            <field name="time_slot">14.0</field>
+            <field name="duration">2.0</field>
+            <field name="status">booked</field>
+        </record>
+
+    </data>
+</odoo>

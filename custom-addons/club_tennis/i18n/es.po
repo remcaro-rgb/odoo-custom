@@ -1,0 +1,419 @@
+# Spanish translation for club_tennis
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the club_tennis module.
+#
+# Translators:
+# Manuel Caro, 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Club Tennis 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-24 00:00+0000\n"
+"PO-Revision-Date: 2026-03-24 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_tennis
+#: model:res.groups,name:club_tennis.group_tennis_staff
+msgid "Tennis Staff"
+msgstr "Personal de Tenis"
+
+#. module: club_tennis
+#: model:ir.model,name:club_tennis.model_club_tennis_court
+msgid "Tennis Court"
+msgstr "Cancha de Tenis"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_court__name
+msgid "Court Name"
+msgstr "Nombre de la Cancha"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_court__surface
+msgid "Surface"
+msgstr "Superficie"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_court__surface__clay
+msgid "Clay"
+msgstr "Arcilla"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_court__surface__hard
+msgid "Hard"
+msgstr "Dura"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_court__surface__grass
+msgid "Grass"
+msgstr "Cesped"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_court__surface__artificial
+msgid "Artificial"
+msgstr "Artificial"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_court__indoor
+msgid "Indoor"
+msgstr "Cubierta"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_court__under_maintenance
+msgid "Under Maintenance"
+msgstr "En Mantenimiento"
+
+#. module: club_tennis
+#: model:ir.model,name:club_tennis.model_club_tennis_booking
+msgid "Tennis Court Booking"
+msgstr "Reserva de Cancha de Tenis"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_booking__court_id
+msgid "Court"
+msgstr "Cancha"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_booking__affiliate_ids
+msgid "Players"
+msgstr "Jugadores"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_booking__date
+msgid "Booking Date"
+msgstr "Fecha de Reserva"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_booking__time_slot
+msgid "Start Time"
+msgstr "Hora de Inicio"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_booking__duration
+msgid "Duration (hours)"
+msgstr "Duracion (horas)"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_booking__caddie_id
+msgid "Caddie"
+msgstr "Caddie"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_booking__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_booking__status__booked
+msgid "Booked"
+msgstr "Reservado"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_booking__status__completed
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_booking__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_tennis
+#: model:ir.model,name:club_tennis.model_club_tennis_caddie
+msgid "Tennis Caddie"
+msgstr "Caddie de Tenis"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_caddie__partner_id
+msgid "Person"
+msgstr "Persona"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_caddie__employee_number
+msgid "Employee Number"
+msgstr "Numero de Empleado"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_caddie__availability_ids
+msgid "Availability"
+msgstr "Disponibilidad"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_caddie__booking_ids
+msgid "Bookings"
+msgstr "Reservas"
+
+#. module: club_tennis
+#: model:ir.model,name:club_tennis.model_club_tennis_caddie_availability
+msgid "Tennis Caddie Availability"
+msgstr "Disponibilidad de Caddie de Tenis"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_caddie_availability__caddie_id
+msgid "Caddie"
+msgstr "Caddie"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_caddie_availability__day_of_week
+msgid "Day of Week"
+msgstr "Dia de la Semana"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_caddie_availability__day_of_week__0
+msgid "Monday"
+msgstr "Lunes"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_caddie_availability__day_of_week__1
+msgid "Tuesday"
+msgstr "Martes"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_caddie_availability__day_of_week__2
+msgid "Wednesday"
+msgstr "Miercoles"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_caddie_availability__day_of_week__3
+msgid "Thursday"
+msgstr "Jueves"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_caddie_availability__day_of_week__4
+msgid "Friday"
+msgstr "Viernes"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_caddie_availability__day_of_week__5
+msgid "Saturday"
+msgstr "Sabado"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_caddie_availability__day_of_week__6
+msgid "Sunday"
+msgstr "Domingo"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_caddie_availability__time_from
+msgid "Available From"
+msgstr "Disponible Desde"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_caddie_availability__time_to
+msgid "Available Until"
+msgstr "Disponible Hasta"
+
+#. module: club_tennis
+#: model:ir.model,name:club_tennis.model_club_tennis_match
+msgid "Tennis Match"
+msgstr "Partido de Tenis"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_match__booking_id
+msgid "Booking"
+msgstr "Reserva"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_match__player_ids
+msgid "Players"
+msgstr "Jugadores"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_match__set_1_score
+msgid "Set 1 Score"
+msgstr "Marcador Set 1"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_match__set_2_score
+msgid "Set 2 Score"
+msgstr "Marcador Set 2"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_match__set_3_score
+msgid "Set 3 Score"
+msgstr "Marcador Set 3"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_match__winner_id
+msgid "Winner"
+msgstr "Ganador"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_match__ranking_points_awarded
+msgid "Ranking Points Awarded"
+msgstr "Puntos de Ranking Otorgados"
+
+#. module: club_tennis
+#: model:ir.model,name:club_tennis.model_club_tennis_ranking
+msgid "Tennis Ranking"
+msgstr "Ranking de Tenis"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_ranking__affiliate_id
+msgid "Affiliate"
+msgstr "Socio"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_ranking__category
+msgid "Category"
+msgstr "Categoria"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_ranking__category__men
+msgid "Men"
+msgstr "Hombres"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_ranking__category__women
+msgid "Women"
+msgstr "Mujeres"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_ranking__category__junior
+msgid "Junior"
+msgstr "Junior"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_ranking__category__senior
+msgid "Senior"
+msgstr "Senior"
+
+#. module: club_tennis
+#: model:ir.model.fields.selection,name:club_tennis.selection__club_tennis_ranking__category__mixed
+msgid "Mixed"
+msgstr "Mixto"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_ranking__points
+msgid "Points"
+msgstr "Puntos"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_ranking__rank
+msgid "Rank"
+msgstr "Posicion"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_ranking__matches_played
+msgid "Matches Played"
+msgstr "Partidos Jugados"
+
+#. module: club_tennis
+#: model:ir.model.fields,field_description:club_tennis.field_club_tennis_ranking__matches_won
+msgid "Matches Won"
+msgstr "Partidos Ganados"
+
+#. module: club_tennis
+#: code:addons/club_tennis/models/club_tennis_booking.py:0
+#, python-format
+msgid "Booking duration must be 1 or 2 hours."
+msgstr "La duracion de la reserva debe ser de 1 o 2 horas."
+
+#. module: club_tennis
+#: code:addons/club_tennis/models/club_tennis_booking.py:0
+#, python-format
+msgid "A tennis booking allows a maximum of 4 players."
+msgstr "Una reserva de tenis permite un maximo de 4 jugadores."
+
+#. module: club_tennis
+#: code:addons/club_tennis/models/club_tennis_booking.py:0
+#, python-format
+msgid "Court \"%s\" already has a booking that overlaps with the selected time on %s."
+msgstr "La cancha \"%s\" ya tiene una reserva que se superpone con el horario seleccionado el %s."
+
+#. module: club_tennis
+#: code:addons/club_tennis/models/club_tennis_booking.py:0
+#, python-format
+msgid "Caddie \"%s\" is already assigned to another booking at that time on %s."
+msgstr "El caddie \"%s\" ya esta asignado a otra reserva en ese horario el %s."
+
+#. module: club_tennis
+#: sql_constraint:club.tennis.ranking:0
+msgid "An affiliate can only have one ranking per category."
+msgstr "Un socio solo puede tener un ranking por categoria."
+
+#. module: club_tennis
+#: model:ir.ui.menu,name:club_tennis.menu_club_tennis
+msgid "Tennis"
+msgstr "Tenis"
+
+#. module: club_tennis
+#: model:ir.ui.menu,name:club_tennis.menu_club_tennis_courts
+msgid "Courts"
+msgstr "Canchas"
+
+#. module: club_tennis
+#: model:ir.ui.menu,name:club_tennis.menu_club_tennis_bookings
+msgid "Bookings"
+msgstr "Reservas"
+
+#. module: club_tennis
+#: model:ir.ui.menu,name:club_tennis.menu_club_tennis_caddies
+msgid "Caddies"
+msgstr "Caddies"
+
+#. module: club_tennis
+#: model:ir.ui.menu,name:club_tennis.menu_club_tennis_matches
+msgid "Matches"
+msgstr "Partidos"
+
+#. module: club_tennis
+#: model:ir.ui.menu,name:club_tennis.menu_club_tennis_rankings
+msgid "Rankings"
+msgstr "Rankings"
+
+#. module: club_tennis
+#: model:ir.actions.act_window,name:club_tennis.action_club_tennis_court
+msgid "Tennis Courts"
+msgstr "Canchas de Tenis"
+
+#. module: club_tennis
+#: model:ir.actions.act_window,name:club_tennis.action_club_tennis_booking
+msgid "Tennis Bookings"
+msgstr "Reservas de Tenis"
+
+#. module: club_tennis
+#: model:ir.actions.act_window,name:club_tennis.action_club_tennis_caddie
+msgid "Tennis Caddies"
+msgstr "Caddies de Tenis"
+
+#. module: club_tennis
+#: model:ir.actions.act_window,name:club_tennis.action_club_tennis_match
+msgid "Tennis Matches"
+msgstr "Partidos de Tenis"
+
+#. module: club_tennis
+#: model:ir.actions.act_window,name:club_tennis.action_club_tennis_ranking
+msgid "Tennis Rankings"
+msgstr "Rankings de Tenis"
+
+#. module: club_tennis
+#: view:club.tennis.court:0
+msgid "Available"
+msgstr "Disponible"
+
+#. module: club_tennis
+#: view:club.tennis.booking:0
+msgid "Group By"
+msgstr "Agrupar Por"
+
+#. module: club_tennis
+#: view:club.tennis.booking:0
+msgid "Date"
+msgstr "Fecha"
+
+#. module: club_tennis
+#: view:club.tennis.match:0
+msgid "Scores"
+msgstr "Marcadores"
+
+#. module: club_tennis
+#: view:club.tennis.court:0
+msgid "Under Maintenance"
+msgstr "En Mantenimiento"

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Tennis submenu under Club root -->
+    <menuitem id="menu_club_tennis"
+        name="Tennis"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <!-- Courts -->
+    <menuitem id="menu_club_tennis_courts"
+        name="Courts"
+        parent="menu_club_tennis"
+        action="action_club_tennis_court"
+        sequence="10"/>
+
+    <!-- Bookings -->
+    <menuitem id="menu_club_tennis_bookings"
+        name="Bookings"
+        parent="menu_club_tennis"
+        action="action_club_tennis_booking"
+        sequence="20"/>
+
+    <!-- Caddies -->
+    <menuitem id="menu_club_tennis_caddies"
+        name="Caddies"
+        parent="menu_club_tennis"
+        action="action_club_tennis_caddie"
+        sequence="30"/>
+
+    <!-- Matches -->
+    <menuitem id="menu_club_tennis_matches"
+        name="Matches"
+        parent="menu_club_tennis"
+        action="action_club_tennis_match"
+        sequence="40"/>
+
+    <!-- Rankings -->
+    <menuitem id="menu_club_tennis_rankings"
+        name="Rankings"
+        parent="menu_club_tennis"
+        action="action_club_tennis_ranking"
+        sequence="50"/>
+
+</odoo>

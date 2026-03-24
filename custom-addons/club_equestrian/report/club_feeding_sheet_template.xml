@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report action -->
+    <record id="action_report_feeding_sheet" model="ir.actions.report">
+        <field name="name">Daily Feeding Sheet</field>
+        <field name="model">club.horse.feeding</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">club_equestrian.report_feeding_sheet</field>
+        <field name="report_file">club_equestrian.report_feeding_sheet</field>
+        <field name="binding_model_id" ref="model_club_horse_feeding"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWeb template -->
+    <template id="report_feeding_sheet">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Daily Feeding Sheet</h2>
+
+                    <!-- Morning -->
+                    <t t-set="morning_records" t-value="docs.filtered(lambda r: r.schedule == 'morning')"/>
+                    <t t-if="morning_records">
+                        <h3>Morning</h3>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Horse</th>
+                                    <th>Feed Type</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Responsible</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="morning_records" t-as="rec">
+                                    <tr>
+                                        <td><t t-out="rec.horse_id.name"/></td>
+                                        <td><t t-out="rec.feed_type"/></td>
+                                        <td><t t-out="rec.quantity"/></td>
+                                        <td><t t-out="rec.unit"/></td>
+                                        <td><t t-out="rec.responsible_id.name or ''"/></td>
+                                        <td><t t-out="rec.notes or ''"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <!-- Afternoon -->
+                    <t t-set="afternoon_records" t-value="docs.filtered(lambda r: r.schedule == 'afternoon')"/>
+                    <t t-if="afternoon_records">
+                        <h3>Afternoon</h3>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Horse</th>
+                                    <th>Feed Type</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Responsible</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="afternoon_records" t-as="rec">
+                                    <tr>
+                                        <td><t t-out="rec.horse_id.name"/></td>
+                                        <td><t t-out="rec.feed_type"/></td>
+                                        <td><t t-out="rec.quantity"/></td>
+                                        <td><t t-out="rec.unit"/></td>
+                                        <td><t t-out="rec.responsible_id.name or ''"/></td>
+                                        <td><t t-out="rec.notes or ''"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <!-- Evening -->
+                    <t t-set="evening_records" t-value="docs.filtered(lambda r: r.schedule == 'evening')"/>
+                    <t t-if="evening_records">
+                        <h3>Evening</h3>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Horse</th>
+                                    <th>Feed Type</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Responsible</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="evening_records" t-as="rec">
+                                    <tr>
+                                        <td><t t-out="rec.horse_id.name"/></td>
+                                        <td><t t-out="rec.feed_type"/></td>
+                                        <td><t t-out="rec.quantity"/></td>
+                                        <td><t t-out="rec.unit"/></td>
+                                        <td><t t-out="rec.responsible_id.name or ''"/></td>
+                                        <td><t t-out="rec.notes or ''"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

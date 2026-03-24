@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_stall_list" model="ir.ui.view">
+        <field name="name">club.stall.list</field>
+        <field name="model">club.stall</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="barn_section"/>
+                <field name="horse_id"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'vacant'"
+                    decoration-info="status == 'occupied'"
+                    decoration-warning="status == 'maintenance'"/>
+                <field name="under_maintenance"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_stall_form" model="ir.ui.view">
+        <field name="name">club.stall.form</field>
+        <field name="model">club.stall</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Stall Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="barn_section"/>
+                            <field name="horse_id"/>
+                        </group>
+                        <group>
+                            <field name="status" widget="badge"
+                                decoration-success="status == 'vacant'"
+                                decoration-info="status == 'occupied'"
+                                decoration-warning="status == 'maintenance'"/>
+                            <field name="under_maintenance"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_stall_search" model="ir.ui.view">
+        <field name="name">club.stall.search</field>
+        <field name="model">club.stall</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="barn_section"/>
+                <field name="horse_id"/>
+                <filter name="vacant" string="Vacant"
+                    domain="[('status', '=', 'vacant')]"/>
+                <filter name="occupied" string="Occupied"
+                    domain="[('status', '=', 'occupied')]"/>
+                <filter name="maintenance" string="Maintenance"
+                    domain="[('status', '=', 'maintenance')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_section" string="Barn Section"
+                        context="{'group_by': 'barn_section'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_stall" model="ir.actions.act_window">
+        <field name="name">Stalls</field>
+        <field name="res_model">club.stall</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_stall_search"/>
+        <field name="path">club-stalls</field>
+    </record>
+
+</odoo>

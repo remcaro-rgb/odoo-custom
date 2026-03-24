@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_golf_cart_kanban" model="ir.ui.view">
+        <field name="name">club.golf.cart.kanban</field>
+        <field name="model">club.golf.cart</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="cart_type"/>
+                <field name="status"/>
+                <field name="battery_level"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong><br/>
+                            <span class="text-muted"><field name="cart_type"/></span><br/>
+                            <span>Battery: <field name="battery_level"/>%</span><br/>
+                            <field name="status" widget="badge"
+                                decoration-success="status == 'available'"
+                                decoration-info="status == 'in_use'"
+                                decoration-warning="status == 'maintenance'"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_golf_cart_list" model="ir.ui.view">
+        <field name="name">club.golf.cart.list</field>
+        <field name="model">club.golf.cart</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="cart_type"/>
+                <field name="owner_id"/>
+                <field name="battery_level"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'available'"
+                    decoration-info="status == 'in_use'"
+                    decoration-warning="status == 'maintenance'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_golf_cart_form" model="ir.ui.view">
+        <field name="name">club.golf.cart.form</field>
+        <field name="model">club.golf.cart</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Cart Number"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="cart_type"/>
+                            <field name="owner_id"
+                                invisible="cart_type != 'owned'"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="battery_level"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Maintenance" name="maintenance">
+                            <field name="maintenance_log" placeholder="Maintenance notes..."/>
+                        </page>
+                        <page string="Tee Times" name="tee_times">
+                            <field name="tee_time_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="time_slot" widget="float_time"/>
+                                    <field name="course_id"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status == 'available'"
+                                        decoration-info="status == 'booked'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_golf_cart_search" model="ir.ui.view">
+        <field name="name">club.golf.cart.search</field>
+        <field name="model">club.golf.cart</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="owner_id"/>
+                <filter name="available" string="Available"
+                    domain="[('status','=','available')]"/>
+                <filter name="maintenance" string="In Maintenance"
+                    domain="[('status','=','maintenance')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Cart Type"
+                        context="{'group_by': 'cart_type'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_golf_cart" model="ir.actions.act_window">
+        <field name="name">Golf Carts</field>
+        <field name="res_model">club.golf.cart</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_golf_cart_search"/>
+        <field name="path">golf-carts</field>
+    </record>
+
+</odoo>

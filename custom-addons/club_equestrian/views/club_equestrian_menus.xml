@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Equestrian top-level submenu under Club -->
+    <menuitem id="menu_equestrian_root"
+        name="Equestrian"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <!-- Horses -->
+    <menuitem id="menu_equestrian_horses"
+        name="Horses"
+        parent="menu_equestrian_root"
+        action="action_club_horse"
+        sequence="10"/>
+
+    <!-- Stalls -->
+    <menuitem id="menu_equestrian_stalls"
+        name="Stalls"
+        parent="menu_equestrian_root"
+        action="action_club_stall"
+        sequence="20"/>
+
+    <!-- Feeding Schedules -->
+    <menuitem id="menu_equestrian_feeding"
+        name="Feeding Schedules"
+        parent="menu_equestrian_root"
+        action="action_club_horse_feeding"
+        sequence="30"/>
+
+    <!-- Vet Records -->
+    <menuitem id="menu_equestrian_vet_records"
+        name="Vet Records"
+        parent="menu_equestrian_root"
+        action="action_club_vet_record"
+        sequence="40"/>
+
+    <!-- Arenas -->
+    <menuitem id="menu_equestrian_arenas"
+        name="Arenas"
+        parent="menu_equestrian_root"
+        action="action_club_arena"
+        sequence="50"/>
+
+    <!-- Bookings -->
+    <menuitem id="menu_equestrian_bookings"
+        name="Arena Bookings"
+        parent="menu_equestrian_root"
+        action="action_club_equestrian_booking"
+        sequence="60"/>
+
+</odoo>

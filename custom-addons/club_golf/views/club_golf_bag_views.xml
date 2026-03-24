@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_golf_bag_list" model="ir.ui.view">
+        <field name="name">club.golf.bag.list</field>
+        <field name="model">club.golf.bag</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="tag_number"/>
+                <field name="owner_id"/>
+                <field name="locker_number"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'stored'"
+                    decoration-info="status == 'with_member'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_golf_bag_form" model="ir.ui.view">
+        <field name="name">club.golf.bag.form</field>
+        <field name="model">club.golf.bag</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="tag_number"/>
+                        <h1><field name="tag_number" placeholder="Tag Number"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="owner_id"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="locker_number"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Description or special instructions..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_golf_bag_search" model="ir.ui.view">
+        <field name="name">club.golf.bag.search</field>
+        <field name="model">club.golf.bag</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="tag_number"/>
+                <field name="owner_id"/>
+                <filter name="stored" string="Stored"
+                    domain="[('status','=','stored')]"/>
+                <filter name="with_member" string="With Member"
+                    domain="[('status','=','with_member')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_owner" string="Owner"
+                        context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_golf_bag" model="ir.actions.act_window">
+        <field name="name">Golf Bags</field>
+        <field name="res_model">club.golf.bag</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_golf_bag_search"/>
+        <field name="path">golf-bags</field>
+    </record>
+
+</odoo>

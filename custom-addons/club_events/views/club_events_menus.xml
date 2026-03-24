@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Events parent menu under Club root -->
+    <menuitem id="menu_club_events"
+        name="Events"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <menuitem id="menu_club_events_list"
+        name="All Events"
+        parent="menu_club_events"
+        action="action_club_event"
+        sequence="10"/>
+
+    <menuitem id="menu_club_events_registrations"
+        name="Registrations"
+        parent="menu_club_events"
+        action="action_club_event_registration"
+        sequence="20"/>
+
+</odoo>

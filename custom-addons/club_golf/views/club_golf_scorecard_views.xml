@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_golf_scorecard_list" model="ir.ui.view">
+        <field name="name">club.golf.scorecard.list</field>
+        <field name="model">club.golf.scorecard</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="date"/>
+                <field name="affiliate_id"/>
+                <field name="course_id"/>
+                <field name="gross_score"/>
+                <field name="course_handicap"/>
+                <field name="net_score"/>
+                <field name="score_differential"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_golf_scorecard_form" model="ir.ui.view">
+        <field name="name">club.golf.scorecard.form</field>
+        <field name="model">club.golf.scorecard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="affiliate_id"/>
+                            <field name="course_id"/>
+                            <field name="date"/>
+                            <field name="tee_time_id"/>
+                        </group>
+                        <group>
+                            <field name="gross_score"/>
+                            <field name="course_handicap"/>
+                            <field name="net_score"/>
+                            <field name="score_differential"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Hole Scores" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="hole_number"/>
+                                    <field name="par"/>
+                                    <field name="score"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_golf_scorecard_search" model="ir.ui.view">
+        <field name="name">club.golf.scorecard.search</field>
+        <field name="model">club.golf.scorecard</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="affiliate_id"/>
+                <field name="course_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_affiliate" string="Affiliate"
+                        context="{'group_by': 'affiliate_id'}"/>
+                    <filter name="group_course" string="Course"
+                        context="{'group_by': 'course_id'}"/>
+                    <filter name="group_date" string="Date"
+                        context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_golf_scorecard" model="ir.actions.act_window">
+        <field name="name">Scorecards</field>
+        <field name="res_model">club.golf.scorecard</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_golf_scorecard_search"/>
+        <field name="path">golf-scorecards</field>
+    </record>
+
+</odoo>

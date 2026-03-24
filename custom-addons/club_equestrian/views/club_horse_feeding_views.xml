@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_horse_feeding_list" model="ir.ui.view">
+        <field name="name">club.horse.feeding.list</field>
+        <field name="model">club.horse.feeding</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="horse_id"/>
+                <field name="feed_type"/>
+                <field name="quantity"/>
+                <field name="unit"/>
+                <field name="schedule" widget="badge"
+                    decoration-info="schedule == 'morning'"
+                    decoration-warning="schedule == 'afternoon'"
+                    decoration-success="schedule == 'evening'"/>
+                <field name="responsible_id"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_horse_feeding_form" model="ir.ui.view">
+        <field name="name">club.horse.feeding.form</field>
+        <field name="model">club.horse.feeding</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="horse_id"/>
+                            <field name="feed_type"/>
+                            <field name="quantity"/>
+                            <field name="unit"/>
+                        </group>
+                        <group>
+                            <field name="schedule"/>
+                            <field name="responsible_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_horse_feeding_search" model="ir.ui.view">
+        <field name="name">club.horse.feeding.search</field>
+        <field name="model">club.horse.feeding</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="horse_id"/>
+                <field name="feed_type"/>
+                <field name="responsible_id"/>
+                <filter name="morning" string="Morning"
+                    domain="[('schedule', '=', 'morning')]"/>
+                <filter name="afternoon" string="Afternoon"
+                    domain="[('schedule', '=', 'afternoon')]"/>
+                <filter name="evening" string="Evening"
+                    domain="[('schedule', '=', 'evening')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_schedule" string="Schedule"
+                        context="{'group_by': 'schedule'}"/>
+                    <filter name="group_horse" string="Horse"
+                        context="{'group_by': 'horse_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_horse_feeding" model="ir.actions.act_window">
+        <field name="name">Feeding Schedules</field>
+        <field name="res_model">club.horse.feeding</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_horse_feeding_search"/>
+        <field name="path">club-feeding</field>
+    </record>
+
+</odoo>

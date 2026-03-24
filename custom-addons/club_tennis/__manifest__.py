@@ -1,0 +1,25 @@
+{
+    'name': 'Club Tennis',
+    'version': '18.0.1.0.0',
+    'summary': 'Social Country Club — Tennis Management',
+    'description': 'Tennis module: courts, bookings, caddies, matches, rankings.',
+    'category': 'Club Management',
+    'author': 'Manuel Caro',
+    'license': 'LGPL-3',
+    'depends': ['club_core'],
+    'data': [
+        'security/club_tennis_security.xml',
+        'security/ir.model.access.csv',
+        'views/club_tennis_court_views.xml',
+        'views/club_tennis_booking_views.xml',
+        'views/club_tennis_caddie_views.xml',
+        'views/club_tennis_match_views.xml',
+        'views/club_tennis_ranking_views.xml',
+        'views/club_tennis_menus.xml',
+    ],
+    'demo': [
+        'data/demo_data.xml',
+    ],
+    'installable': True,
+    'application': False,
+}

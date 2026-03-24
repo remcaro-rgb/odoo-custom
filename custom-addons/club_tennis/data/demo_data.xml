@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Partners for demo affiliates ──────────────────────── -->
+
+        <record id="partner_tennis_01" model="res.partner">
+            <field name="name">Rafael Torres</field>
+            <field name="email">rafael.torres@example.com</field>
+        </record>
+
+        <record id="partner_tennis_02" model="res.partner">
+            <field name="name">Camila Herrera</field>
+            <field name="email">camila.herrera@example.com</field>
+        </record>
+
+        <record id="partner_tennis_03" model="res.partner">
+            <field name="name">Diego Morales</field>
+            <field name="email">diego.morales@example.com</field>
+        </record>
+
+        <record id="partner_tennis_04" model="res.partner">
+            <field name="name">Valentina Ruiz</field>
+            <field name="email">valentina.ruiz@example.com</field>
+        </record>
+
+        <record id="partner_tennis_05" model="res.partner">
+            <field name="name">Mateo Jimenez</field>
+            <field name="email">mateo.jimenez@example.com</field>
+        </record>
+
+        <record id="partner_tennis_06" model="res.partner">
+            <field name="name">Isabella Castro</field>
+            <field name="email">isabella.castro@example.com</field>
+        </record>
+
+        <!-- ── Affiliates ─────────────────────────────────────────── -->
+
+        <record id="affiliate_tennis_01" model="club.affiliate">
+            <field name="partner_id" ref="partner_tennis_01"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="affiliate_tennis_02" model="club.affiliate">
+            <field name="partner_id" ref="partner_tennis_02"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="affiliate_tennis_03" model="club.affiliate">
+            <field name="partner_id" ref="partner_tennis_03"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="affiliate_tennis_04" model="club.affiliate">
+            <field name="partner_id" ref="partner_tennis_04"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="affiliate_tennis_05" model="club.affiliate">
+            <field name="partner_id" ref="partner_tennis_05"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="affiliate_tennis_06" model="club.affiliate">
+            <field name="partner_id" ref="partner_tennis_06"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <!-- ── Courts ──────────────────────────────────────────────── -->
+
+        <record id="court_clay_01" model="club.tennis.court">
+            <field name="name">Court 1 - Clay</field>
+            <field name="surface">clay</field>
+            <field name="indoor" eval="False"/>
+            <field name="under_maintenance" eval="False"/>
+        </record>
+
+        <record id="court_hard_02" model="club.tennis.court">
+            <field name="name">Court 2 - Hard Indoor</field>
+            <field name="surface">hard</field>
+            <field name="indoor" eval="True"/>
+            <field name="under_maintenance" eval="False"/>
+        </record>
+
+        <record id="court_grass_03" model="club.tennis.court">
+            <field name="name">Court 3 - Grass</field>
+            <field name="surface">grass</field>
+            <field name="indoor" eval="False"/>
+            <field name="under_maintenance" eval="False"/>
+        </record>
+
+        <!-- ── Caddie Partners ──────────────────────────────────────── -->
+
+        <record id="partner_caddie_tennis_01" model="res.partner">
+            <field name="name">Luis Ballboy Garcia</field>
+            <field name="email">luis.caddie@example.com</field>
+        </record>
+
+        <record id="partner_caddie_tennis_02" model="res.partner">
+            <field name="name">Sandra Ballgirl Rodriguez</field>
+            <field name="email">sandra.caddie@example.com</field>
+        </record>
+
+        <!-- ── Caddies ──────────────────────────────────────────────── -->
+
+        <record id="caddie_tennis_01" model="club.tennis.caddie">
+            <field name="partner_id" ref="partner_caddie_tennis_01"/>
+            <field name="employee_number">TC-001</field>
+        </record>
+
+        <record id="caddie_tennis_02" model="club.tennis.caddie">
+            <field name="partner_id" ref="partner_caddie_tennis_02"/>
+            <field name="employee_number">TC-002</field>
+        </record>
+
+        <!-- ── Caddie Availability ───────────────────────────────── -->
+
+        <record id="caddie_avail_01_mon" model="club.tennis.caddie.availability">
+            <field name="caddie_id" ref="caddie_tennis_01"/>
+            <field name="day_of_week">0</field>
+            <field name="time_from">8.0</field>
+            <field name="time_to">17.0</field>
+        </record>
+
+        <record id="caddie_avail_01_wed" model="club.tennis.caddie.availability">
+            <field name="caddie_id" ref="caddie_tennis_01"/>
+            <field name="day_of_week">2</field>
+            <field name="time_from">8.0</field>
+            <field name="time_to">17.0</field>
+        </record>
+
+        <record id="caddie_avail_01_fri" model="club.tennis.caddie.availability">
+            <field name="caddie_id" ref="caddie_tennis_01"/>
+            <field name="day_of_week">4</field>
+            <field name="time_from">8.0</field>
+            <field name="time_to">17.0</field>
+        </record>
+
+        <record id="caddie_avail_02_tue" model="club.tennis.caddie.availability">
+            <field name="caddie_id" ref="caddie_tennis_02"/>
+            <field name="day_of_week">1</field>
+            <field name="time_from">9.0</field>
+            <field name="time_to">18.0</field>
+        </record>
+
+        <record id="caddie_avail_02_thu" model="club.tennis.caddie.availability">
+            <field name="caddie_id" ref="caddie_tennis_02"/>
+            <field name="day_of_week">3</field>
+            <field name="time_from">9.0</field>
+            <field name="time_to">18.0</field>
+        </record>
+
+        <record id="caddie_avail_02_sat" model="club.tennis.caddie.availability">
+            <field name="caddie_id" ref="caddie_tennis_02"/>
+            <field name="day_of_week">5</field>
+            <field name="time_from">7.0</field>
+            <field name="time_to">14.0</field>
+        </record>
+
+        <!-- ── Bookings ────────────────────────────────────────────── -->
+
+        <record id="booking_01" model="club.tennis.booking">
+            <field name="court_id" ref="court_clay_01"/>
+            <field name="affiliate_ids" eval="[(6, 0, [ref('affiliate_tennis_01'), ref('affiliate_tennis_02')])]"/>
+            <field name="date">2026-04-01</field>
+            <field name="time_slot">9.0</field>
+            <field name="duration">1.0</field>
+            <field name="caddie_id" ref="caddie_tennis_01"/>
+            <field name="status">completed</field>
+        </record>
+
+        <record id="booking_02" model="club.tennis.booking">
+            <field name="court_id" ref="court_hard_02"/>
+            <field name="affiliate_ids" eval="[(6, 0, [ref('affiliate_tennis_03'), ref('affiliate_tennis_04')])]"/>
+            <field name="date">2026-04-01</field>
+            <field name="time_slot">10.0</field>
+            <field name="duration">2.0</field>
+            <field name="status">completed</field>
+        </record>
+
+        <record id="booking_03" model="club.tennis.booking">
+            <field name="court_id" ref="court_grass_03"/>
+            <field name="affiliate_ids" eval="[(6, 0, [ref('affiliate_tennis_05'), ref('affiliate_tennis_06')])]"/>
+            <field name="date">2026-04-02</field>
+            <field name="time_slot">14.0</field>
+            <field name="duration">1.0</field>
+            <field name="caddie_id" ref="caddie_tennis_02"/>
+            <field name="status">completed</field>
+        </record>
+
+        <record id="booking_04" model="club.tennis.booking">
+            <field name="court_id" ref="court_clay_01"/>
+            <field name="affiliate_ids" eval="[(6, 0, [ref('affiliate_tennis_01'), ref('affiliate_tennis_03'), ref('affiliate_tennis_02'), ref('affiliate_tennis_04')])]"/>
+            <field name="date">2026-04-05</field>
+            <field name="time_slot">16.0</field>
+            <field name="duration">2.0</field>
+            <field name="status">booked</field>
+        </record>
+
+        <record id="booking_05" model="club.tennis.booking">
+            <field name="court_id" ref="court_hard_02"/>
+            <field name="affiliate_ids" eval="[(6, 0, [ref('affiliate_tennis_05'), ref('affiliate_tennis_01')])]"/>
+            <field name="date">2026-04-06</field>
+            <field name="time_slot">8.0</field>
+            <field name="duration">1.0</field>
+            <field name="status">booked</field>
+        </record>
+
+        <!-- ── Rankings (seeded before matches) ─────────────────────── -->
+
+        <record id="ranking_rafael_men" model="club.tennis.ranking">
+            <field name="affiliate_id" ref="affiliate_tennis_01"/>
+            <field name="category">men</field>
+            <field name="points">150</field>
+            <field name="rank">1</field>
+            <field name="matches_played">5</field>
+            <field name="matches_won">4</field>
+        </record>
+
+        <record id="ranking_camila_women" model="club.tennis.ranking">
+            <field name="affiliate_id" ref="affiliate_tennis_02"/>
+            <field name="category">women</field>
+            <field name="points">120</field>
+            <field name="rank">1</field>
+            <field name="matches_played">4</field>
+            <field name="matches_won">3</field>
+        </record>
+
+        <record id="ranking_diego_men" model="club.tennis.ranking">
+            <field name="affiliate_id" ref="affiliate_tennis_03"/>
+            <field name="category">men</field>
+            <field name="points">130</field>
+            <field name="rank">2</field>
+            <field name="matches_played">5</field>
+            <field name="matches_won">3</field>
+        </record>
+
+        <record id="ranking_valentina_women" model="club.tennis.ranking">
+            <field name="affiliate_id" ref="affiliate_tennis_04"/>
+            <field name="category">women</field>
+            <field name="points">100</field>
+            <field name="rank">2</field>
+            <field name="matches_played">3</field>
+            <field name="matches_won">2</field>
+        </record>
+
+        <record id="ranking_mateo_junior" model="club.tennis.ranking">
+            <field name="affiliate_id" ref="affiliate_tennis_05"/>
+            <field name="category">junior</field>
+            <field name="points">80</field>
+            <field name="rank">1</field>
+            <field name="matches_played">3</field>
+            <field name="matches_won">2</field>
+        </record>
+
+        <record id="ranking_isabella_junior" model="club.tennis.ranking">
+            <field name="affiliate_id" ref="affiliate_tennis_06"/>
+            <field name="category">junior</field>
+            <field name="points">60</field>
+            <field name="rank">2</field>
+            <field name="matches_played">2</field>
+            <field name="matches_won">1</field>
+        </record>
+
+        <record id="ranking_rafael_mixed" model="club.tennis.ranking">
+            <field name="affiliate_id" ref="affiliate_tennis_01"/>
+            <field name="category">mixed</field>
+            <field name="points">50</field>
+            <field name="rank">1</field>
+            <field name="matches_played">2</field>
+            <field name="matches_won">2</field>
+        </record>
+
+        <record id="ranking_camila_mixed" model="club.tennis.ranking">
+            <field name="affiliate_id" ref="affiliate_tennis_02"/>
+            <field name="category">mixed</field>
+            <field name="points">40</field>
+            <field name="rank">2</field>
+            <field name="matches_played">2</field>
+            <field name="matches_won">1</field>
+        </record>
+
+        <!-- ── Matches ──────────────────────────────────────────────── -->
+
+        <record id="match_01" model="club.tennis.match">
+            <field name="booking_id" ref="booking_01"/>
+            <field name="player_ids" eval="[(6, 0, [ref('affiliate_tennis_01'), ref('affiliate_tennis_02')])]"/>
+            <field name="set_1_score">6-4</field>
+            <field name="set_2_score">7-5</field>
+            <field name="winner_id" ref="affiliate_tennis_01"/>
+            <field name="ranking_points_awarded">10</field>
+        </record>
+
+        <record id="match_02" model="club.tennis.match">
+            <field name="booking_id" ref="booking_02"/>
+            <field name="player_ids" eval="[(6, 0, [ref('affiliate_tennis_03'), ref('affiliate_tennis_04')])]"/>
+            <field name="set_1_score">3-6</field>
+            <field name="set_2_score">6-3</field>
+            <field name="set_3_score">7-6</field>
+            <field name="winner_id" ref="affiliate_tennis_04"/>
+            <field name="ranking_points_awarded">15</field>
+        </record>
+
+        <record id="match_03" model="club.tennis.match">
+            <field name="booking_id" ref="booking_03"/>
+            <field name="player_ids" eval="[(6, 0, [ref('affiliate_tennis_05'), ref('affiliate_tennis_06')])]"/>
+            <field name="set_1_score">6-2</field>
+            <field name="set_2_score">6-1</field>
+            <field name="winner_id" ref="affiliate_tennis_05"/>
+            <field name="ranking_points_awarded">10</field>
+        </record>
+
+    </data>
+</odoo>

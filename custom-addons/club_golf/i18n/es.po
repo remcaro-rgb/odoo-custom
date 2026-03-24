@@ -1,0 +1,525 @@
+# Spanish translation for club_golf
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the club_golf module.
+#
+# Translators:
+# Manuel Caro, 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Club Golf 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-24 00:00+0000\n"
+"PO-Revision-Date: 2026-03-24 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_golf
+#: model:res.groups,name:club_golf.group_golf_staff
+msgid "Golf Staff"
+msgstr "Personal de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_course
+msgid "Golf Course"
+msgstr "Campo de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_tee_time
+msgid "Golf Tee Time"
+msgstr "Hora de Salida de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_caddie
+msgid "Golf Caddie"
+msgstr "Caddie de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_caddie_availability
+msgid "Golf Caddie Availability"
+msgstr "Disponibilidad de Caddie de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_cart
+msgid "Golf Cart"
+msgstr "Carrito de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_bag
+msgid "Golf Bag"
+msgstr "Bolsa de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_scorecard
+msgid "Golf Scorecard"
+msgstr "Tarjeta de Puntuacion de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_scorecard_line
+msgid "Golf Scorecard Line"
+msgstr "Linea de Tarjeta de Puntuacion"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_handicap
+msgid "Golf Handicap"
+msgstr "Handicap de Golf"
+
+#. module: club_golf
+#: model:ir.model,name:club_golf.model_club_golf_handicap_history
+msgid "Golf Handicap History"
+msgstr "Historial de Handicap de Golf"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_course__name
+msgid "Course Name"
+msgstr "Nombre del Campo"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_course__holes
+msgid "Holes"
+msgstr "Hoyos"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_course__par
+msgid "Par"
+msgstr "Par"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_course__slope_rating
+msgid "Slope Rating"
+msgstr "Clasificacion de Pendiente"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_course__course_rating
+msgid "Course Rating"
+msgstr "Clasificacion del Campo"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__time_slot
+msgid "Start Time"
+msgstr "Hora de Salida"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__course_id
+msgid "Course"
+msgstr "Campo"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__affiliate_ids
+msgid "Affiliates"
+msgstr "Socios"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__guest_count
+msgid "Guest Count"
+msgstr "Cantidad de Invitados"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__caddie_id
+msgid "Caddie"
+msgstr "Caddie"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__cart_id
+msgid "Cart"
+msgstr "Carrito"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__bag_ids
+msgid "Bags"
+msgstr "Bolsas"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_tee_time__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_tee_time__status__available
+msgid "Available"
+msgstr "Disponible"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_tee_time__status__booked
+msgid "Booked"
+msgstr "Reservado"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_tee_time__status__completed
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_tee_time__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_caddie__partner_id
+msgid "Person"
+msgstr "Persona"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_caddie__employee_number
+msgid "Employee Number"
+msgstr "Numero de Empleado"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_caddie__availability_ids
+msgid "Availability"
+msgstr "Disponibilidad"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_caddie__tee_time_ids
+msgid "Tee Times"
+msgstr "Horas de Salida"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_caddie_availability__day_of_week
+msgid "Day of Week"
+msgstr "Dia de la Semana"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_caddie_availability__day_of_week__0
+msgid "Monday"
+msgstr "Lunes"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_caddie_availability__day_of_week__1
+msgid "Tuesday"
+msgstr "Martes"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_caddie_availability__day_of_week__2
+msgid "Wednesday"
+msgstr "Miercoles"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_caddie_availability__day_of_week__3
+msgid "Thursday"
+msgstr "Jueves"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_caddie_availability__day_of_week__4
+msgid "Friday"
+msgstr "Viernes"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_caddie_availability__day_of_week__5
+msgid "Saturday"
+msgstr "Sabado"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_caddie_availability__day_of_week__6
+msgid "Sunday"
+msgstr "Domingo"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_caddie_availability__time_from
+msgid "Available From"
+msgstr "Disponible Desde"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_caddie_availability__time_to
+msgid "Available Until"
+msgstr "Disponible Hasta"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_cart__name
+msgid "Cart Number"
+msgstr "Numero de Carrito"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_cart__cart_type
+msgid "Cart Type"
+msgstr "Tipo de Carrito"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_cart__cart_type__rental
+msgid "Rental"
+msgstr "Alquiler"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_cart__cart_type__owned
+msgid "Owned"
+msgstr "Propio"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_cart__owner_id
+msgid "Owner"
+msgstr "Propietario"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_cart__status__available
+msgid "Available"
+msgstr "Disponible"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_cart__status__in_use
+msgid "In Use"
+msgstr "En Uso"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_cart__status__maintenance
+msgid "Maintenance"
+msgstr "Mantenimiento"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_cart__battery_level
+msgid "Battery Level (%)"
+msgstr "Nivel de Bateria (%)"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_cart__maintenance_log
+msgid "Maintenance Log"
+msgstr "Registro de Mantenimiento"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_bag__tag_number
+msgid "Tag Number"
+msgstr "Numero de Etiqueta"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_bag__locker_number
+msgid "Locker Number"
+msgstr "Numero de Casillero"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_bag__status__stored
+msgid "Stored"
+msgstr "Almacenada"
+
+#. module: club_golf
+#: model:ir.model.fields.selection,name:club_golf.selection__club_golf_bag__status__with_member
+msgid "With Member"
+msgstr "Con el Socio"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_bag__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard__tee_time_id
+msgid "Tee Time"
+msgstr "Hora de Salida"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard__affiliate_id
+msgid "Affiliate"
+msgstr "Socio"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard__line_ids
+msgid "Hole Scores"
+msgstr "Puntuaciones por Hoyo"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard__gross_score
+msgid "Gross Score"
+msgstr "Puntuacion Bruta"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard__course_handicap
+msgid "Course Handicap"
+msgstr "Handicap del Campo"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard__net_score
+msgid "Net Score"
+msgstr "Puntuacion Neta"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard__score_differential
+msgid "Score Differential"
+msgstr "Diferencial de Puntuacion"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard_line__hole_number
+msgid "Hole"
+msgstr "Hoyo"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_scorecard_line__score
+msgid "Score"
+msgstr "Puntuacion"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_handicap__affiliate_id
+msgid "Affiliate"
+msgstr "Socio"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_handicap__handicap_index
+msgid "Handicap Index"
+msgstr "Indice de Handicap"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_handicap__revision_date
+msgid "Revision Date"
+msgstr "Fecha de Revision"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_handicap__history_ids
+msgid "History"
+msgstr "Historial"
+
+#. module: club_golf
+#: model:ir.model.fields,field_description:club_golf.field_club_golf_handicap_history__scorecard_ids
+msgid "Scorecards Used"
+msgstr "Tarjetas Utilizadas"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_root
+msgid "Golf"
+msgstr "Golf"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_tee_times
+msgid "Tee Times"
+msgstr "Horas de Salida"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_scorecards
+msgid "Scorecards"
+msgstr "Tarjetas de Puntuacion"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_handicaps
+msgid "Handicaps"
+msgstr "Handicaps"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_resources
+msgid "Resources"
+msgstr "Recursos"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_caddies
+msgid "Caddies"
+msgstr "Caddies"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_carts
+msgid "Carts"
+msgstr "Carritos"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_bags
+msgid "Bags"
+msgstr "Bolsas"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_config
+msgid "Configuration"
+msgstr "Configuracion"
+
+#. module: club_golf
+#: model:ir.ui.menu,name:club_golf.menu_golf_config_courses
+msgid "Courses"
+msgstr "Campos"
+
+#. module: club_golf
+#: model:ir.actions.act_window,name:club_golf.action_club_golf_course
+msgid "Golf Courses"
+msgstr "Campos de Golf"
+
+#. module: club_golf
+#: model:ir.actions.act_window,name:club_golf.action_club_golf_tee_time
+msgid "Tee Times"
+msgstr "Horas de Salida"
+
+#. module: club_golf
+#: model:ir.actions.act_window,name:club_golf.action_club_golf_caddie
+msgid "Caddies"
+msgstr "Caddies"
+
+#. module: club_golf
+#: model:ir.actions.act_window,name:club_golf.action_club_golf_cart
+msgid "Golf Carts"
+msgstr "Carritos de Golf"
+
+#. module: club_golf
+#: model:ir.actions.act_window,name:club_golf.action_club_golf_bag
+msgid "Golf Bags"
+msgstr "Bolsas de Golf"
+
+#. module: club_golf
+#: model:ir.actions.act_window,name:club_golf.action_club_golf_scorecard
+msgid "Scorecards"
+msgstr "Tarjetas de Puntuacion"
+
+#. module: club_golf
+#: model:ir.actions.act_window,name:club_golf.action_club_golf_handicap
+msgid "Handicaps"
+msgstr "Handicaps"
+
+#. module: club_golf
+#: code:addons/club_golf/models/club_golf_tee_time.py:0
+msgid "A tee time already exists for this course, date and time slot."
+msgstr "Ya existe una hora de salida para este campo, fecha y horario."
+
+#. module: club_golf
+#: code:addons/club_golf/models/club_golf_tee_time.py:0
+msgid "This caddie is already booked for another tee time at the same date and time."
+msgstr "Este caddie ya esta reservado para otra hora de salida en la misma fecha y hora."
+
+#. module: club_golf
+#: code:addons/club_golf/models/club_golf_tee_time.py:0
+msgid "This rental cart is already assigned to another tee time at the same date and time."
+msgstr "Este carrito de alquiler ya esta asignado a otra hora de salida en la misma fecha y hora."
+
+#. module: club_golf
+#: code:addons/club_golf/models/club_golf_tee_time.py:0
+msgid "This owned cart is already assigned to another affiliate at the same date and time."
+msgstr "Este carrito propio ya esta asignado a otro socio en la misma fecha y hora."
+
+#. module: club_golf
+#: code:addons/club_golf/models/club_golf_tee_time.py:0
+msgid "A tee time can have a maximum of 4 affiliates."
+msgstr "Una hora de salida puede tener un maximo de 4 socios."
+
+#. module: club_golf
+#: code:addons/club_golf/models/club_golf_cart.py:0
+msgid "An owned cart must have an owner assigned."
+msgstr "Un carrito propio debe tener un propietario asignado."
+
+#. module: club_golf
+#: sql_constraint:club.golf.bag:tag_number_uniq
+msgid "Bag tag number must be unique."
+msgstr "El numero de etiqueta de la bolsa debe ser unico."
+
+#. module: club_golf
+#: sql_constraint:club.golf.handicap:affiliate_uniq
+msgid "Each affiliate can have only one handicap record."
+msgstr "Cada socio puede tener solo un registro de handicap."
+
+#. module: club_golf
+#: model:ir.ui.view,arch_db:club_golf.view_club_golf_tee_time_search
+msgid "Today"
+msgstr "Hoy"
+
+#. module: club_golf
+#: model:ir.ui.view,arch_db:club_golf.view_club_golf_cart_search
+msgid "In Maintenance"
+msgstr "En Mantenimiento"
+
+#. module: club_golf
+#: model:ir.ui.view,arch_db:club_golf.view_club_golf_bag_search
+msgid "With Member"
+msgstr "Con el Socio"
+
+#. module: club_golf
+#: model:ir.ui.view,arch_db:club_golf.view_club_golf_tee_time_form
+msgid "Players"
+msgstr "Jugadores"

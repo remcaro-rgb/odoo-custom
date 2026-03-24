@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ── Golf Course ─────────────────────────────────────────── -->
+
+        <record id="course_main" model="club.golf.course">
+            <field name="name">Championship Course</field>
+            <field name="holes">18</field>
+            <field name="par">72</field>
+            <field name="slope_rating">130</field>
+            <field name="course_rating">72.5</field>
+        </record>
+
+        <!-- ── Demo Affiliates for Golf ─────────────────────────────── -->
+
+        <record id="partner_golf_demo_1" model="res.partner">
+            <field name="name">Andrés Gutiérrez</field>
+            <field name="email">andres@example.com</field>
+            <field name="phone">+57 300 1000001</field>
+        </record>
+        <record id="affiliate_golf_1" model="club.affiliate">
+            <field name="partner_id" ref="partner_golf_demo_1"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="partner_golf_demo_2" model="res.partner">
+            <field name="name">Valentina Ríos</field>
+            <field name="email">valentina@example.com</field>
+            <field name="phone">+57 300 1000002</field>
+        </record>
+        <record id="affiliate_golf_2" model="club.affiliate">
+            <field name="partner_id" ref="partner_golf_demo_2"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="partner_golf_demo_3" model="res.partner">
+            <field name="name">Santiago Herrera</field>
+            <field name="email">santiago@example.com</field>
+            <field name="phone">+57 300 1000003</field>
+        </record>
+        <record id="affiliate_golf_3" model="club.affiliate">
+            <field name="partner_id" ref="partner_golf_demo_3"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="partner_golf_demo_4" model="res.partner">
+            <field name="name">Camila Morales</field>
+            <field name="email">camila@example.com</field>
+            <field name="phone">+57 300 1000004</field>
+        </record>
+        <record id="affiliate_golf_4" model="club.affiliate">
+            <field name="partner_id" ref="partner_golf_demo_4"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <!-- ── Caddies ─────────────────────────────────────────────── -->
+
+        <record id="partner_caddie_1" model="res.partner">
+            <field name="name">Luis Caddie</field>
+        </record>
+        <record id="caddie_1" model="club.golf.caddie">
+            <field name="partner_id" ref="partner_caddie_1"/>
+            <field name="employee_number">CAD-001</field>
+        </record>
+
+        <record id="partner_caddie_2" model="res.partner">
+            <field name="name">Miguel Caddie</field>
+        </record>
+        <record id="caddie_2" model="club.golf.caddie">
+            <field name="partner_id" ref="partner_caddie_2"/>
+            <field name="employee_number">CAD-002</field>
+        </record>
+
+        <!-- Caddie availability -->
+        <record id="caddie_1_avail_mon" model="club.golf.caddie.availability">
+            <field name="caddie_id" ref="caddie_1"/>
+            <field name="day_of_week">0</field>
+            <field name="time_from">6.0</field>
+            <field name="time_to">14.0</field>
+        </record>
+        <record id="caddie_1_avail_wed" model="club.golf.caddie.availability">
+            <field name="caddie_id" ref="caddie_1"/>
+            <field name="day_of_week">2</field>
+            <field name="time_from">6.0</field>
+            <field name="time_to">14.0</field>
+        </record>
+        <record id="caddie_1_avail_fri" model="club.golf.caddie.availability">
+            <field name="caddie_id" ref="caddie_1"/>
+            <field name="day_of_week">4</field>
+            <field name="time_from">6.0</field>
+            <field name="time_to">14.0</field>
+        </record>
+        <record id="caddie_2_avail_tue" model="club.golf.caddie.availability">
+            <field name="caddie_id" ref="caddie_2"/>
+            <field name="day_of_week">1</field>
+            <field name="time_from">7.0</field>
+            <field name="time_to">15.0</field>
+        </record>
+        <record id="caddie_2_avail_thu" model="club.golf.caddie.availability">
+            <field name="caddie_id" ref="caddie_2"/>
+            <field name="day_of_week">3</field>
+            <field name="time_from">7.0</field>
+            <field name="time_to">15.0</field>
+        </record>
+        <record id="caddie_2_avail_sat" model="club.golf.caddie.availability">
+            <field name="caddie_id" ref="caddie_2"/>
+            <field name="day_of_week">5</field>
+            <field name="time_from">6.0</field>
+            <field name="time_to">16.0</field>
+        </record>
+
+        <!-- ── Carts ───────────────────────────────────────────────── -->
+
+        <record id="cart_rental_1" model="club.golf.cart">
+            <field name="name">R-01</field>
+            <field name="cart_type">rental</field>
+            <field name="status">available</field>
+            <field name="battery_level">95</field>
+        </record>
+        <record id="cart_rental_2" model="club.golf.cart">
+            <field name="name">R-02</field>
+            <field name="cart_type">rental</field>
+            <field name="status">available</field>
+            <field name="battery_level">88</field>
+        </record>
+        <record id="cart_owned_1" model="club.golf.cart">
+            <field name="name">P-01</field>
+            <field name="cart_type">owned</field>
+            <field name="owner_id" ref="affiliate_golf_1"/>
+            <field name="status">available</field>
+            <field name="battery_level">100</field>
+        </record>
+        <record id="cart_owned_2" model="club.golf.cart">
+            <field name="name">P-02</field>
+            <field name="cart_type">owned</field>
+            <field name="owner_id" ref="affiliate_golf_2"/>
+            <field name="status">available</field>
+            <field name="battery_level">72</field>
+        </record>
+
+        <!-- ── Bags ────────────────────────────────────────────────── -->
+
+        <record id="bag_1" model="club.golf.bag">
+            <field name="tag_number">BAG-001</field>
+            <field name="owner_id" ref="affiliate_golf_1"/>
+            <field name="locker_number">L-101</field>
+            <field name="status">stored</field>
+        </record>
+        <record id="bag_2" model="club.golf.bag">
+            <field name="tag_number">BAG-002</field>
+            <field name="owner_id" ref="affiliate_golf_2"/>
+            <field name="locker_number">L-102</field>
+            <field name="status">stored</field>
+        </record>
+        <record id="bag_3" model="club.golf.bag">
+            <field name="tag_number">BAG-003</field>
+            <field name="owner_id" ref="affiliate_golf_3"/>
+            <field name="locker_number">L-103</field>
+            <field name="status">stored</field>
+        </record>
+        <record id="bag_4" model="club.golf.bag">
+            <field name="tag_number">BAG-004</field>
+            <field name="owner_id" ref="affiliate_golf_4"/>
+            <field name="locker_number">L-104</field>
+            <field name="status">with_member</field>
+        </record>
+        <record id="bag_5" model="club.golf.bag">
+            <field name="tag_number">BAG-005</field>
+            <field name="owner_id" ref="affiliate_golf_1"/>
+            <field name="locker_number">L-105</field>
+            <field name="status">stored</field>
+            <field name="notes">Travel bag - oversized</field>
+        </record>
+
+        <!-- ── Tee Times ───────────────────────────────────────────── -->
+
+        <record id="tee_time_1" model="club.golf.tee.time">
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">7.0</field>
+            <field name="course_id" ref="course_main"/>
+            <field name="affiliate_ids" eval="[(6, 0, [ref('affiliate_golf_1'), ref('affiliate_golf_2')])]"/>
+            <field name="caddie_id" ref="caddie_1"/>
+            <field name="cart_id" ref="cart_rental_1"/>
+            <field name="bag_ids" eval="[(6, 0, [ref('bag_1'), ref('bag_2')])]"/>
+            <field name="status">booked</field>
+        </record>
+
+        <record id="tee_time_2" model="club.golf.tee.time">
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">7.5</field>
+            <field name="course_id" ref="course_main"/>
+            <field name="affiliate_ids" eval="[(6, 0, [ref('affiliate_golf_3'), ref('affiliate_golf_4')])]"/>
+            <field name="caddie_id" ref="caddie_2"/>
+            <field name="cart_id" ref="cart_rental_2"/>
+            <field name="bag_ids" eval="[(6, 0, [ref('bag_3'), ref('bag_4')])]"/>
+            <field name="status">booked</field>
+        </record>
+
+        <record id="tee_time_3" model="club.golf.tee.time">
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">8.0</field>
+            <field name="course_id" ref="course_main"/>
+            <field name="status">available</field>
+        </record>
+
+        <record id="tee_time_4" model="club.golf.tee.time">
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">8.5</field>
+            <field name="course_id" ref="course_main"/>
+            <field name="status">available</field>
+        </record>
+
+        <record id="tee_time_5" model="club.golf.tee.time">
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">9.0</field>
+            <field name="course_id" ref="course_main"/>
+            <field name="affiliate_ids" eval="[(6, 0, [ref('affiliate_golf_1'), ref('affiliate_golf_3')])]"/>
+            <field name="status">completed</field>
+            <field name="guest_count">1</field>
+        </record>
+
+        <!-- ── Scorecards ──────────────────────────────────────────── -->
+
+        <!-- Scorecard 1: Andres round 1 -->
+        <record id="scorecard_1" model="club.golf.scorecard">
+            <field name="affiliate_id" ref="affiliate_golf_1"/>
+            <field name="course_id" ref="course_main"/>
+            <field name="date">2026-03-01</field>
+            <field name="tee_time_id" ref="tee_time_5"/>
+        </record>
+        <!-- 18 holes for scorecard 1 (par 4s and par 3/5 mix, gross ~85) -->
+        <record id="sc1_h1" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">1</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc1_h2" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">2</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc1_h3" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">3</field><field name="par">3</field><field name="score">4</field></record>
+        <record id="sc1_h4" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">4</field><field name="par">5</field><field name="score">6</field></record>
+        <record id="sc1_h5" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">5</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc1_h6" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">6</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc1_h7" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">7</field><field name="par">3</field><field name="score">4</field></record>
+        <record id="sc1_h8" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">8</field><field name="par">5</field><field name="score">6</field></record>
+        <record id="sc1_h9" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">9</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc1_h10" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">10</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc1_h11" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">11</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc1_h12" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">12</field><field name="par">3</field><field name="score">3</field></record>
+        <record id="sc1_h13" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">13</field><field name="par">5</field><field name="score">5</field></record>
+        <record id="sc1_h14" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">14</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc1_h15" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">15</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc1_h16" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">16</field><field name="par">3</field><field name="score">4</field></record>
+        <record id="sc1_h17" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">17</field><field name="par">5</field><field name="score">6</field></record>
+        <record id="sc1_h18" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_1"/><field name="hole_number">18</field><field name="par">4</field><field name="score">5</field></record>
+
+        <!-- Scorecard 2: Andres round 2 -->
+        <record id="scorecard_2" model="club.golf.scorecard">
+            <field name="affiliate_id" ref="affiliate_golf_1"/>
+            <field name="course_id" ref="course_main"/>
+            <field name="date">2026-03-08</field>
+        </record>
+        <record id="sc2_h1" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">1</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc2_h2" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">2</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc2_h3" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">3</field><field name="par">3</field><field name="score">3</field></record>
+        <record id="sc2_h4" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">4</field><field name="par">5</field><field name="score">5</field></record>
+        <record id="sc2_h5" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">5</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc2_h6" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">6</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc2_h7" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">7</field><field name="par">3</field><field name="score">3</field></record>
+        <record id="sc2_h8" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">8</field><field name="par">5</field><field name="score">5</field></record>
+        <record id="sc2_h9" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">9</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc2_h10" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">10</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc2_h11" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">11</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc2_h12" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">12</field><field name="par">3</field><field name="score">4</field></record>
+        <record id="sc2_h13" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">13</field><field name="par">5</field><field name="score">6</field></record>
+        <record id="sc2_h14" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">14</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc2_h15" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">15</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc2_h16" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">16</field><field name="par">3</field><field name="score">3</field></record>
+        <record id="sc2_h17" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">17</field><field name="par">5</field><field name="score">5</field></record>
+        <record id="sc2_h18" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_2"/><field name="hole_number">18</field><field name="par">4</field><field name="score">4</field></record>
+
+        <!-- Scorecard 3: Andres round 3 (enables handicap calculation) -->
+        <record id="scorecard_3" model="club.golf.scorecard">
+            <field name="affiliate_id" ref="affiliate_golf_1"/>
+            <field name="course_id" ref="course_main"/>
+            <field name="date">2026-03-15</field>
+        </record>
+        <record id="sc3_h1" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">1</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc3_h2" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">2</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc3_h3" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">3</field><field name="par">3</field><field name="score">3</field></record>
+        <record id="sc3_h4" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">4</field><field name="par">5</field><field name="score">6</field></record>
+        <record id="sc3_h5" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">5</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc3_h6" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">6</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc3_h7" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">7</field><field name="par">3</field><field name="score">4</field></record>
+        <record id="sc3_h8" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">8</field><field name="par">5</field><field name="score">5</field></record>
+        <record id="sc3_h9" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">9</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc3_h10" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">10</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc3_h11" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">11</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc3_h12" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">12</field><field name="par">3</field><field name="score">3</field></record>
+        <record id="sc3_h13" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">13</field><field name="par">5</field><field name="score">6</field></record>
+        <record id="sc3_h14" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">14</field><field name="par">4</field><field name="score">4</field></record>
+        <record id="sc3_h15" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">15</field><field name="par">4</field><field name="score">5</field></record>
+        <record id="sc3_h16" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">16</field><field name="par">3</field><field name="score">3</field></record>
+        <record id="sc3_h17" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">17</field><field name="par">5</field><field name="score">6</field></record>
+        <record id="sc3_h18" model="club.golf.scorecard.line"><field name="scorecard_id" ref="scorecard_3"/><field name="hole_number">18</field><field name="par">4</field><field name="score">5</field></record>
+
+    </data>
+</odoo>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_horse_list" model="ir.ui.view">
+        <field name="name">club.horse.list</field>
+        <field name="model">club.horse</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="registration_number"/>
+                <field name="name"/>
+                <field name="breed"/>
+                <field name="color"/>
+                <field name="owner_id"/>
+                <field name="stall_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_horse_form" model="ir.ui.view">
+        <field name="name">club.horse.form</field>
+        <field name="model">club.horse</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"
+                        options="{'preview_image': 'photo'}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Horse Name"/></h1>
+                        <h4 class="text-muted">
+                            <field name="registration_number" readonly="1"/>
+                        </h4>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="breed"/>
+                            <field name="color"/>
+                            <field name="birth_date"/>
+                        </group>
+                        <group>
+                            <field name="owner_id"/>
+                            <field name="stall_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Feeding Schedules" name="feeding">
+                            <field name="feeding_ids">
+                                <list editable="bottom">
+                                    <field name="feed_type"/>
+                                    <field name="quantity"/>
+                                    <field name="unit"/>
+                                    <field name="schedule"/>
+                                    <field name="responsible_id"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Vet Records" name="vet_records">
+                            <field name="vet_record_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="vet_name"/>
+                                    <field name="procedure"/>
+                                    <field name="next_visit_date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Bookings" name="bookings">
+                            <field name="booking_ids">
+                                <list>
+                                    <field name="arena_id"/>
+                                    <field name="affiliate_id"/>
+                                    <field name="date"/>
+                                    <field name="time_slot" widget="float_time"/>
+                                    <field name="duration"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status == 'booked'"
+                                        decoration-info="status == 'completed'"
+                                        decoration-muted="status == 'cancelled'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_horse_search" model="ir.ui.view">
+        <field name="name">club.horse.search</field>
+        <field name="model">club.horse</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="registration_number"/>
+                <field name="breed"/>
+                <field name="owner_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_breed" string="Breed"
+                        context="{'group_by': 'breed'}"/>
+                    <filter name="group_owner" string="Owner"
+                        context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_horse" model="ir.actions.act_window">
+        <field name="name">Horses</field>
+        <field name="res_model">club.horse</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_horse_search"/>
+        <field name="path">club-horses</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_tennis_court_admin,club.tennis.court admin,model_club_tennis_court,club_core.group_club_admin,1,1,1,1
+access_club_tennis_court_staff,club.tennis.court staff,model_club_tennis_court,club_tennis.group_tennis_staff,1,1,1,1
+access_club_tennis_booking_admin,club.tennis.booking admin,model_club_tennis_booking,club_core.group_club_admin,1,1,1,1
+access_club_tennis_booking_staff,club.tennis.booking staff,model_club_tennis_booking,club_tennis.group_tennis_staff,1,1,1,1
+access_club_tennis_booking_member,club.tennis.booking member,model_club_tennis_booking,club_core.group_club_member,1,0,0,0
+access_club_tennis_caddie_admin,club.tennis.caddie admin,model_club_tennis_caddie,club_core.group_club_admin,1,1,1,1
+access_club_tennis_caddie_staff,club.tennis.caddie staff,model_club_tennis_caddie,club_tennis.group_tennis_staff,1,1,1,1
+access_club_tennis_caddie_availability_admin,club.tennis.caddie.availability admin,model_club_tennis_caddie_availability,club_core.group_club_admin,1,1,1,1
+access_club_tennis_caddie_availability_staff,club.tennis.caddie.availability staff,model_club_tennis_caddie_availability,club_tennis.group_tennis_staff,1,1,1,1
+access_club_tennis_match_admin,club.tennis.match admin,model_club_tennis_match,club_core.group_club_admin,1,1,1,1
+access_club_tennis_match_staff,club.tennis.match staff,model_club_tennis_match,club_tennis.group_tennis_staff,1,1,1,1
+access_club_tennis_match_member,club.tennis.match member,model_club_tennis_match,club_core.group_club_member,1,0,0,0
+access_club_tennis_ranking_admin,club.tennis.ranking admin,model_club_tennis_ranking,club_core.group_club_admin,1,1,1,1
+access_club_tennis_ranking_staff,club.tennis.ranking staff,model_club_tennis_ranking,club_tennis.group_tennis_staff,1,1,1,1
+access_club_tennis_ranking_member,club.tennis.ranking member,model_club_tennis_ranking,club_core.group_club_member,1,0,0,0

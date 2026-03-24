@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_golf_tee_time_kanban" model="ir.ui.view">
+        <field name="name">club.golf.tee.time.kanban</field>
+        <field name="model">club.golf.tee.time</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="date"/>
+                <field name="time_slot"/>
+                <field name="course_id"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="course_id"/></strong><br/>
+                            <span><field name="date"/> - <field name="time_slot" widget="float_time"/></span><br/>
+                            <field name="status" widget="badge"
+                                decoration-success="status == 'available'"
+                                decoration-info="status == 'booked'"
+                                decoration-muted="status == 'completed'"
+                                decoration-danger="status == 'cancelled'"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_golf_tee_time_list" model="ir.ui.view">
+        <field name="name">club.golf.tee.time.list</field>
+        <field name="model">club.golf.tee.time</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="date"/>
+                <field name="time_slot" widget="float_time"/>
+                <field name="course_id"/>
+                <field name="affiliate_ids" widget="many2many_tags"/>
+                <field name="guest_count"/>
+                <field name="caddie_id"/>
+                <field name="cart_id"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'available'"
+                    decoration-info="status == 'booked'"
+                    decoration-muted="status == 'completed'"
+                    decoration-danger="status == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_golf_tee_time_form" model="ir.ui.view">
+        <field name="name">club.golf.tee.time.form</field>
+        <field name="model">club.golf.tee.time</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="course_id" placeholder="Course"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="time_slot" widget="float_time"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="caddie_id"/>
+                            <field name="cart_id"/>
+                            <field name="guest_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Players" name="players">
+                            <field name="affiliate_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Bags" name="bags">
+                            <field name="bag_ids">
+                                <list>
+                                    <field name="tag_number"/>
+                                    <field name="owner_id"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status == 'stored'"
+                                        decoration-info="status == 'with_member'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_golf_tee_time_search" model="ir.ui.view">
+        <field name="name">club.golf.tee.time.search</field>
+        <field name="model">club.golf.tee.time</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="course_id"/>
+                <field name="affiliate_ids"/>
+                <field name="caddie_id"/>
+                <filter name="available" string="Available"
+                    domain="[('status','=','available')]"/>
+                <filter name="booked" string="Booked"
+                    domain="[('status','=','booked')]"/>
+                <filter name="today" string="Today"
+                    domain="[('date','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_course" string="Course"
+                        context="{'group_by': 'course_id'}"/>
+                    <filter name="group_date" string="Date"
+                        context="{'group_by': 'date'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_golf_tee_time" model="ir.actions.act_window">
+        <field name="name">Tee Times</field>
+        <field name="res_model">club.golf.tee.time</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_golf_tee_time_search"/>
+        <field name="path">golf-tee-times</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Golf section under Club root menu -->
+    <menuitem id="menu_golf_root"
+        name="Golf"
+        parent="club_core.menu_club_root"
+        sequence="30"
+        groups="club_golf.group_golf_staff,club_core.group_club_admin"/>
+
+    <!-- Tee Times -->
+    <menuitem id="menu_golf_tee_times"
+        name="Tee Times"
+        parent="menu_golf_root"
+        action="action_club_golf_tee_time"
+        sequence="10"/>
+
+    <!-- Scorecards -->
+    <menuitem id="menu_golf_scorecards"
+        name="Scorecards"
+        parent="menu_golf_root"
+        action="action_club_golf_scorecard"
+        sequence="20"/>
+
+    <!-- Handicaps -->
+    <menuitem id="menu_golf_handicaps"
+        name="Handicaps"
+        parent="menu_golf_root"
+        action="action_club_golf_handicap"
+        sequence="30"/>
+
+    <!-- Resources submenu -->
+    <menuitem id="menu_golf_resources"
+        name="Resources"
+        parent="menu_golf_root"
+        sequence="40"/>
+
+    <menuitem id="menu_golf_caddies"
+        name="Caddies"
+        parent="menu_golf_resources"
+        action="action_club_golf_caddie"
+        sequence="10"/>
+
+    <menuitem id="menu_golf_carts"
+        name="Carts"
+        parent="menu_golf_resources"
+        action="action_club_golf_cart"
+        sequence="20"/>
+
+    <menuitem id="menu_golf_bags"
+        name="Bags"
+        parent="menu_golf_resources"
+        action="action_club_golf_bag"
+        sequence="30"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_golf_config"
+        name="Configuration"
+        parent="menu_golf_root"
+        sequence="100"
+        groups="club_core.group_club_admin"/>
+
+    <menuitem id="menu_golf_config_courses"
+        name="Courses"
+        parent="menu_golf_config"
+        action="action_club_golf_course"
+        sequence="10"/>
+
+</odoo>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_tennis_ranking_list" model="ir.ui.view">
+        <field name="name">club.tennis.ranking.list</field>
+        <field name="model">club.tennis.ranking</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="rank"/>
+                <field name="affiliate_id"/>
+                <field name="category" widget="badge"/>
+                <field name="points"/>
+                <field name="matches_played"/>
+                <field name="matches_won"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_tennis_ranking_form" model="ir.ui.view">
+        <field name="name">club.tennis.ranking.form</field>
+        <field name="model">club.tennis.ranking</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="affiliate_id"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="rank"/>
+                            <field name="points"/>
+                            <field name="matches_played"/>
+                            <field name="matches_won"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_tennis_ranking_search" model="ir.ui.view">
+        <field name="name">club.tennis.ranking.search</field>
+        <field name="model">club.tennis.ranking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="affiliate_id"/>
+                <filter name="men" string="Men"
+                    domain="[('category','=','men')]"/>
+                <filter name="women" string="Women"
+                    domain="[('category','=','women')]"/>
+                <filter name="junior" string="Junior"
+                    domain="[('category','=','junior')]"/>
+                <filter name="senior" string="Senior"
+                    domain="[('category','=','senior')]"/>
+                <filter name="mixed" string="Mixed"
+                    domain="[('category','=','mixed')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_category" string="Category"
+                        context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_tennis_ranking" model="ir.actions.act_window">
+        <field name="name">Tennis Rankings</field>
+        <field name="res_model">club.tennis.ranking</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_tennis_ranking_search"/>
+        <field name="path">club-tennis-rankings</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Inherit event.event form view ─────────────────────────── -->
+    <record id="view_event_form_inherit_club" model="ir.ui.view">
+        <field name="name">event.event.form.inherit.club</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="before">
+                <group string="Club Settings">
+                    <group>
+                        <field name="event_scope"/>
+                        <field name="sport_category"/>
+                        <field name="member_only"/>
+                    </group>
+                    <group>
+                        <field name="member_price"/>
+                        <field name="public_price"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Inherit event.event list view ─────────────────────────── -->
+    <record id="view_event_list_inherit_club" model="ir.ui.view">
+        <field name="name">event.event.list.inherit.club</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="event_scope" optional="show" widget="badge"
+                    decoration-info="event_scope == 'internal'"
+                    decoration-success="event_scope == 'external'"/>
+                <field name="sport_category" optional="show"/>
+                <field name="member_only" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Inherit event.event search view ───────────────────────── -->
+    <record id="view_event_search_inherit_club" model="ir.ui.view">
+        <field name="name">event.event.search.inherit.club</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='myevents']" position="after">
+                <separator/>
+                <filter name="internal_events" string="Internal Events"
+                    domain="[('event_scope', '=', 'internal')]"/>
+                <filter name="external_events" string="External Events"
+                    domain="[('event_scope', '=', 'external')]"/>
+                <filter name="member_only_events" string="Members Only"
+                    domain="[('member_only', '=', True)]"/>
+            </xpath>
+            <xpath expr="//filter[@name='event_type_id']" position="after">
+                <filter name="group_event_scope" string="Event Scope"
+                    context="{'group_by': 'event_scope'}"/>
+                <filter name="group_sport_category" string="Sport Category"
+                    context="{'group_by': 'sport_category'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Action for club events ────────────────────────────────── -->
+    <record id="action_club_event" model="ir.actions.act_window">
+        <field name="name">Club Events</field>
+        <field name="res_model">event.event</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
+        <field name="search_view_id" ref="event.view_event_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Club Event
+            </p><p>
+                Schedule and organize club events for members and the public.
+            </p>
+        </field>
+    </record>
+
+</odoo>

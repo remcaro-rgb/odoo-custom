@@ -1,0 +1,422 @@
+# Spanish translation for club_equestrian
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the club_equestrian module.
+#
+# Translators:
+# Manuel Caro, 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Club Equestrian 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-24 00:00+0000\n"
+"PO-Revision-Date: 2026-03-24 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_equestrian
+#: model:res.groups,name:club_equestrian.group_equestrian_staff
+msgid "Equestrian Staff"
+msgstr "Personal de Equitación"
+
+#. module: club_equestrian
+#: model:ir.ui.menu,name:club_equestrian.menu_equestrian_root
+msgid "Equestrian"
+msgstr "Equitación"
+
+#. module: club_equestrian
+#: model:ir.ui.menu,name:club_equestrian.menu_equestrian_horses
+msgid "Horses"
+msgstr "Caballos"
+
+#. module: club_equestrian
+#: model:ir.ui.menu,name:club_equestrian.menu_equestrian_stalls
+msgid "Stalls"
+msgstr "Pesebreras"
+
+#. module: club_equestrian
+#: model:ir.ui.menu,name:club_equestrian.menu_equestrian_feeding
+msgid "Feeding Schedules"
+msgstr "Programas de Alimentación"
+
+#. module: club_equestrian
+#: model:ir.ui.menu,name:club_equestrian.menu_equestrian_vet_records
+msgid "Vet Records"
+msgstr "Registros Veterinarios"
+
+#. module: club_equestrian
+#: model:ir.ui.menu,name:club_equestrian.menu_equestrian_arenas
+msgid "Arenas"
+msgstr "Arenas"
+
+#. module: club_equestrian
+#: model:ir.ui.menu,name:club_equestrian.menu_equestrian_bookings
+msgid "Arena Bookings"
+msgstr "Reservas de Arena"
+
+#. module: club_equestrian
+#: model:ir.model,name:club_equestrian.model_club_horse
+msgid "Club Horse"
+msgstr "Caballo del Club"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse__name
+msgid "Horse Name"
+msgstr "Nombre del Caballo"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse__breed
+msgid "Breed"
+msgstr "Raza"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse__color
+msgid "Coat Color"
+msgstr "Color del Pelaje"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse__birth_date
+msgid "Date of Birth"
+msgstr "Fecha de Nacimiento"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse__owner_id
+msgid "Owner"
+msgstr "Propietario"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse__registration_number
+msgid "Registration Number"
+msgstr "Número de Registro"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse__stall_id
+msgid "Stall"
+msgstr "Pesebrera"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse__photo
+msgid "Photo"
+msgstr "Foto"
+
+#. module: club_equestrian
+#: model:ir.model,name:club_equestrian.model_club_stall
+msgid "Club Stall"
+msgstr "Pesebrera del Club"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_stall__name
+msgid "Stall Name"
+msgstr "Nombre de Pesebrera"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_stall__barn_section
+msgid "Barn / Section"
+msgstr "Establo / Sección"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_stall__horse_id
+msgid "Current Horse"
+msgstr "Caballo Actual"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_stall__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_stall__status__vacant
+msgid "Vacant"
+msgstr "Vacante"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_stall__status__occupied
+msgid "Occupied"
+msgstr "Ocupada"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_stall__status__maintenance
+msgid "Maintenance"
+msgstr "Mantenimiento"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_stall__under_maintenance
+msgid "Under Maintenance"
+msgstr "En Mantenimiento"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_stall__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_equestrian
+#: model:ir.model,name:club_equestrian.model_club_horse_feeding
+msgid "Horse Feeding Schedule"
+msgstr "Programa de Alimentación del Caballo"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse_feeding__feed_type
+msgid "Feed Type"
+msgstr "Tipo de Alimento"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse_feeding__quantity
+msgid "Quantity"
+msgstr "Cantidad"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse_feeding__unit
+msgid "Unit"
+msgstr "Unidad"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_horse_feeding__unit__kg
+msgid "Kg"
+msgstr "Kg"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_horse_feeding__unit__lbs
+msgid "Lbs"
+msgstr "Lbs"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_horse_feeding__unit__flakes
+msgid "Flakes"
+msgstr "Hojuelas"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse_feeding__schedule
+msgid "Schedule"
+msgstr "Horario"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_horse_feeding__schedule__morning
+msgid "Morning"
+msgstr "Mañana"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_horse_feeding__schedule__afternoon
+msgid "Afternoon"
+msgstr "Tarde"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_horse_feeding__schedule__evening
+msgid "Evening"
+msgstr "Noche"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_horse_feeding__responsible_id
+msgid "Responsible"
+msgstr "Responsable"
+
+#. module: club_equestrian
+#: model:ir.model,name:club_equestrian.model_club_vet_record
+msgid "Veterinary Record"
+msgstr "Registro Veterinario"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_vet_record__date
+msgid "Visit Date"
+msgstr "Fecha de Visita"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_vet_record__vet_name
+msgid "Veterinarian"
+msgstr "Veterinario"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_vet_record__procedure
+msgid "Procedure / Diagnosis"
+msgstr "Procedimiento / Diagnóstico"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_vet_record__next_visit_date
+msgid "Next Scheduled Visit"
+msgstr "Próxima Visita Programada"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_vet_record__attachment_ids
+msgid "Attachments"
+msgstr "Adjuntos"
+
+#. module: club_equestrian
+#: model:ir.model,name:club_equestrian.model_club_arena
+msgid "Equestrian Arena"
+msgstr "Arena de Equitación"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_arena__name
+msgid "Arena Name"
+msgstr "Nombre de Arena"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_arena__arena_type
+msgid "Type"
+msgstr "Tipo"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_arena__arena_type__dressage
+msgid "Dressage"
+msgstr "Adiestramiento"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_arena__arena_type__jumping
+msgid "Jumping"
+msgstr "Salto"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_arena__arena_type__outdoor
+msgid "Outdoor"
+msgstr "Al Aire Libre"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_arena__arena_type__multipurpose
+msgid "Multipurpose"
+msgstr "Multipropósito"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_arena__capacity
+msgid "Max Riders"
+msgstr "Máximo de Jinetes"
+
+#. module: club_equestrian
+#: model:ir.model,name:club_equestrian.model_club_equestrian_booking
+msgid "Equestrian Arena Booking"
+msgstr "Reserva de Arena de Equitación"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_equestrian_booking__arena_id
+msgid "Arena"
+msgstr "Arena"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_equestrian_booking__affiliate_id
+msgid "Affiliate"
+msgstr "Socio"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_equestrian_booking__horse_id
+msgid "Horse"
+msgstr "Caballo"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_equestrian_booking__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_equestrian_booking__time_slot
+msgid "Start Time"
+msgstr "Hora de Inicio"
+
+#. module: club_equestrian
+#: model:ir.model.fields,field_description:club_equestrian.field_club_equestrian_booking__duration
+msgid "Duration (hours)"
+msgstr "Duración (horas)"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_equestrian_booking__status__booked
+msgid "Booked"
+msgstr "Reservado"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_equestrian_booking__status__completed
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_equestrian
+#: model:ir.model.fields.selection,name:club_equestrian.selection__club_equestrian_booking__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_equestrian
+#: code:addons/club_equestrian/models/club_equestrian_booking.py:0
+#, python-format
+msgid "Duration must be greater than zero."
+msgstr "La duración debe ser mayor a cero."
+
+#. module: club_equestrian
+#: code:addons/club_equestrian/models/club_equestrian_booking.py:0
+#, python-format
+msgid "Maximum booking duration is 2 hours."
+msgstr "La duración máxima de la reserva es de 2 horas."
+
+#. module: club_equestrian
+#: code:addons/club_equestrian/models/club_equestrian_booking.py:0
+#, python-format
+msgid "The horse \"%(horse)s\" does not belong to affiliate \"%(affiliate)s\"."
+msgstr "El caballo \"%(horse)s\" no pertenece al socio \"%(affiliate)s\"."
+
+#. module: club_equestrian
+#: code:addons/club_equestrian/models/club_equestrian_booking.py:0
+#, python-format
+msgid "This booking overlaps with an existing booking in arena \"%(arena)s\" on %(date)s."
+msgstr "Esta reserva se superpone con una reserva existente en la arena \"%(arena)s\" el %(date)s."
+
+#. module: club_equestrian
+#: code:addons/club_equestrian/models/club_vet_record.py:0
+#, python-format
+msgid "Reminder: Veterinary visit scheduled on %(date)s with %(vet)s. Procedure: %(procedure)s"
+msgstr "Recordatorio: Visita veterinaria programada el %(date)s con %(vet)s. Procedimiento: %(procedure)s"
+
+#. module: club_equestrian
+#: code:addons/club_equestrian/models/club_vet_record.py:0
+#, python-format
+msgid "Upcoming Vet Visit"
+msgstr "Próxima Visita Veterinaria"
+
+#. module: club_equestrian
+#: code:addons/club_equestrian/models/club_vet_record.py:0
+#, python-format
+msgid "N/A"
+msgstr "N/D"
+
+#. module: club_equestrian
+#: model:ir.actions.report,name:club_equestrian.action_report_feeding_sheet
+msgid "Daily Feeding Sheet"
+msgstr "Hoja de Alimentación Diaria"
+
+#. module: club_equestrian
+#: model:ir.cron,name:club_equestrian.cron_vet_visit_alert
+msgid "Equestrian: Vet Visit Reminder"
+msgstr "Equitación: Recordatorio de Visita Veterinaria"
+
+#. module: club_equestrian
+#: model:ir.actions.act_window,name:club_equestrian.action_club_horse
+msgid "Horses"
+msgstr "Caballos"
+
+#. module: club_equestrian
+#: model:ir.actions.act_window,name:club_equestrian.action_club_stall
+msgid "Stalls"
+msgstr "Pesebreras"
+
+#. module: club_equestrian
+#: model:ir.actions.act_window,name:club_equestrian.action_club_horse_feeding
+msgid "Feeding Schedules"
+msgstr "Programas de Alimentación"
+
+#. module: club_equestrian
+#: model:ir.actions.act_window,name:club_equestrian.action_club_vet_record
+msgid "Vet Records"
+msgstr "Registros Veterinarios"
+
+#. module: club_equestrian
+#: model:ir.actions.act_window,name:club_equestrian.action_club_arena
+msgid "Arenas"
+msgstr "Arenas"
+
+#. module: club_equestrian
+#: model:ir.actions.act_window,name:club_equestrian.action_club_equestrian_booking
+msgid "Arena Bookings"
+msgstr "Reservas de Arena"
+
+#. module: club_equestrian
+#: sql_constraint:club.horse:registration_number_uniq
+msgid "Registration number must be unique."
+msgstr "El número de registro debe ser único."

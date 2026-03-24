@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Internal Events (Members Only) ────────────────────── -->
+
+        <record id="event_golf_tournament" model="event.event">
+            <field name="name">Club Golf Tournament 2026</field>
+            <field name="event_scope">internal</field>
+            <field name="sport_category">golf</field>
+            <field name="member_only" eval="True"/>
+            <field name="member_price">150.00</field>
+            <field name="public_price">0.00</field>
+            <field name="date_begin" eval="DateTime.now() + timedelta(days=30)"/>
+            <field name="date_end" eval="DateTime.now() + timedelta(days=30, hours=8)"/>
+        </record>
+
+        <record id="event_social_gala" model="event.event">
+            <field name="name">Annual Social Gala Dinner</field>
+            <field name="event_scope">internal</field>
+            <field name="sport_category">social</field>
+            <field name="member_only" eval="True"/>
+            <field name="member_price">80.00</field>
+            <field name="public_price">0.00</field>
+            <field name="date_begin" eval="DateTime.now() + timedelta(days=45)"/>
+            <field name="date_end" eval="DateTime.now() + timedelta(days=45, hours=5)"/>
+        </record>
+
+        <!-- ── External Event (Open to Public) ───────────────────── -->
+
+        <record id="event_open_day" model="event.event">
+            <field name="name">Club Open Day — All Welcome</field>
+            <field name="event_scope">external</field>
+            <field name="sport_category">general</field>
+            <field name="member_only" eval="False"/>
+            <field name="member_price">0.00</field>
+            <field name="public_price">25.00</field>
+            <field name="date_begin" eval="DateTime.now() + timedelta(days=15)"/>
+            <field name="date_end" eval="DateTime.now() + timedelta(days=15, hours=10)"/>
+        </record>
+
+        <!-- ── Registrations ─────────────────────────────────────── -->
+
+        <!-- Member registration to golf tournament -->
+        <record id="registration_carlos_golf" model="event.registration">
+            <field name="event_id" ref="event_golf_tournament"/>
+            <field name="name">Carlos Rodriguez</field>
+            <field name="email">carlos@example.com</field>
+            <field name="attendee_type">member</field>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="applied_price">150.00</field>
+        </record>
+
+        <!-- Member registration to social gala -->
+        <record id="registration_ana_gala" model="event.registration">
+            <field name="event_id" ref="event_social_gala"/>
+            <field name="name">Ana Martinez</field>
+            <field name="email">ana@example.com</field>
+            <field name="attendee_type">member</field>
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="applied_price">80.00</field>
+        </record>
+
+        <!-- Public registration to open day -->
+        <record id="registration_public_open_day" model="event.registration">
+            <field name="event_id" ref="event_open_day"/>
+            <field name="name">External Visitor</field>
+            <field name="email">visitor@example.com</field>
+            <field name="attendee_type">public</field>
+            <field name="applied_price">25.00</field>
+        </record>
+
+        <!-- Guest registration to open day -->
+        <record id="registration_guest_open_day" model="event.registration">
+            <field name="event_id" ref="event_open_day"/>
+            <field name="name">Invited Guest</field>
+            <field name="email">guest@example.com</field>
+            <field name="attendee_type">guest</field>
+            <field name="applied_price">25.00</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,210 @@
+# Spanish translation for club_events
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the club_events module.
+#
+# Translators:
+# Manuel Caro, 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Club Events 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-24 00:00+0000\n"
+"PO-Revision-Date: 2026-03-24 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_events
+#: model:res.groups,name:club_events.group_events_staff
+msgid "Events Staff"
+msgstr "Personal de Eventos"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_event__event_scope
+msgid "Event Scope"
+msgstr "Alcance del Evento"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_event__event_scope__internal
+msgid "Internal"
+msgstr "Interno"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_event__event_scope__external
+msgid "External"
+msgstr "Externo"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_event__sport_category
+msgid "Sport Category"
+msgstr "Categoría Deportiva"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_event__sport_category__golf
+msgid "Golf"
+msgstr "Golf"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_event__sport_category__equestrian
+msgid "Equestrian"
+msgstr "Equitación"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_event__sport_category__tennis
+msgid "Tennis"
+msgstr "Tenis"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_event__sport_category__social
+msgid "Social"
+msgstr "Social"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_event__sport_category__general
+msgid "General"
+msgstr "General"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_event__member_only
+msgid "Members Only"
+msgstr "Solo Socios"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_event__member_price
+msgid "Member Price"
+msgstr "Precio Socio"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_event__public_price
+msgid "Public Price"
+msgstr "Precio Público"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_registration__affiliate_id
+msgid "Affiliate"
+msgstr "Socio"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_registration__attendee_type
+msgid "Attendee Type"
+msgstr "Tipo de Asistente"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_registration__attendee_type__member
+msgid "Member"
+msgstr "Socio"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_registration__attendee_type__guest
+msgid "Guest"
+msgstr "Invitado"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_registration__attendee_type__public
+msgid "Public"
+msgstr "Público"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_registration__applied_price
+msgid "Applied Price"
+msgstr "Precio Aplicado"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_registration__payment_move_id
+msgid "Payment Invoice"
+msgstr "Factura de Pago"
+
+#. module: club_events
+#: model:ir.model.fields,field_description:club_events.field_event_registration__payment_status
+msgid "Payment Status"
+msgstr "Estado de Pago"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_registration__payment_status__pending
+msgid "Pending"
+msgstr "Pendiente"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_registration__payment_status__paid
+msgid "Paid"
+msgstr "Pagado"
+
+#. module: club_events
+#: model:ir.model.fields.selection,name:club_events.selection__event_registration__payment_status__refunded
+msgid "Refunded"
+msgstr "Reembolsado"
+
+#. module: club_events
+#: model:ir.ui.menu,name:club_events.menu_club_events
+msgid "Events"
+msgstr "Eventos"
+
+#. module: club_events
+#: model:ir.ui.menu,name:club_events.menu_club_events_list
+msgid "All Events"
+msgstr "Todos los Eventos"
+
+#. module: club_events
+#: model:ir.ui.menu,name:club_events.menu_club_events_registrations
+msgid "Registrations"
+msgstr "Inscripciones"
+
+#. module: club_events
+#: model:ir.actions.act_window,name:club_events.action_club_event
+msgid "Club Events"
+msgstr "Eventos del Club"
+
+#. module: club_events
+#: model:ir.actions.act_window,name:club_events.action_club_event_registration
+msgid "Event Registrations"
+msgstr "Inscripciones a Eventos"
+
+#. module: club_events
+#: model:ir.ui.view,arch_db:club_events.view_event_form_inherit_club
+msgid "Club Settings"
+msgstr "Configuración del Club"
+
+#. module: club_events
+#: model:ir.ui.view,arch_db:club_events.view_event_registration_form_inherit_club
+msgid "Club Information"
+msgstr "Información del Club"
+
+#. module: club_events
+#: model:ir.rule,name:club_events.rule_event_club_member_all
+msgid "Event: club members see all events"
+msgstr "Evento: socios del club ven todos los eventos"
+
+#. module: club_events
+#: model:ir.rule,name:club_events.rule_event_portal_public_only
+msgid "Event: portal sees only public events"
+msgstr "Evento: portal solo ve eventos públicos"
+
+#. module: club_events
+#: model:ir.rule,name:club_events.rule_registration_portal_own
+msgid "Registration: portal sees own registrations"
+msgstr "Inscripción: portal ve sus propias inscripciones"
+
+#. module: club_events
+#: view filter label
+msgid "Internal Events"
+msgstr "Eventos Internos"
+
+#. module: club_events
+#: view filter label
+msgid "External Events"
+msgstr "Eventos Externos"
+
+#. module: club_events
+#: view filter label
+msgid "Members"
+msgstr "Socios"
+
+#. module: club_events
+#: view filter label
+msgid "Guests"
+msgstr "Invitados"

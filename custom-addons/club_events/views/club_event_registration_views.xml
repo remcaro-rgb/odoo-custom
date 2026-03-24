@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Inherit event.registration form view ──────────────────── -->
+    <record id="view_event_registration_form_inherit_club" model="ir.ui.view">
+        <field name="name">event.registration.form.inherit.club</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='event']" position="after">
+                <group string="Club Information" name="club_info">
+                    <group>
+                        <field name="attendee_type" widget="badge"
+                            decoration-info="attendee_type == 'member'"
+                            decoration-warning="attendee_type == 'guest'"
+                            decoration-muted="attendee_type == 'public'"/>
+                        <field name="affiliate_id"
+                            invisible="attendee_type != 'member'"/>
+                    </group>
+                    <group>
+                        <field name="applied_price"/>
+                        <field name="payment_move_id"/>
+                        <field name="payment_status" widget="badge"
+                            decoration-warning="payment_status == 'pending'"
+                            decoration-success="payment_status == 'paid'"
+                            decoration-danger="payment_status == 'refunded'"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Inherit event.registration list view ──────────────────── -->
+    <record id="view_event_registration_list_inherit_club" model="ir.ui.view">
+        <field name="name">event.registration.list.inherit.club</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='event_ticket_id']" position="after">
+                <field name="attendee_type" optional="show" widget="badge"
+                    decoration-info="attendee_type == 'member'"
+                    decoration-warning="attendee_type == 'guest'"
+                    decoration-muted="attendee_type == 'public'"/>
+                <field name="affiliate_id" optional="hide"/>
+                <field name="applied_price" optional="show" sum="Total"/>
+                <field name="payment_status" optional="show" widget="badge"
+                    decoration-warning="payment_status == 'pending'"
+                    decoration-success="payment_status == 'paid'"
+                    decoration-danger="payment_status == 'refunded'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Inherit event.registration search view ────────────────── -->
+    <record id="view_event_registration_search_inherit_club" model="ir.ui.view">
+        <field name="name">event.registration.search.inherit.club</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_registration_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='attended']" position="after">
+                <separator/>
+                <filter name="members" string="Members"
+                    domain="[('attendee_type', '=', 'member')]"/>
+                <filter name="guests" string="Guests"
+                    domain="[('attendee_type', '=', 'guest')]"/>
+                <filter name="public_attendees" string="Public"
+                    domain="[('attendee_type', '=', 'public')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='group_by_utm_medium_id']" position="after">
+                <filter name="group_attendee_type" string="Attendee Type"
+                    context="{'group_by': 'attendee_type'}"/>
+                <filter name="group_payment_status" string="Payment Status"
+                    context="{'group_by': 'payment_status'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Action for club registrations ─────────────────────────── -->
+    <record id="action_club_event_registration" model="ir.actions.act_window">
+        <field name="name">Event Registrations</field>
+        <field name="res_model">event.registration</field>
+        <field name="view_mode">list,kanban,form,calendar</field>
+        <field name="search_view_id" ref="event.view_registration_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No registrations yet.
+            </p><p>
+                Registrations appear here as attendees sign up for club events.
+            </p>
+        </field>
+    </record>
+
+</odoo>

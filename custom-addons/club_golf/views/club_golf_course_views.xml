@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_golf_course_list" model="ir.ui.view">
+        <field name="name">club.golf.course.list</field>
+        <field name="model">club.golf.course</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="holes"/>
+                <field name="par"/>
+                <field name="slope_rating"/>
+                <field name="course_rating"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_golf_course_form" model="ir.ui.view">
+        <field name="name">club.golf.course.form</field>
+        <field name="model">club.golf.course</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Course Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="holes"/>
+                            <field name="par"/>
+                        </group>
+                        <group>
+                            <field name="slope_rating"/>
+                            <field name="course_rating"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_golf_course_search" model="ir.ui.view">
+        <field name="name">club.golf.course.search</field>
+        <field name="model">club.golf.course</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_holes" string="Holes"
+                        context="{'group_by': 'holes'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_golf_course" model="ir.actions.act_window">
+        <field name="name">Golf Courses</field>
+        <field name="res_model">club.golf.course</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_golf_course_search"/>
+        <field name="path">golf-courses</field>
+    </record>
+
+</odoo>

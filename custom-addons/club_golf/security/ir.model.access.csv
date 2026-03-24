@@ -1,0 +1,24 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_golf_course_admin,club.golf.course admin,model_club_golf_course,club_core.group_club_admin,1,1,1,1
+access_club_golf_course_staff,club.golf.course staff,model_club_golf_course,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_tee_time_admin,club.golf.tee.time admin,model_club_golf_tee_time,club_core.group_club_admin,1,1,1,1
+access_club_golf_tee_time_staff,club.golf.tee.time staff,model_club_golf_tee_time,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_tee_time_member,club.golf.tee.time member,model_club_golf_tee_time,club_core.group_club_member,1,0,0,0
+access_club_golf_caddie_admin,club.golf.caddie admin,model_club_golf_caddie,club_core.group_club_admin,1,1,1,1
+access_club_golf_caddie_staff,club.golf.caddie staff,model_club_golf_caddie,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_caddie_avail_admin,club.golf.caddie.availability admin,model_club_golf_caddie_availability,club_core.group_club_admin,1,1,1,1
+access_club_golf_caddie_avail_staff,club.golf.caddie.availability staff,model_club_golf_caddie_availability,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_cart_admin,club.golf.cart admin,model_club_golf_cart,club_core.group_club_admin,1,1,1,1
+access_club_golf_cart_staff,club.golf.cart staff,model_club_golf_cart,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_bag_admin,club.golf.bag admin,model_club_golf_bag,club_core.group_club_admin,1,1,1,1
+access_club_golf_bag_staff,club.golf.bag staff,model_club_golf_bag,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_scorecard_admin,club.golf.scorecard admin,model_club_golf_scorecard,club_core.group_club_admin,1,1,1,1
+access_club_golf_scorecard_staff,club.golf.scorecard staff,model_club_golf_scorecard,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_scorecard_member,club.golf.scorecard member,model_club_golf_scorecard,club_core.group_club_member,1,0,0,0
+access_club_golf_scorecard_line_admin,club.golf.scorecard.line admin,model_club_golf_scorecard_line,club_core.group_club_admin,1,1,1,1
+access_club_golf_scorecard_line_staff,club.golf.scorecard.line staff,model_club_golf_scorecard_line,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_scorecard_line_member,club.golf.scorecard.line member,model_club_golf_scorecard_line,club_core.group_club_member,1,0,0,0
+access_club_golf_handicap_admin,club.golf.handicap admin,model_club_golf_handicap,club_core.group_club_admin,1,1,1,1
+access_club_golf_handicap_staff,club.golf.handicap staff,model_club_golf_handicap,club_golf.group_golf_staff,1,1,1,1
+access_club_golf_handicap_history_admin,club.golf.handicap.history admin,model_club_golf_handicap_history,club_core.group_club_admin,1,1,1,1
+access_club_golf_handicap_history_staff,club.golf.handicap.history staff,model_club_golf_handicap_history,club_golf.group_golf_staff,1,1,1,1

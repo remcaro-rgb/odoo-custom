@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_tennis_booking_list" model="ir.ui.view">
+        <field name="name">club.tennis.booking.list</field>
+        <field name="model">club.tennis.booking</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="court_id"/>
+                <field name="date"/>
+                <field name="time_slot" widget="float_time"/>
+                <field name="duration"/>
+                <field name="affiliate_ids" widget="many2many_tags"/>
+                <field name="caddie_id"/>
+                <field name="status" widget="badge"
+                    decoration-info="status == 'booked'"
+                    decoration-success="status == 'completed'"
+                    decoration-danger="status == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_tennis_booking_form" model="ir.ui.view">
+        <field name="name">club.tennis.booking.form</field>
+        <field name="model">club.tennis.booking</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="booked,completed,cancelled"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="court_id"/>
+                            <field name="date"/>
+                            <field name="time_slot" widget="float_time"/>
+                            <field name="duration"/>
+                        </group>
+                        <group>
+                            <field name="caddie_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Players" name="players">
+                            <field name="affiliate_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Matches" name="matches">
+                            <field name="match_ids">
+                                <list>
+                                    <field name="player_ids" widget="many2many_tags"/>
+                                    <field name="set_1_score"/>
+                                    <field name="set_2_score"/>
+                                    <field name="set_3_score"/>
+                                    <field name="winner_id"/>
+                                    <field name="ranking_points_awarded"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_tennis_booking_search" model="ir.ui.view">
+        <field name="name">club.tennis.booking.search</field>
+        <field name="model">club.tennis.booking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="court_id"/>
+                <field name="date"/>
+                <field name="caddie_id"/>
+                <filter name="booked" string="Booked"
+                    domain="[('status','=','booked')]"/>
+                <filter name="completed" string="Completed"
+                    domain="[('status','=','completed')]"/>
+                <filter name="cancelled" string="Cancelled"
+                    domain="[('status','=','cancelled')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_court" string="Court"
+                        context="{'group_by': 'court_id'}"/>
+                    <filter name="group_date" string="Date"
+                        context="{'group_by': 'date'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_tennis_booking" model="ir.actions.act_window">
+        <field name="name">Tennis Bookings</field>
+        <field name="res_model">club.tennis.booking</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_tennis_booking_search"/>
+        <field name="context">{'search_default_booked': 1}</field>
+        <field name="path">club-tennis-bookings</field>
+    </record>
+
+</odoo>

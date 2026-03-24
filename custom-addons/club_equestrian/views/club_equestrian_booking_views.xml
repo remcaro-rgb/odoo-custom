@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_equestrian_booking_list" model="ir.ui.view">
+        <field name="name">club.equestrian.booking.list</field>
+        <field name="model">club.equestrian.booking</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="arena_id"/>
+                <field name="affiliate_id"/>
+                <field name="horse_id"/>
+                <field name="date"/>
+                <field name="time_slot" widget="float_time"/>
+                <field name="duration"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'booked'"
+                    decoration-info="status == 'completed'"
+                    decoration-muted="status == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_equestrian_booking_form" model="ir.ui.view">
+        <field name="name">club.equestrian.booking.form</field>
+        <field name="model">club.equestrian.booking</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="arena_id"/>
+                            <field name="affiliate_id"/>
+                            <field name="horse_id"
+                                domain="[('owner_id', '=', affiliate_id)]"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="time_slot" widget="float_time"/>
+                            <field name="duration"/>
+                            <field name="status" widget="badge"
+                                decoration-success="status == 'booked'"
+                                decoration-info="status == 'completed'"
+                                decoration-muted="status == 'cancelled'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_equestrian_booking_search" model="ir.ui.view">
+        <field name="name">club.equestrian.booking.search</field>
+        <field name="model">club.equestrian.booking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="arena_id"/>
+                <field name="affiliate_id"/>
+                <field name="horse_id"/>
+                <filter name="booked" string="Booked"
+                    domain="[('status', '=', 'booked')]"/>
+                <filter name="completed" string="Completed"
+                    domain="[('status', '=', 'completed')]"/>
+                <filter name="cancelled" string="Cancelled"
+                    domain="[('status', '=', 'cancelled')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_arena" string="Arena"
+                        context="{'group_by': 'arena_id'}"/>
+                    <filter name="group_date" string="Date"
+                        context="{'group_by': 'date'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_equestrian_booking" model="ir.actions.act_window">
+        <field name="name">Arena Bookings</field>
+        <field name="res_model">club.equestrian.booking</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_equestrian_booking_search"/>
+        <field name="context">{'search_default_booked': 1}</field>
+        <field name="path">club-equestrian-bookings</field>
+    </record>
+
+</odoo>

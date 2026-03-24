@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_golf_handicap_list" model="ir.ui.view">
+        <field name="name">club.golf.handicap.list</field>
+        <field name="model">club.golf.handicap</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="affiliate_id"/>
+                <field name="handicap_index"/>
+                <field name="revision_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_golf_handicap_form" model="ir.ui.view">
+        <field name="name">club.golf.handicap.form</field>
+        <field name="model">club.golf.handicap</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="affiliate_id"/>
+                            <field name="handicap_index"/>
+                            <field name="revision_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="History" name="history">
+                            <field name="history_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="handicap_index"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_golf_handicap_search" model="ir.ui.view">
+        <field name="name">club.golf.handicap.search</field>
+        <field name="model">club.golf.handicap</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="affiliate_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_golf_handicap" model="ir.actions.act_window">
+        <field name="name">Handicaps</field>
+        <field name="res_model">club.golf.handicap</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_golf_handicap_search"/>
+        <field name="path">golf-handicaps</field>
+    </record>
+
+</odoo>

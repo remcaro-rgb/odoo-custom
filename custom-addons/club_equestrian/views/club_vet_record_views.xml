@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_vet_record_list" model="ir.ui.view">
+        <field name="name">club.vet.record.list</field>
+        <field name="model">club.vet.record</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="horse_id"/>
+                <field name="date"/>
+                <field name="vet_name"/>
+                <field name="procedure"/>
+                <field name="next_visit_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_vet_record_form" model="ir.ui.view">
+        <field name="name">club.vet.record.form</field>
+        <field name="model">club.vet.record</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="horse_id"/>
+                            <field name="date"/>
+                            <field name="vet_name"/>
+                        </group>
+                        <group>
+                            <field name="next_visit_date"/>
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="procedure"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_vet_record_search" model="ir.ui.view">
+        <field name="name">club.vet.record.search</field>
+        <field name="model">club.vet.record</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="horse_id"/>
+                <field name="vet_name"/>
+                <filter name="upcoming" string="Upcoming Visits"
+                    domain="[('next_visit_date', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_horse" string="Horse"
+                        context="{'group_by': 'horse_id'}"/>
+                    <filter name="group_vet" string="Veterinarian"
+                        context="{'group_by': 'vet_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_vet_record" model="ir.actions.act_window">
+        <field name="name">Vet Records</field>
+        <field name="res_model">club.vet.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_vet_record_search"/>
+        <field name="path">club-vet-records</field>
+    </record>
+
+</odoo>

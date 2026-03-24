@@ -1,0 +1,27 @@
+{
+    'name': 'Club Golf',
+    'version': '18.0.1.0.0',
+    'summary': 'Social Country Club — Golf Management',
+    'description': 'Golf module: tee times, courses, scorecards, handicaps, caddies, carts, bags.',
+    'category': 'Club Management',
+    'author': 'Manuel Caro',
+    'license': 'LGPL-3',
+    'depends': ['club_core'],
+    'data': [
+        'security/club_golf_security.xml',
+        'security/ir.model.access.csv',
+        'views/club_golf_course_views.xml',
+        'views/club_golf_tee_time_views.xml',
+        'views/club_golf_caddie_views.xml',
+        'views/club_golf_cart_views.xml',
+        'views/club_golf_bag_views.xml',
+        'views/club_golf_scorecard_views.xml',
+        'views/club_golf_handicap_views.xml',
+        'views/club_golf_menus.xml',
+    ],
+    'demo': [
+        'data/demo_data.xml',
+    ],
+    'installable': True,
+    'application': False,
+}

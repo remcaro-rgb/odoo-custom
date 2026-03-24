@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_event_event_events_staff,event.event events staff,event.model_event_event,club_events.group_events_staff,1,1,1,1
+access_event_registration_events_staff,event.registration events staff,event.model_event_registration,club_events.group_events_staff,1,1,1,1
+access_event_event_club_member,event.event club member,event.model_event_event,club_core.group_club_member,1,0,0,0
+access_event_registration_club_member,event.registration club member,event.model_event_registration,club_core.group_club_member,1,0,0,0
