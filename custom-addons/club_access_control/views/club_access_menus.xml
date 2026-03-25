@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Access Control parent menu ──────────────────────────────── -->
+
+    <menuitem id="menu_club_access_control"
+        name="Access Control"
+        parent="club_core.menu_club_root"
+        sequence="40"/>
+
+    <!-- ── Guard quick-access entries ──────────────────────────────── -->
+
+    <menuitem id="menu_club_access_new_entry"
+        name="New Entry"
+        parent="menu_club_access_control"
+        action="action_club_access_entry_new"
+        sequence="10"
+        groups="club_access_control.group_access_staff"/>
+
+    <menuitem id="menu_club_access_log"
+        name="Access Log"
+        parent="menu_club_access_control"
+        action="action_club_access_entry_log"
+        sequence="20"/>
+
+    <menuitem id="menu_club_access_active"
+        name="Active Entries"
+        parent="menu_club_access_control"
+        action="action_club_access_entry_active"
+        sequence="30"/>
+
+    <menuitem id="menu_club_access_vehicles"
+        name="Vehicles"
+        parent="menu_club_access_control"
+        action="action_club_access_vehicle"
+        sequence="40"/>
+
+    <!-- ── Administration submenu ──────────────────────────────────── -->
+
+    <menuitem id="menu_club_access_admin"
+        name="Administration"
+        parent="menu_club_access_control"
+        sequence="90"
+        groups="club_access_control.group_access_manager,club_core.group_club_admin"/>
+
+    <menuitem id="menu_club_access_checkpoints"
+        name="Checkpoints"
+        parent="menu_club_access_admin"
+        action="action_club_access_checkpoint"
+        sequence="10"/>
+
+    <menuitem id="menu_club_access_suppliers"
+        name="Suppliers"
+        parent="menu_club_access_admin"
+        action="action_club_access_supplier"
+        sequence="20"/>
+
+    <menuitem id="menu_club_access_supplier_staff"
+        name="Supplier Staff"
+        parent="menu_club_access_admin"
+        action="action_club_access_supplier_staff"
+        sequence="30"/>
+
+</odoo>

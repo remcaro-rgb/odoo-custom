@@ -1,0 +1,750 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * club_access_control
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 00:00+0000\n"
+"PO-Revision-Date: 2025-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_access_control
+#: model:ir.model,name:club_access_control.model_club_access_vehicle
+msgid "Club Access Vehicle"
+msgstr "Vehiculo de Acceso al Club"
+
+#. module: club_access_control
+#: model:ir.model,name:club_access_control.model_club_access_checkpoint
+msgid "Club Access Checkpoint"
+msgstr "Punto de Control de Acceso"
+
+#. module: club_access_control
+#: model:ir.model,name:club_access_control.model_club_access_supplier
+msgid "Club Access Supplier"
+msgstr "Proveedor de Acceso al Club"
+
+#. module: club_access_control
+#: model:ir.model,name:club_access_control.model_club_access_supplier_staff
+msgid "Club Access Supplier Staff"
+msgstr "Personal de Proveedor"
+
+#. module: club_access_control
+#: model:ir.model,name:club_access_control.model_club_access_entry
+msgid "Club Access Entry"
+msgstr "Entrada de Acceso al Club"
+
+#. module: club_access_control
+#: model:ir.model,name:club_access_control.model_club_access_lookup_wizard
+msgid "Access Lookup Wizard"
+msgstr "Asistente de Busqueda de Acceso"
+
+#. module: club_access_control
+#: model:ir.model,name:club_access_control.model_club_access_lookup_result
+msgid "Access Lookup Result"
+msgstr "Resultado de Busqueda de Acceso"
+
+#. module: club_access_control
+#: model:ir.model,name:club_access_control.model_club_access_deny_wizard
+msgid "Deny Access Wizard"
+msgstr "Asistente de Denegacion de Acceso"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__affiliate_id
+msgid "Affiliate"
+msgstr "Afiliado"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__plate_number
+msgid "Plate Number"
+msgstr "Numero de Placa"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__vehicle_type
+msgid "Vehicle Type"
+msgstr "Tipo de Vehiculo"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_vehicle__vehicle_type__car
+msgid "Car"
+msgstr "Automovil"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_vehicle__vehicle_type__motorcycle
+msgid "Motorcycle"
+msgstr "Motocicleta"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_vehicle__vehicle_type__bicycle
+msgid "Bicycle"
+msgstr "Bicicleta"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__brand
+msgid "Brand"
+msgstr "Marca"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__model
+msgid "Model"
+msgstr "Modelo"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__color
+msgid "Color"
+msgstr "Color"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__year
+msgid "Year"
+msgstr "Ano"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_checkpoint__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_checkpoint__location
+msgid "Location"
+msgstr "Ubicacion"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_checkpoint__checkpoint_type
+msgid "Checkpoint Type"
+msgstr "Tipo de Punto de Control"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_checkpoint__checkpoint_type__main_gate
+msgid "Main Gate"
+msgstr "Puerta Principal"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_checkpoint__checkpoint_type__parking
+msgid "Parking"
+msgstr "Parqueadero"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_checkpoint__checkpoint_type__pool_area
+msgid "Pool Area"
+msgstr "Area de Piscina"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_checkpoint__checkpoint_type__sports_area
+msgid "Sports Area"
+msgstr "Area Deportiva"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_checkpoint__checkpoint_type__service_entrance
+msgid "Service Entrance"
+msgstr "Entrada de Servicio"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier__contract_reference
+msgid "Contract Reference"
+msgstr "Referencia de Contrato"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier__staff_count
+msgid "Staff Count"
+msgstr "Cantidad de Personal"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier_staff__identification_type
+msgid "Identification Type"
+msgstr "Tipo de Identificacion"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_supplier_staff__identification_type__cc
+msgid "CC - Cedula de Ciudadania"
+msgstr "CC - Cedula de Ciudadania"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_supplier_staff__identification_type__ce
+msgid "CE - Cedula de Extranjeria"
+msgstr "CE - Cedula de Extranjeria"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_supplier_staff__identification_type__passport
+msgid "Passport"
+msgstr "Pasaporte"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier_staff__identification_number
+msgid "Identification Number"
+msgstr "Numero de Identificacion"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__name
+msgid "Entry Number"
+msgstr "Numero de Entrada"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__checkpoint_id
+msgid "Checkpoint"
+msgstr "Punto de Control"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__entry_datetime
+msgid "Entry Date/Time"
+msgstr "Fecha/Hora de Entrada"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__exit_datetime
+msgid "Exit Date/Time"
+msgstr "Fecha/Hora de Salida"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__person_type
+msgid "Person Type"
+msgstr "Tipo de Persona"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__person_type__affiliate
+msgid "Affiliate"
+msgstr "Afiliado"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__person_type__family_member
+msgid "Family Member"
+msgstr "Miembro Familiar"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__person_type__affiliate_employee
+msgid "Affiliate Employee"
+msgstr "Empleado del Afiliado"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__person_type__guest
+msgid "Guest"
+msgstr "Invitado"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__person_type__event_attendee
+msgid "Event Attendee"
+msgstr "Asistente de Evento"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__person_type__tournament_participant
+msgid "Tournament Participant"
+msgstr "Participante de Torneo"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__person_type__supplier_staff
+msgid "Supplier Staff"
+msgstr "Personal de Proveedor"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__person_name
+msgid "Person Name"
+msgstr "Nombre de la Persona"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__identification_method
+msgid "Identification Method"
+msgstr "Metodo de Identificacion"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__identification_method__membership_card
+msgid "Membership Card"
+msgstr "Carnet de Membresia"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__identification_method__access_card
+msgid "Access Card"
+msgstr "Tarjeta de Acceso"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__identification_method__gov_id
+msgid "Government ID"
+msgstr "Documento de Identidad"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__identification_method__vehicle_plate
+msgid "Vehicle Plate"
+msgstr "Placa de Vehiculo"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__identification_method__manual_lookup
+msgid "Manual Lookup"
+msgstr "Busqueda Manual"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__identification_value
+msgid "Identifier"
+msgstr "Identificador"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__access_status
+msgid "Access Status"
+msgstr "Estado de Acceso"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__access_status__pending
+msgid "Pending"
+msgstr "Pendiente"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__access_status__granted
+msgid "Granted"
+msgstr "Concedido"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__access_status__denied
+msgid "Denied"
+msgstr "Denegado"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_entry__access_status__exited
+msgid "Exited"
+msgstr "Salida"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__denial_reason
+msgid "Denial Reason"
+msgstr "Razon de Denegacion"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__authorized_by
+msgid "Authorized By"
+msgstr "Autorizado Por"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__is_active_entry
+msgid "Active Entry"
+msgstr "Entrada Activa"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__duration_minutes
+msgid "Duration (min)"
+msgstr "Duracion (min)"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__notes
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__notes
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_checkpoint__notes
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier__notes
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier_staff__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_vehicle__active
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_checkpoint__active
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_supplier_staff__status__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_supplier_staff__status__suspended
+msgid "Suspended"
+msgstr "Suspendido"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_supplier_staff__status__inactive
+msgid "Inactive"
+msgstr "Inactivo"
+
+#. module: club_access_control
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_vehicle__vehicle_type__other
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_checkpoint__checkpoint_type__other
+#: model:ir.model.fields.selection,name:club_access_control.selection__club_access_supplier_staff__identification_type__other
+msgid "Other"
+msgstr "Otro"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier__partner_id
+msgid "Partner"
+msgstr "Contacto"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier_staff__phone
+msgid "Phone"
+msgstr "Telefono"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier_staff__photo
+msgid "Photo"
+msgstr "Foto"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier_staff__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier_staff__supplier_id
+msgid "Supplier"
+msgstr "Proveedor"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__vehicle_id
+msgid "Vehicle"
+msgstr "Vehiculo"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__employee_id
+msgid "Employee"
+msgstr "Empleado"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__guest_id
+msgid "Guest"
+msgstr "Invitado"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__guest_visit_id
+msgid "Guest Visit"
+msgstr "Visita de Invitado"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__event_registration_id
+msgid "Event Registration"
+msgstr "Registro de Evento"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__tournament_participant_id
+msgid "Tournament Participant"
+msgstr "Participante de Torneo"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__supplier_staff_id
+msgid "Supplier Staff"
+msgstr "Personal de Proveedor"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_entry__person_photo
+msgid "Person Photo"
+msgstr "Foto de la Persona"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_lookup_wizard__search_term
+msgid "Search Term"
+msgstr "Termino de Busqueda"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_lookup_wizard__result_ids
+msgid "Results"
+msgstr "Resultados"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_lookup_result__person_ref
+msgid "Person Reference"
+msgstr "Referencia de Persona"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_deny_wizard__reason
+msgid "Denial Reason"
+msgstr "Razon de Denegacion"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Please enter or scan an identifier."
+msgstr "Por favor ingrese o escanee un identificador."
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "No matching person found for identifier: %s"
+msgstr "No se encontro persona para el identificador: %s"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Membership is not active (status: %s)"
+msgstr "La membresia no esta activa (estado: %s)"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Employee is not active (status: %s)"
+msgstr "El empleado no esta activo (estado: %s)"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Employer affiliate \"%s\" does not have an active membership"
+msgstr "El afiliado empleador \"%s\" no tiene una membresia activa"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Affiliate \"%s\" membership is not active (status: %s)"
+msgstr "La membresia del afiliado \"%s\" no esta activa (estado: %s)"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "No visit registered for today for guest \"%s\""
+msgstr "No hay visita registrada para hoy para el invitado \"%s\""
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Supplier staff is not active (status: %s)"
+msgstr "El personal del proveedor no esta activo (estado: %s)"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Only entries with granted access can be exited."
+msgstr "Solo las entradas con acceso concedido pueden registrar salida."
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Only pending entries can be manually granted."
+msgstr "Solo las entradas pendientes pueden ser concedidas manualmente."
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Only pending entries can be denied."
+msgstr "Solo las entradas pendientes pueden ser denegadas."
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Manually denied"
+msgstr "Denegado manualmente"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Deny Access"
+msgstr "Denegar Acceso"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "Lookup Results"
+msgstr "Resultados de Busqueda"
+
+#. module: club_access_control
+#. odoo-python
+#: code:addons/club_access_control/models/club_access_entry.py:0
+msgid "New"
+msgstr "Nuevo"
+
+#. module: club_access_control
+#: model:ir.actions.act_window,name:club_access_control.action_club_access_entry_new
+msgid "New Entry"
+msgstr "Nueva Entrada"
+
+#. module: club_access_control
+#: model:ir.actions.act_window,name:club_access_control.action_club_access_entry_log
+msgid "Access Log"
+msgstr "Registro de Acceso"
+
+#. module: club_access_control
+#: model:ir.actions.act_window,name:club_access_control.action_club_access_entry_active
+msgid "Active Entries"
+msgstr "Entradas Activas"
+
+#. module: club_access_control
+#: model:ir.actions.act_window,name:club_access_control.action_club_access_vehicle
+msgid "Vehicles"
+msgstr "Vehiculos"
+
+#. module: club_access_control
+#: model:ir.actions.act_window,name:club_access_control.action_club_access_checkpoint
+msgid "Checkpoints"
+msgstr "Puntos de Control"
+
+#. module: club_access_control
+#: model:ir.actions.act_window,name:club_access_control.action_club_access_supplier
+msgid "Suppliers"
+msgstr "Proveedores"
+
+#. module: club_access_control
+#: model:ir.actions.act_window,name:club_access_control.action_club_access_supplier_staff
+msgid "Supplier Staff"
+msgstr "Personal de Proveedores"
+
+#. module: club_access_control
+#: model:ir.ui.menu,name:club_access_control.menu_club_access_control
+msgid "Access Control"
+msgstr "Control de Acceso"
+
+#. module: club_access_control
+#: model:ir.ui.menu,name:club_access_control.menu_club_access_admin
+msgid "Administration"
+msgstr "Administracion"
+
+#. module: club_access_control
+#: model:res.groups,name:club_access_control.group_access_staff
+msgid "Access Control Staff (Guard)"
+msgstr "Personal de Control de Acceso (Guardia)"
+
+#. module: club_access_control
+#: model:res.groups,name:club_access_control.group_access_manager
+msgid "Access Control Manager"
+msgstr "Administrador de Control de Acceso"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Search"
+msgstr "Buscar"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Grant Access"
+msgstr "Conceder Acceso"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Deny Access"
+msgstr "Denegar Acceso"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Register Exit"
+msgstr "Registrar Salida"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Grant access manually without lookup?"
+msgstr "Conceder acceso manualmente sin busqueda?"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Identification"
+msgstr "Identificacion"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Person Identified"
+msgstr "Persona Identificada"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Scan or type identifier..."
+msgstr "Escanee o digite identificador..."
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Additional notes..."
+msgstr "Notas adicionales..."
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_form
+msgid "Denied"
+msgstr "Denegado"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_deny_wizard_form
+msgid "Confirm Denial"
+msgstr "Confirmar Denegacion"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_deny_wizard_form
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_deny_wizard_form
+msgid "Enter denial reason..."
+msgstr "Ingrese razon de denegacion..."
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_lookup_wizard_form
+msgid "Lookup Results"
+msgstr "Resultados de Busqueda"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_lookup_wizard_form
+msgid "Select"
+msgstr "Seleccionar"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_lookup_wizard_form
+msgid "Close"
+msgstr "Cerrar"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_supplier_form
+msgid "Staff Members"
+msgstr "Miembros del Personal"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Today"
+msgstr "Hoy"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Active Entries"
+msgstr "Entradas Activas"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Affiliates"
+msgstr "Afiliados"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Employees"
+msgstr "Empleados"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Guests"
+msgstr "Invitados"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Event Attendees"
+msgstr "Asistentes de Eventos"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Tournament Participants"
+msgstr "Participantes de Torneos"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Group By"
+msgstr "Agrupar Por"
+
+#. module: club_access_control
+#: model_terms:ir.ui.view,arch_db:club_access_control.view_club_access_entry_search
+msgid "Entry Date"
+msgstr "Fecha de Entrada"
+
+#. module: club_access_control
+#: model:ir.sequence,name:club_access_control.seq_club_access_entry
+msgid "Club Access Entry"
+msgstr "Entrada de Acceso al Club"
+
+#. module: club_access_control
+#: model:ir.model.constraint,message:club_access_control.constraint_club_access_vehicle_plate_number_uniq
+msgid "Plate number must be unique."
+msgstr "El numero de placa debe ser unico."
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier__staff_ids
+msgid "Staff Members"
+msgstr "Miembros del Personal"
+
+#. module: club_access_control
+#: model:ir.model.fields,field_description:club_access_control.field_club_access_supplier_staff__name
+msgid "Full Name"
+msgstr "Nombre Completo"
+
+#. module: club_access_control
+#: model:ir.model.fields,help:club_access_control.field_club_access_entry__identification_value
+msgid "Scan or type the membership card, access card, ID number, or plate."
+msgstr "Escanee o digite el carnet de membresia, tarjeta de acceso, numero de ID o placa."

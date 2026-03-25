@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Checkpoints ──────────────────────────────────────────── -->
+
+        <record id="checkpoint_main_gate" model="club.access.checkpoint">
+            <field name="name">Main Gate</field>
+            <field name="location">Front entrance, Building A</field>
+            <field name="checkpoint_type">main_gate</field>
+        </record>
+
+        <record id="checkpoint_parking" model="club.access.checkpoint">
+            <field name="name">Parking Entrance</field>
+            <field name="location">Underground parking level B1</field>
+            <field name="checkpoint_type">parking</field>
+        </record>
+
+        <record id="checkpoint_service" model="club.access.checkpoint">
+            <field name="name">Service Entrance</field>
+            <field name="location">Rear gate, service road</field>
+            <field name="checkpoint_type">service_entrance</field>
+        </record>
+
+        <!-- ── Suppliers ────────────────────────────────────────────── -->
+
+        <record id="partner_supplier_catering" model="res.partner">
+            <field name="name">Gourmet Catering S.A.S.</field>
+            <field name="is_company" eval="True"/>
+            <field name="phone">+57 601 5550100</field>
+        </record>
+
+        <record id="partner_supplier_landscaping" model="res.partner">
+            <field name="name">Verde Jardines Ltda.</field>
+            <field name="is_company" eval="True"/>
+            <field name="phone">+57 601 5550200</field>
+        </record>
+
+        <record id="supplier_catering" model="club.access.supplier">
+            <field name="partner_id" ref="partner_supplier_catering"/>
+            <field name="contract_reference">CONT-2025-001</field>
+        </record>
+
+        <record id="supplier_landscaping" model="club.access.supplier">
+            <field name="partner_id" ref="partner_supplier_landscaping"/>
+            <field name="contract_reference">CONT-2025-002</field>
+        </record>
+
+        <!-- ── Supplier Staff ───────────────────────────────────────── -->
+
+        <record id="staff_catering_01" model="club.access.supplier.staff">
+            <field name="supplier_id" ref="supplier_catering"/>
+            <field name="name">Fernando Ruiz</field>
+            <field name="identification_type">cc</field>
+            <field name="identification_number">71234567</field>
+            <field name="phone">+57 315 1110001</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="staff_catering_02" model="club.access.supplier.staff">
+            <field name="supplier_id" ref="supplier_catering"/>
+            <field name="name">Patricia Salazar</field>
+            <field name="identification_type">cc</field>
+            <field name="identification_number">52345678</field>
+            <field name="phone">+57 315 1110002</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="staff_landscaping_01" model="club.access.supplier.staff">
+            <field name="supplier_id" ref="supplier_landscaping"/>
+            <field name="name">Diego Montoya</field>
+            <field name="identification_type">cc</field>
+            <field name="identification_number">80345678</field>
+            <field name="phone">+57 315 1110003</field>
+            <field name="status">active</field>
+        </record>
+
+        <!-- ── Vehicles ─────────────────────────────────────────────── -->
+
+        <record id="vehicle_carlos_01" model="club.access.vehicle">
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="plate_number">ABC-123</field>
+            <field name="vehicle_type">car</field>
+            <field name="brand">BMW</field>
+            <field name="model">X5</field>
+            <field name="color">Black</field>
+            <field name="year">2023</field>
+        </record>
+
+        <record id="vehicle_carlos_02" model="club.access.vehicle">
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="plate_number">DEF-456</field>
+            <field name="vehicle_type">motorcycle</field>
+            <field name="brand">Ducati</field>
+            <field name="model">Monster 797</field>
+            <field name="color">Red</field>
+            <field name="year">2022</field>
+        </record>
+
+        <record id="vehicle_ana_01" model="club.access.vehicle">
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="plate_number">GHI-789</field>
+            <field name="vehicle_type">car</field>
+            <field name="brand">Mercedes-Benz</field>
+            <field name="model">GLC 300</field>
+            <field name="color">White</field>
+            <field name="year">2024</field>
+        </record>
+
+        <record id="vehicle_jorge_01" model="club.access.vehicle">
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="plate_number">JKL-012</field>
+            <field name="vehicle_type">car</field>
+            <field name="brand">Audi</field>
+            <field name="model">Q7</field>
+            <field name="color">Gray</field>
+            <field name="year">2023</field>
+        </record>
+
+        <record id="vehicle_pedro_01" model="club.access.vehicle">
+            <field name="affiliate_id" ref="club_core.affiliate_005"/>
+            <field name="plate_number">MNO-345</field>
+            <field name="vehicle_type">car</field>
+            <field name="brand">Toyota</field>
+            <field name="model">Land Cruiser</field>
+            <field name="color">Silver</field>
+            <field name="year">2022</field>
+        </record>
+
+        <!-- ── Access Entries ───────────────────────────────────────── -->
+
+        <!-- Granted affiliate entry via membership card -->
+        <record id="entry_001" model="club.access.entry">
+            <field name="checkpoint_id" ref="checkpoint_main_gate"/>
+            <field name="entry_datetime" eval="DateTime.now().strftime('%Y-%m-%d 08:30:00')"/>
+            <field name="person_type">affiliate</field>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="identification_method">membership_card</field>
+            <field name="access_status">granted</field>
+        </record>
+
+        <!-- Exited affiliate entry via vehicle plate -->
+        <record id="entry_002" model="club.access.entry">
+            <field name="checkpoint_id" ref="checkpoint_parking"/>
+            <field name="entry_datetime" eval="DateTime.now().strftime('%Y-%m-%d 09:00:00')"/>
+            <field name="exit_datetime" eval="DateTime.now().strftime('%Y-%m-%d 12:30:00')"/>
+            <field name="person_type">affiliate</field>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="vehicle_id" ref="vehicle_jorge_01"/>
+            <field name="identification_method">vehicle_plate</field>
+            <field name="identification_value">JKL-012</field>
+            <field name="access_status">exited</field>
+        </record>
+
+        <!-- Denied entry — employee with suspended status -->
+        <record id="entry_003" model="club.access.entry">
+            <field name="checkpoint_id" ref="checkpoint_main_gate"/>
+            <field name="entry_datetime" eval="DateTime.now().strftime('%Y-%m-%d 10:15:00')"/>
+            <field name="person_type">affiliate_employee</field>
+            <field name="employee_id" ref="club_affiliate_employees.employee_martha"/>
+            <field name="identification_method">access_card</field>
+            <field name="identification_value">EMP-0004</field>
+            <field name="access_status">denied</field>
+            <field name="denial_reason">Employee is not active (status: suspended)</field>
+        </record>
+
+        <!-- Granted supplier staff via gov ID -->
+        <record id="entry_004" model="club.access.entry">
+            <field name="checkpoint_id" ref="checkpoint_service"/>
+            <field name="entry_datetime" eval="DateTime.now().strftime('%Y-%m-%d 07:00:00')"/>
+            <field name="person_type">supplier_staff</field>
+            <field name="supplier_staff_id" ref="staff_catering_01"/>
+            <field name="identification_method">gov_id</field>
+            <field name="identification_value">71234567</field>
+            <field name="access_status">granted</field>
+        </record>
+
+        <!-- Pending entry waiting for lookup -->
+        <record id="entry_005" model="club.access.entry">
+            <field name="checkpoint_id" ref="checkpoint_main_gate"/>
+            <field name="entry_datetime" eval="DateTime.now().strftime('%Y-%m-%d 11:00:00')"/>
+            <field name="identification_method">gov_id</field>
+            <field name="access_status">pending</field>
+            <field name="notes">Visitor waiting for identification verification.</field>
+        </record>
+
+    </data>
+</odoo>

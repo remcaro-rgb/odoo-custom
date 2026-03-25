@@ -1,0 +1,24 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_vehicle_manager,club.access.vehicle manager,model_club_access_vehicle,club_access_control.group_access_manager,1,1,1,1
+access_vehicle_staff,club.access.vehicle staff,model_club_access_vehicle,club_access_control.group_access_staff,1,0,0,0
+access_vehicle_admin,club.access.vehicle admin,model_club_access_vehicle,club_core.group_club_admin,1,1,1,1
+access_vehicle_member,club.access.vehicle member,model_club_access_vehicle,club_core.group_club_member,1,1,0,0
+access_checkpoint_manager,club.access.checkpoint manager,model_club_access_checkpoint,club_access_control.group_access_manager,1,1,1,1
+access_checkpoint_staff,club.access.checkpoint staff,model_club_access_checkpoint,club_access_control.group_access_staff,1,0,0,0
+access_checkpoint_admin,club.access.checkpoint admin,model_club_access_checkpoint,club_core.group_club_admin,1,1,1,1
+access_supplier_manager,club.access.supplier manager,model_club_access_supplier,club_access_control.group_access_manager,1,1,1,1
+access_supplier_staff_group,club.access.supplier staff group,model_club_access_supplier,club_access_control.group_access_staff,1,0,0,0
+access_supplier_admin,club.access.supplier admin,model_club_access_supplier,club_core.group_club_admin,1,1,1,1
+access_supplier_staff_manager,club.access.supplier.staff manager,model_club_access_supplier_staff,club_access_control.group_access_manager,1,1,1,1
+access_supplier_staff_guard,club.access.supplier.staff guard,model_club_access_supplier_staff,club_access_control.group_access_staff,1,0,0,0
+access_supplier_staff_admin,club.access.supplier.staff admin,model_club_access_supplier_staff,club_core.group_club_admin,1,1,1,1
+access_entry_manager,club.access.entry manager,model_club_access_entry,club_access_control.group_access_manager,1,1,1,1
+access_entry_staff,club.access.entry staff,model_club_access_entry,club_access_control.group_access_staff,1,1,1,1
+access_entry_admin,club.access.entry admin,model_club_access_entry,club_core.group_club_admin,1,1,1,1
+access_entry_member,club.access.entry member,model_club_access_entry,club_core.group_club_member,1,0,0,0
+access_lookup_wizard_manager,club.access.lookup.wizard manager,model_club_access_lookup_wizard,club_access_control.group_access_manager,1,1,1,1
+access_lookup_wizard_staff,club.access.lookup.wizard staff,model_club_access_lookup_wizard,club_access_control.group_access_staff,1,1,1,1
+access_lookup_result_manager,club.access.lookup.result manager,model_club_access_lookup_result,club_access_control.group_access_manager,1,1,1,1
+access_lookup_result_staff,club.access.lookup.result staff,model_club_access_lookup_result,club_access_control.group_access_staff,1,1,1,1
+access_deny_wizard_manager,club.access.deny.wizard manager,model_club_access_deny_wizard,club_access_control.group_access_manager,1,1,1,1
+access_deny_wizard_staff,club.access.deny.wizard staff,model_club_access_deny_wizard,club_access_control.group_access_staff,1,1,1,1

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ── Security Groups ──────────────────────────────────────── -->
+
+        <record id="group_access_staff" model="res.groups">
+            <field name="name">Access Control Staff (Guard)</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_access_manager" model="res.groups">
+            <field name="name">Access Control Manager</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="implied_ids" eval="[(4, ref('club_access_control.group_access_staff'))]"/>
+        </record>
+
+        <!-- ── Record Rules ─────────────────────────────────────────── -->
+
+        <!-- Portal: entries — member sees only own entries -->
+        <record id="rule_entry_portal_own" model="ir.rule">
+            <field name="name">Access Entry: portal sees own entries</field>
+            <field name="model_id" ref="model_club_access_entry"/>
+            <field name="domain_force">[('affiliate_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('club_core.group_club_member'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Portal: vehicles — member sees and manages own vehicles -->
+        <record id="rule_vehicle_portal_own" model="ir.rule">
+            <field name="name">Access Vehicle: portal sees own vehicles</field>
+            <field name="model_id" ref="model_club_access_vehicle"/>
+            <field name="domain_force">[('affiliate_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('club_core.group_club_member'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

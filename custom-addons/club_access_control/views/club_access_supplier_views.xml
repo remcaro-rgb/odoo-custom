@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Supplier Staff ────────────────────────────────────────────── -->
+
+    <!-- Staff List view -->
+    <record id="view_club_access_supplier_staff_list" model="ir.ui.view">
+        <field name="name">club.access.supplier.staff.list</field>
+        <field name="model">club.access.supplier.staff</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="supplier_id"/>
+                <field name="identification_type"/>
+                <field name="identification_number"/>
+                <field name="phone"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'active'"
+                    decoration-warning="status == 'suspended'"
+                    decoration-danger="status == 'inactive'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Staff Form view -->
+    <record id="view_club_access_supplier_staff_form" model="ir.ui.view">
+        <field name="name">club.access.supplier.staff.form</field>
+        <field name="model">club.access.supplier.staff</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"
+                        options="{'preview_image': 'photo'}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="identification_type"/>
+                            <field name="identification_number"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Additional notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Staff Search view -->
+    <record id="view_club_access_supplier_staff_search" model="ir.ui.view">
+        <field name="name">club.access.supplier.staff.search</field>
+        <field name="model">club.access.supplier.staff</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="identification_number"/>
+                <field name="supplier_id"/>
+                <filter name="active_staff" string="Active"
+                    domain="[('status', '=', 'active')]"/>
+                <filter name="suspended_staff" string="Suspended"
+                    domain="[('status', '=', 'suspended')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_supplier" string="Supplier"
+                        context="{'group_by': 'supplier_id'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Staff Action -->
+    <record id="action_club_access_supplier_staff" model="ir.actions.act_window">
+        <field name="name">Supplier Staff</field>
+        <field name="res_model">club.access.supplier.staff</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_access_supplier_staff_search"/>
+        <field name="context">{'search_default_active_staff': 1}</field>
+        <field name="path">club-access-supplier-staff</field>
+    </record>
+
+    <!-- ── Suppliers ─────────────────────────────────────────────────── -->
+
+    <!-- Supplier List view -->
+    <record id="view_club_access_supplier_list" model="ir.ui.view">
+        <field name="name">club.access.supplier.list</field>
+        <field name="model">club.access.supplier</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="contract_reference"/>
+                <field name="staff_count"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Supplier Form view -->
+    <record id="view_club_access_supplier_form" model="ir.ui.view">
+        <field name="name">club.access.supplier.form</field>
+        <field name="model">club.access.supplier</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="partner_id"/>
+                        <h1><field name="partner_id"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="contract_reference"/>
+                            <field name="staff_count"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Staff Members" name="staff">
+                            <field name="staff_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="identification_type"/>
+                                    <field name="identification_number"/>
+                                    <field name="phone"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status == 'active'"
+                                        decoration-warning="status == 'suspended'"
+                                        decoration-danger="status == 'inactive'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Supplier Search view -->
+    <record id="view_club_access_supplier_search" model="ir.ui.view">
+        <field name="name">club.access.supplier.search</field>
+        <field name="model">club.access.supplier</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="contract_reference"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Supplier Action -->
+    <record id="action_club_access_supplier" model="ir.actions.act_window">
+        <field name="name">Suppliers</field>
+        <field name="res_model">club.access.supplier</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_access_supplier_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="path">club-access-suppliers</field>
+    </record>
+
+</odoo>
