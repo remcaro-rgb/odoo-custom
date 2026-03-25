@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app data-string="Colombian Payroll" string="Colombian Payroll">
+                <app data-string="Colombian Payroll" string="Colombian Payroll" name="co_payroll">
                     <block title="Payroll Constants">
                         <setting>
                             <div class="content-group">
