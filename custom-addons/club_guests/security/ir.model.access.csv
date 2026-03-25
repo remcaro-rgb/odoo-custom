@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_guest_policy_admin,club.guest.policy admin,model_club_guest_policy,club_core.group_club_admin,1,1,1,1
+access_club_guest_policy_staff,club.guest.policy staff,model_club_guest_policy,club_guests.group_guest_staff,1,1,1,0
+access_club_guest_policy_member,club.guest.policy member,model_club_guest_policy,club_core.group_club_member,1,0,0,0
+access_club_guest_admin,club.guest admin,model_club_guest,club_core.group_club_admin,1,1,1,1
+access_club_guest_staff,club.guest staff,model_club_guest,club_guests.group_guest_staff,1,1,1,1
+access_club_guest_member,club.guest member,model_club_guest,club_core.group_club_member,1,0,0,0
+access_club_guest_visit_admin,club.guest.visit admin,model_club_guest_visit,club_core.group_club_admin,1,1,1,1
+access_club_guest_visit_staff,club.guest.visit staff,model_club_guest_visit,club_guests.group_guest_staff,1,1,1,1
+access_club_guest_visit_member,club.guest.visit member,model_club_guest_visit,club_core.group_club_member,1,0,1,0

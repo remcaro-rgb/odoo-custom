@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_found_item_kanban" model="ir.ui.view">
+        <field name="name">club.found.item.kanban</field>
+        <field name="model">club.found.item</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="category"/>
+                <field name="status"/>
+                <field name="date_found"/>
+                <field name="storage_location"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong><br/>
+                            <span class="text-muted"><field name="category"/></span><br/>
+                            <field name="description" class="text-truncate"/><br/>
+                            <span class="text-muted">
+                                <i class="fa fa-map-marker"/> <field name="storage_location"/>
+                            </span><br/>
+                            <field name="status" widget="badge"
+                                decoration-info="status == 'registered'"
+                                decoration-warning="status == 'matched'"
+                                decoration-success="status == 'claimed'"
+                                decoration-muted="status == 'disposed'"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_found_item_list" model="ir.ui.view">
+        <field name="name">club.found.item.list</field>
+        <field name="model">club.found.item</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="category"/>
+                <field name="location_found"/>
+                <field name="date_found"/>
+                <field name="storage_location"/>
+                <field name="found_by"/>
+                <field name="status" widget="badge"
+                    decoration-info="status == 'registered'"
+                    decoration-warning="status == 'matched'"
+                    decoration-success="status == 'claimed'"
+                    decoration-muted="status == 'disposed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_found_item_form" model="ir.ui.view">
+        <field name="name">club.found.item.form</field>
+        <field name="model">club.found.item</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_claim_wizard"
+                        string="Claim"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="status not in ('registered', 'matched')"/>
+                    <button name="action_dispose"
+                        string="Dispose"
+                        type="object"
+                        invisible="status not in ('registered', 'matched')"
+                        confirm="Are you sure you want to dispose of this item?"/>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="registered,matched,claimed,disposed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="date_found"/>
+                            <field name="location_found"/>
+                            <field name="storage_location"/>
+                        </group>
+                        <group>
+                            <field name="found_by"/>
+                            <field name="found_by_affiliate_id"/>
+                            <field name="claimed_by_id" readonly="1"/>
+                            <field name="claim_date" readonly="1"/>
+                            <field name="photo" widget="image" class="oe_avatar"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Describe the found item in detail..."/>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_found_item_search" model="ir.ui.view">
+        <field name="name">club.found.item.search</field>
+        <field name="model">club.found.item</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="found_by"/>
+                <field name="location_found"/>
+                <field name="storage_location"/>
+                <separator/>
+                <filter name="registered" string="Registered"
+                    domain="[('status','=','registered')]"/>
+                <filter name="matched" string="Matched"
+                    domain="[('status','=','matched')]"/>
+                <filter name="claimed" string="Claimed"
+                    domain="[('status','=','claimed')]"/>
+                <filter name="disposed" string="Disposed"
+                    domain="[('status','=','disposed')]"/>
+                <separator/>
+                <filter name="date_found_this_month" string="Found This Month"
+                    domain="[('date_found','&gt;=', (context_today() - relativedelta(day=1)).strftime('%%Y-%%m-%%d')),
+                             ('date_found','&lt;=', context_today().strftime('%%Y-%%m-%%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_category" string="Category"
+                        context="{'group_by': 'category'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_date_found" string="Date Found"
+                        context="{'group_by': 'date_found'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_found_item" model="ir.actions.act_window">
+        <field name="name">Found Items</field>
+        <field name="res_model">club.found.item</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_found_item_search"/>
+        <field name="context">{'search_default_registered': 1}</field>
+        <field name="path">club-found-items</field>
+    </record>
+
+</odoo>

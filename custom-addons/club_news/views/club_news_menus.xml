@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- News top-level under Club -->
+    <menuitem id="menu_club_news"
+        name="News"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <menuitem id="menu_club_news_all"
+        name="All Articles"
+        parent="menu_club_news"
+        action="action_club_news_article"
+        sequence="10"/>
+
+    <menuitem id="menu_club_news_published"
+        name="Published"
+        parent="menu_club_news"
+        action="action_club_news_article_published"
+        sequence="20"/>
+
+    <!-- Configuration sub-menus -->
+    <menuitem id="menu_club_news_config_categories"
+        name="Categories"
+        parent="club_core.menu_club_config"
+        action="action_club_news_category"
+        sequence="30"/>
+
+    <menuitem id="menu_club_news_config_tags"
+        name="Tags"
+        parent="club_core.menu_club_config"
+        action="action_club_news_tag"
+        sequence="40"/>
+
+</odoo>

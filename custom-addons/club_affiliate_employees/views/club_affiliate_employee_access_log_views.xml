@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_affiliate_employee_access_log_list" model="ir.ui.view">
+        <field name="name">club.affiliate.employee.access.log.list</field>
+        <field name="model">club.affiliate.employee.access.log</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="check_in" widget="float_time"/>
+                <field name="check_out" widget="float_time"/>
+                <field name="area"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_affiliate_employee_access_log_form" model="ir.ui.view">
+        <field name="name">club.affiliate.employee.access.log.form</field>
+        <field name="model">club.affiliate.employee.access.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="check_in" widget="float_time"/>
+                            <field name="check_out" widget="float_time"/>
+                            <field name="area"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_affiliate_employee_access_log_search" model="ir.ui.view">
+        <field name="name">club.affiliate.employee.access.log.search</field>
+        <field name="model">club.affiliate.employee.access.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="area"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_employee" string="Employee"
+                        context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_date" string="Date"
+                        context="{'group_by': 'date'}"/>
+                    <filter name="group_area" string="Area"
+                        context="{'group_by': 'area'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_affiliate_employee_access_log" model="ir.actions.act_window">
+        <field name="name">Access Log</field>
+        <field name="res_model">club.affiliate.employee.access.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_affiliate_employee_access_log_search"/>
+        <field name="path">club-employee-access-log</field>
+    </record>
+
+</odoo>

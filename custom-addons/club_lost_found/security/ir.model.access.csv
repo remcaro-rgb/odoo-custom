@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_lost_item_admin,club.lost.item admin,model_club_lost_item,club_core.group_club_admin,1,1,1,1
+access_club_lost_item_staff,club.lost.item staff,model_club_lost_item,club_lost_found.group_lost_found_staff,1,1,1,1
+access_club_lost_item_member,club.lost.item member,model_club_lost_item,club_core.group_club_member,1,0,1,0
+access_club_found_item_admin,club.found.item admin,model_club_found_item,club_core.group_club_admin,1,1,1,1
+access_club_found_item_staff,club.found.item staff,model_club_found_item,club_lost_found.group_lost_found_staff,1,1,1,1
+access_club_found_item_member,club.found.item member,model_club_found_item,club_core.group_club_member,1,0,0,0

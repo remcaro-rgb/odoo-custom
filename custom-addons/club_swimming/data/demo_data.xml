@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ── Pools ─────────────────────────────────────────────────── -->
+
+        <record id="pool_olympic" model="club.swimming.pool">
+            <field name="name">Olympic Pool</field>
+            <field name="pool_type">olympic</field>
+            <field name="lane_count">8</field>
+            <field name="max_capacity">40</field>
+            <field name="under_maintenance" eval="False"/>
+        </record>
+
+        <record id="pool_kids" model="club.swimming.pool">
+            <field name="name">Kids Pool</field>
+            <field name="pool_type">kids</field>
+            <field name="lane_count">3</field>
+            <field name="max_capacity">15</field>
+            <field name="under_maintenance" eval="False"/>
+        </record>
+
+        <!-- ── Lanes — Olympic Pool ──────────────────────────────────── -->
+
+        <record id="lane_olympic_1" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="name">Lane 1</field>
+            <field name="lane_type">lap</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_olympic_2" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="name">Lane 2</field>
+            <field name="lane_type">lap</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_olympic_3" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="name">Lane 3</field>
+            <field name="lane_type">free_swim</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_olympic_4" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="name">Lane 4</field>
+            <field name="lane_type">free_swim</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_olympic_5" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="name">Lane 5</field>
+            <field name="lane_type">reserved</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_olympic_6" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="name">Lane 6</field>
+            <field name="lane_type">reserved</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_olympic_7" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="name">Lane 7</field>
+            <field name="lane_type">class</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_olympic_8" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="name">Lane 8</field>
+            <field name="lane_type">class</field>
+            <field name="status">available</field>
+        </record>
+
+        <!-- ── Lanes — Kids Pool ─────────────────────────────────────── -->
+
+        <record id="lane_kids_1" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_kids"/>
+            <field name="name">Lane 1</field>
+            <field name="lane_type">free_swim</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_kids_2" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_kids"/>
+            <field name="name">Lane 2</field>
+            <field name="lane_type">class</field>
+            <field name="status">available</field>
+        </record>
+        <record id="lane_kids_3" model="club.swimming.lane">
+            <field name="pool_id" ref="pool_kids"/>
+            <field name="name">Lane 3</field>
+            <field name="lane_type">free_swim</field>
+            <field name="status">available</field>
+        </record>
+
+        <!-- ── Demo Affiliates for Swimming ──────────────────────────── -->
+
+        <record id="partner_swim_demo_1" model="res.partner">
+            <field name="name">Laura Piscina</field>
+            <field name="email">laura@example.com</field>
+        </record>
+        <record id="affiliate_swim_1" model="club.affiliate">
+            <field name="partner_id" ref="partner_swim_demo_1"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="partner_swim_demo_2" model="res.partner">
+            <field name="name">Carlos Nadador</field>
+            <field name="email">carlos@example.com</field>
+        </record>
+        <record id="affiliate_swim_2" model="club.affiliate">
+            <field name="partner_id" ref="partner_swim_demo_2"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="partner_swim_demo_3" model="res.partner">
+            <field name="name">Sofia Aguas</field>
+            <field name="email">sofia@example.com</field>
+        </record>
+        <record id="affiliate_swim_3" model="club.affiliate">
+            <field name="partner_id" ref="partner_swim_demo_3"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <!-- ── Lifeguard ─────────────────────────────────────────────── -->
+
+        <record id="partner_lifeguard_1" model="res.partner">
+            <field name="name">Miguel Salvavidas</field>
+        </record>
+        <record id="lifeguard_1" model="club.swimming.lifeguard">
+            <field name="partner_id" ref="partner_lifeguard_1"/>
+            <field name="employee_number">LG-001</field>
+            <field name="certification">Red Cross Lifeguard</field>
+            <field name="certification_expiry">2027-06-30</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ── Bookings ──────────────────────────────────────────────── -->
+
+        <record id="booking_1" model="club.swimming.booking">
+            <field name="affiliate_id" ref="affiliate_swim_1"/>
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="lane_id" ref="lane_olympic_1"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">8.0</field>
+            <field name="duration">1.5</field>
+            <field name="guest_count">0</field>
+            <field name="status">booked</field>
+        </record>
+
+        <record id="booking_2" model="club.swimming.booking">
+            <field name="affiliate_id" ref="affiliate_swim_2"/>
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="lane_id" ref="lane_olympic_3"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">10.0</field>
+            <field name="duration">1.0</field>
+            <field name="guest_count">2</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="booking_3" model="club.swimming.booking">
+            <field name="affiliate_id" ref="affiliate_swim_3"/>
+            <field name="pool_id" ref="pool_kids"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">14.0</field>
+            <field name="duration">2.0</field>
+            <field name="guest_count">1</field>
+            <field name="status">completed</field>
+        </record>
+
+        <!-- ── Class ─────────────────────────────────────────────────── -->
+
+        <record id="class_adult_beginner" model="club.swimming.class">
+            <field name="name">Adult Beginner</field>
+            <field name="pool_id" ref="pool_olympic"/>
+            <field name="instructor_id" ref="lifeguard_1"/>
+            <field name="day_of_week">2</field>
+            <field name="time_slot">9.0</field>
+            <field name="duration">1.0</field>
+            <field name="max_students">10</field>
+            <field name="student_ids" eval="[(6, 0, [ref('affiliate_swim_1'), ref('affiliate_swim_2')])]"/>
+            <field name="level">beginner</field>
+        </record>
+
+    </data>
+</odoo>

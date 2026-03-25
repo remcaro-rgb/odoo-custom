@@ -1,0 +1,278 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * club_pqr
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_pqr
+#: model:ir.model,name:club_pqr.model_club_pqr_category
+msgid "PQR Category"
+msgstr "Categoria PQR"
+
+#. module: club_pqr
+#: model:ir.model,name:club_pqr.model_club_pqr_request
+msgid "PQR Request"
+msgstr "Solicitud PQR"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_category__name
+msgid "Category Name"
+msgstr "Nombre de Categoria"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_category__description
+msgid "Description"
+msgstr "Descripcion"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_category__responsible_id
+msgid "Default Handler"
+msgstr "Responsable por Defecto"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_category__sla_days
+msgid "SLA Days"
+msgstr "Dias SLA"
+
+#. module: club_pqr
+#: model:ir.model.fields,help:club_pqr.field_club_pqr_category__sla_days
+msgid "Expected number of days to resolve requests in this category."
+msgstr "Numero esperado de dias para resolver solicitudes en esta categoria."
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__name
+msgid "Number"
+msgstr "Numero"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__affiliate_id
+msgid "Affiliate"
+msgstr "Afiliado"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__category_id
+msgid "Category"
+msgstr "Categoria"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__request_type
+msgid "Type"
+msgstr "Tipo"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__request_type__petition
+msgid "Petition"
+msgstr "Peticion"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__request_type__complaint
+msgid "Complaint"
+msgstr "Queja"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__request_type__claim
+msgid "Claim"
+msgstr "Reclamo"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__subject
+msgid "Subject"
+msgstr "Asunto"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__priority
+msgid "Priority"
+msgstr "Prioridad"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__priority__low
+msgid "Low"
+msgstr "Baja"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__priority__medium
+msgid "Medium"
+msgstr "Media"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__priority__high
+msgid "High"
+msgstr "Alta"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__priority__urgent
+msgid "Urgent"
+msgstr "Urgente"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__status__draft
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__status__submitted
+msgid "Submitted"
+msgstr "Enviada"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__status__in_progress
+msgid "In Progress"
+msgstr "En Progreso"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__status__resolved
+msgid "Resolved"
+msgstr "Resuelta"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__status__closed
+msgid "Closed"
+msgstr "Cerrada"
+
+#. module: club_pqr
+#: model:ir.model.fields.selection,name:club_pqr.field_club_pqr_request__status__rejected
+msgid "Rejected"
+msgstr "Rechazada"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__assigned_to
+msgid "Assigned To"
+msgstr "Asignado a"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__submit_date
+msgid "Submit Date"
+msgstr "Fecha de Envio"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__due_date
+msgid "Due Date"
+msgstr "Fecha Limite"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__resolution_date
+msgid "Resolution Date"
+msgstr "Fecha de Resolucion"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__resolution_notes
+msgid "Resolution Notes"
+msgstr "Notas de Resolucion"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__attachment_ids
+msgid "Attachments"
+msgstr "Adjuntos"
+
+#. module: club_pqr
+#: model:ir.model.fields,field_description:club_pqr.field_club_pqr_request__is_overdue
+msgid "Overdue"
+msgstr "Vencida"
+
+#. module: club_pqr
+#: model:res.groups,name:club_pqr.group_pqr_staff
+msgid "PQR Staff"
+msgstr "Personal PQR"
+
+#. module: club_pqr
+#: model:ir.actions.act_window,name:club_pqr.action_club_pqr_request
+msgid "All PQR Requests"
+msgstr "Todas las Solicitudes PQR"
+
+#. module: club_pqr
+#: model:ir.actions.act_window,name:club_pqr.action_club_pqr_request_my
+msgid "My Assigned PQR"
+msgstr "Mis PQR Asignadas"
+
+#. module: club_pqr
+#: model:ir.actions.act_window,name:club_pqr.action_club_pqr_category
+msgid "PQR Categories"
+msgstr "Categorias PQR"
+
+#. module: club_pqr
+#: model:ir.ui.menu,name:club_pqr.menu_club_pqr
+msgid "PQR"
+msgstr "PQR"
+
+#. module: club_pqr
+#: model:ir.ui.menu,name:club_pqr.menu_club_pqr_all
+msgid "All Requests"
+msgstr "Todas las Solicitudes"
+
+#. module: club_pqr
+#: model:ir.ui.menu,name:club_pqr.menu_club_pqr_my
+msgid "My Assigned"
+msgstr "Mis Asignadas"
+
+#. module: club_pqr
+#: model:ir.ui.menu,name:club_pqr.menu_club_pqr_config_categories
+msgid "PQR Categories"
+msgstr "Categorias PQR"
+
+#. module: club_pqr
+#: code:addons/club_pqr/models/club_pqr_request.py:0
+#, python-format
+msgid "Only draft requests can be submitted."
+msgstr "Solo se pueden enviar solicitudes en borrador."
+
+#. module: club_pqr
+#: code:addons/club_pqr/models/club_pqr_request.py:0
+#, python-format
+msgid "Only submitted requests can be assigned."
+msgstr "Solo se pueden asignar solicitudes enviadas."
+
+#. module: club_pqr
+#: code:addons/club_pqr/models/club_pqr_request.py:0
+#, python-format
+msgid "Only in-progress requests can be resolved."
+msgstr "Solo se pueden resolver solicitudes en progreso."
+
+#. module: club_pqr
+#: code:addons/club_pqr/models/club_pqr_request.py:0
+#, python-format
+msgid "Only resolved requests can be closed."
+msgstr "Solo se pueden cerrar solicitudes resueltas."
+
+#. module: club_pqr
+#: code:addons/club_pqr/models/club_pqr_request.py:0
+#, python-format
+msgid "Only submitted or in-progress requests can be rejected."
+msgstr "Solo se pueden rechazar solicitudes enviadas o en progreso."
+
+#. module: club_pqr
+#: code:addons/club_pqr/models/club_pqr_request.py:0
+#, python-format
+msgid "Unsupported operator for is_overdue search."
+msgstr "Operador no soportado para busqueda de vencidas."
+
+#. module: club_pqr
+#: model:ir.sequence,name:club_pqr.seq_club_pqr_request
+msgid "PQR Request Number"
+msgstr "Numero de Solicitud PQR"
+
+#. module: club_pqr
+#: model:ir.rule,name:club_pqr.rule_pqr_request_portal_own
+msgid "PQR Request: portal sees own requests"
+msgstr "Solicitud PQR: portal ve solo sus solicitudes"
+
+#. module: club_pqr
+#: model:ir.rule,name:club_pqr.rule_pqr_category_portal
+msgid "PQR Category: portal read-only"
+msgstr "Categoria PQR: portal solo lectura"

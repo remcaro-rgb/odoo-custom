@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Lost Items -->
+        <record id="lost_item_001" model="club.lost.item">
+            <field name="reporter_id" ref="club_core.affiliate_001"/>
+            <field name="description">Black leather wallet with club membership card and personal ID inside.</field>
+            <field name="location_lost">Main Pool Area</field>
+            <field name="date_lost" eval="(DateTime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
+            <field name="date_reported" eval="(DateTime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
+            <field name="category">other</field>
+            <field name="status">reported</field>
+        </record>
+
+        <record id="lost_item_002" model="club.lost.item">
+            <field name="reporter_id" ref="club_core.affiliate_002"/>
+            <field name="description">Gold bracelet with small diamond charm, sentimental value.</field>
+            <field name="location_lost">Tennis Courts</field>
+            <field name="date_lost" eval="(DateTime.now() - timedelta(days=10)).strftime('%Y-%m-%d')"/>
+            <field name="date_reported" eval="(DateTime.now() - timedelta(days=9)).strftime('%Y-%m-%d')"/>
+            <field name="category">jewelry</field>
+            <field name="status">matched</field>
+        </record>
+
+        <record id="lost_item_003" model="club.lost.item">
+            <field name="reporter_id" ref="club_core.affiliate_003"/>
+            <field name="description">Apple AirPods Pro in white charging case, engraved initials JL.</field>
+            <field name="location_lost">Golf Course - Hole 9</field>
+            <field name="date_lost" eval="(DateTime.now() - timedelta(days=3)).strftime('%Y-%m-%d')"/>
+            <field name="date_reported" eval="(DateTime.now() - timedelta(days=3)).strftime('%Y-%m-%d')"/>
+            <field name="category">electronics</field>
+            <field name="status">reported</field>
+        </record>
+
+        <!-- Found Items -->
+        <record id="found_item_001" model="club.found.item">
+            <field name="found_by">Staff - Miguel Torres</field>
+            <field name="description">Set of car keys with BMW logo keychain and a small flashlight.</field>
+            <field name="location_found">Parking Lot B</field>
+            <field name="date_found" eval="(DateTime.now() - timedelta(days=4)).strftime('%Y-%m-%d')"/>
+            <field name="category">other</field>
+            <field name="storage_location">Front Desk - Locker 3</field>
+            <field name="status">registered</field>
+        </record>
+
+        <record id="found_item_002" model="club.found.item">
+            <field name="found_by">Staff - Laura Sánchez</field>
+            <field name="description">Gold bracelet with small diamond charm, found near bench.</field>
+            <field name="location_found">Tennis Courts - Bench Area</field>
+            <field name="date_found" eval="(DateTime.now() - timedelta(days=8)).strftime('%Y-%m-%d')"/>
+            <field name="category">jewelry</field>
+            <field name="storage_location">Front Desk - Safe Box</field>
+            <field name="status">matched</field>
+        </record>
+
+        <record id="found_item_003" model="club.found.item">
+            <field name="found_by">Member</field>
+            <field name="found_by_affiliate_id" ref="club_core.affiliate_005"/>
+            <field name="description">Blue sports jacket, size M, Nike brand.</field>
+            <field name="location_found">Gym Changing Room</field>
+            <field name="date_found" eval="(DateTime.now() - timedelta(days=15)).strftime('%Y-%m-%d')"/>
+            <field name="category">clothing</field>
+            <field name="storage_location">Front Desk - Lost &amp; Found Shelf</field>
+            <field name="status">registered</field>
+        </record>
+
+        <!-- Link the matched pair -->
+        <record id="lost_item_002" model="club.lost.item">
+            <field name="matched_found_id" ref="found_item_002"/>
+        </record>
+
+    </data>
+</odoo>

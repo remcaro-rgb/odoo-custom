@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_pqr_category_list" model="ir.ui.view">
+        <field name="name">club.pqr.category.list</field>
+        <field name="model">club.pqr.category</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="responsible_id"/>
+                <field name="sla_days"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_pqr_category_form" model="ir.ui.view">
+        <field name="name">club.pqr.category.form</field>
+        <field name="model">club.pqr.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="responsible_id"/>
+                            <field name="sla_days"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_pqr_category" model="ir.actions.act_window">
+        <field name="name">PQR Categories</field>
+        <field name="res_model">club.pqr.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="path">club-pqr-categories</field>
+    </record>
+
+</odoo>

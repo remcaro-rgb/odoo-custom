@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Swimming section under Club root menu -->
+    <menuitem id="menu_swimming_root"
+        name="Swimming"
+        parent="club_core.menu_club_root"
+        sequence="40"
+        groups="club_swimming.group_swimming_staff,club_core.group_club_admin"/>
+
+    <!-- Bookings -->
+    <menuitem id="menu_swimming_bookings"
+        name="Bookings"
+        parent="menu_swimming_root"
+        action="action_club_swimming_booking"
+        sequence="10"/>
+
+    <!-- Pools -->
+    <menuitem id="menu_swimming_pools"
+        name="Pools"
+        parent="menu_swimming_root"
+        action="action_club_swimming_pool"
+        sequence="20"/>
+
+    <!-- Lifeguards -->
+    <menuitem id="menu_swimming_lifeguards"
+        name="Lifeguards"
+        parent="menu_swimming_root"
+        action="action_club_swimming_lifeguard"
+        sequence="30"/>
+
+    <!-- Classes -->
+    <menuitem id="menu_swimming_classes"
+        name="Classes"
+        parent="menu_swimming_root"
+        action="action_club_swimming_class"
+        sequence="40"/>
+
+</odoo>

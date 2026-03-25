@@ -1,0 +1,266 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * club_object_loan
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 00:00+0000\n"
+"PO-Revision-Date: 2025-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_object_loan
+#: model:ir.model,name:club_object_loan.model_club_object_category
+msgid "Object Loan Category"
+msgstr "Categoria de Prestamo de Objetos"
+
+#. module: club_object_loan
+#: model:ir.model,name:club_object_loan.model_club_object_item
+msgid "Loanable Object / Item"
+msgstr "Objeto / Articulo Prestable"
+
+#. module: club_object_loan
+#: model:ir.model,name:club_object_loan.model_club_object_loan
+msgid "Object Loan"
+msgstr "Prestamo de Objeto"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_category__name
+msgid "Category Name"
+msgstr "Nombre de Categoria"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_category__max_loan_days
+msgid "Max Loan Days"
+msgstr "Dias Maximos de Prestamo"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_item__name
+msgid "Item Name"
+msgstr "Nombre del Articulo"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_item__category_id
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__category_id
+msgid "Category"
+msgstr "Categoria"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_item__code
+msgid "Code / Barcode"
+msgstr "Codigo / Codigo de Barras"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_item__description
+msgid "Description"
+msgstr "Descripcion"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_item__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_item__photo
+msgid "Photo"
+msgstr "Foto"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_item__quantity_total
+msgid "Total Quantity"
+msgstr "Cantidad Total"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_item__quantity_available
+msgid "Available Quantity"
+msgstr "Cantidad Disponible"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__name
+msgid "Loan Reference"
+msgstr "Referencia de Prestamo"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__item_id
+msgid "Item"
+msgstr "Articulo"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__affiliate_id
+msgid "Affiliate"
+msgstr "Afiliado"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__loan_date
+msgid "Loan Date"
+msgstr "Fecha de Prestamo"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__due_date
+msgid "Due Date"
+msgstr "Fecha de Vencimiento"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__return_date
+msgid "Return Date"
+msgstr "Fecha de Devolucion"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__quantity
+msgid "Quantity"
+msgstr "Cantidad"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_object_loan
+#: model:ir.model.fields,field_description:club_object_loan.field_club_object_loan__is_overdue
+msgid "Is Overdue"
+msgstr "Esta Vencido"
+
+#. module: club_object_loan
+#: model:ir.model.fields,selection:club_object_loan.field_club_object_item__status:0
+msgid "Available"
+msgstr "Disponible"
+
+#. module: club_object_loan
+#: model:ir.model.fields,selection:club_object_loan.field_club_object_item__status:0
+msgid "Loaned"
+msgstr "Prestado"
+
+#. module: club_object_loan
+#: model:ir.model.fields,selection:club_object_loan.field_club_object_item__status:0
+msgid "Maintenance"
+msgstr "Mantenimiento"
+
+#. module: club_object_loan
+#: model:ir.model.fields,selection:club_object_loan.field_club_object_item__status:0
+msgid "Retired"
+msgstr "Retirado"
+
+#. module: club_object_loan
+#: model:ir.model.fields,selection:club_object_loan.field_club_object_loan__status:0
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_object_loan
+#: model:ir.model.fields,selection:club_object_loan.field_club_object_loan__status:0
+msgid "Returned"
+msgstr "Devuelto"
+
+#. module: club_object_loan
+#: model:ir.model.fields,selection:club_object_loan.field_club_object_loan__status:0
+msgid "Overdue"
+msgstr "Vencido"
+
+#. module: club_object_loan
+#: model:ir.model.fields,selection:club_object_loan.field_club_object_loan__status:0
+msgid "Lost"
+msgstr "Perdido"
+
+#. module: club_object_loan
+#: code:addons/club_object_loan/models/club_object_loan.py:0
+#, python-format
+msgid "Loan quantity must be at least 1."
+msgstr "La cantidad del prestamo debe ser al menos 1."
+
+#. module: club_object_loan
+#: code:addons/club_object_loan/models/club_object_loan.py:0
+#, python-format
+msgid "Not enough items available. Requested: %(requested)s, Available: %(available)s."
+msgstr "No hay suficientes articulos disponibles. Solicitados: %(requested)s, Disponibles: %(available)s."
+
+#. module: club_object_loan
+#: code:addons/club_object_loan/models/club_object_loan.py:0
+#, python-format
+msgid "Cannot loan item \"%(item)s\": it is currently %(status)s."
+msgstr "No se puede prestar el articulo \"%(item)s\": actualmente esta %(status)s."
+
+#. module: club_object_loan
+#: model:ir.actions.act_window,name:club_object_loan.action_club_object_loan
+msgid "Loans"
+msgstr "Prestamos"
+
+#. module: club_object_loan
+#: model:ir.actions.act_window,name:club_object_loan.action_club_object_item
+msgid "Items"
+msgstr "Articulos"
+
+#. module: club_object_loan
+#: model:ir.actions.act_window,name:club_object_loan.action_club_object_category
+msgid "Object Categories"
+msgstr "Categorias de Objetos"
+
+#. module: club_object_loan
+#: model:ir.ui.menu,name:club_object_loan.menu_club_object_loans
+msgid "Object Loans"
+msgstr "Prestamo de Objetos"
+
+#. module: club_object_loan
+#: model:ir.ui.menu,name:club_object_loan.menu_club_loans_list
+msgid "All Loans"
+msgstr "Todos los Prestamos"
+
+#. module: club_object_loan
+#: model:ir.ui.menu,name:club_object_loan.menu_club_items_list
+msgid "Items"
+msgstr "Articulos"
+
+#. module: club_object_loan
+#: model:ir.ui.menu,name:club_object_loan.menu_club_config_object_categories
+msgid "Object Categories"
+msgstr "Categorias de Objetos"
+
+#. module: club_object_loan
+#: model:res.groups,name:club_object_loan.group_loan_staff
+msgid "Object Loan Staff"
+msgstr "Personal de Prestamo de Objetos"
+
+#. module: club_object_loan
+#: model:ir.cron,name:club_object_loan.cron_check_overdue_loans
+msgid "Club: Check Overdue Loans"
+msgstr "Club: Verificar Prestamos Vencidos"
+
+#. module: club_object_loan
+#: model_terms:ir.ui.view,arch_db:club_object_loan.view_club_object_loan_form
+msgid "Return"
+msgstr "Devolver"
+
+#. module: club_object_loan
+#: model_terms:ir.ui.view,arch_db:club_object_loan.view_club_object_loan_form
+msgid "Mark as Lost"
+msgstr "Marcar como Perdido"
+
+#. module: club_object_loan
+#: model_terms:ir.ui.view,arch_db:club_object_loan.view_club_object_loan_form
+msgid "Are you sure you want to mark this item as lost?"
+msgstr "Esta seguro de que desea marcar este articulo como perdido?"
+
+#. module: club_object_loan
+#: model_terms:ir.ui.view,arch_db:club_object_loan.view_club_object_item_form
+msgid "Current Loans"
+msgstr "Prestamos Actuales"
+
+#. module: club_object_loan
+#: model:ir.model.fields,help:club_object_loan.field_club_object_category__max_loan_days
+msgid "Maximum number of days an item in this category can be loaned."
+msgstr "Numero maximo de dias que un articulo de esta categoria puede ser prestado."
+
+#. module: club_object_loan
+#: model:ir.sequence,name:club_object_loan.seq_club_object_item
+msgid "Club Object Item Code"
+msgstr "Codigo de Articulo del Club"
+
+#. module: club_object_loan
+#: model:ir.sequence,name:club_object_loan.seq_club_object_loan
+msgid "Club Object Loan Reference"
+msgstr "Referencia de Prestamo de Objeto del Club"

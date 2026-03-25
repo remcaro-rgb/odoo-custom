@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Tournaments section under Club root -->
+    <menuitem id="menu_club_tournaments"
+        name="Tournaments"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <menuitem id="menu_club_tournaments_all"
+        name="All Tournaments"
+        parent="menu_club_tournaments"
+        action="action_club_tournament"
+        sequence="10"/>
+
+    <menuitem id="menu_club_tournaments_my"
+        name="My Tournaments"
+        parent="menu_club_tournaments"
+        action="action_club_tournament_my"
+        sequence="20"/>
+
+</odoo>

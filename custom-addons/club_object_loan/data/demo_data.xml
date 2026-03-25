@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Categories ───────────────────────────────────────────── -->
+
+        <record id="category_sports" model="club.object.category">
+            <field name="name">Sports Equipment</field>
+            <field name="max_loan_days">3</field>
+        </record>
+
+        <record id="category_books" model="club.object.category">
+            <field name="name">Books</field>
+            <field name="max_loan_days">14</field>
+        </record>
+
+        <record id="category_games" model="club.object.category">
+            <field name="name">Games</field>
+            <field name="max_loan_days">7</field>
+        </record>
+
+        <!-- ── Items ────────────────────────────────────────────────── -->
+
+        <record id="item_tennis_racket" model="club.object.item">
+            <field name="name">Tennis Racket</field>
+            <field name="category_id" ref="category_sports"/>
+            <field name="description">Professional tennis racket, suitable for all levels.</field>
+            <field name="status">available</field>
+            <field name="quantity_total">5</field>
+        </record>
+
+        <record id="item_football" model="club.object.item">
+            <field name="name">Football</field>
+            <field name="category_id" ref="category_sports"/>
+            <field name="description">Official size football.</field>
+            <field name="status">available</field>
+            <field name="quantity_total">10</field>
+        </record>
+
+        <record id="item_chess_set" model="club.object.item">
+            <field name="name">Chess Set</field>
+            <field name="category_id" ref="category_games"/>
+            <field name="description">Tournament-grade chess set with timer.</field>
+            <field name="status">available</field>
+            <field name="quantity_total">3</field>
+        </record>
+
+        <record id="item_novel_cien" model="club.object.item">
+            <field name="name">Cien Anos de Soledad</field>
+            <field name="category_id" ref="category_books"/>
+            <field name="description">Classic novel by Gabriel Garcia Marquez.</field>
+            <field name="status">available</field>
+            <field name="quantity_total">2</field>
+        </record>
+
+        <record id="item_board_game" model="club.object.item">
+            <field name="name">Monopoly</field>
+            <field name="category_id" ref="category_games"/>
+            <field name="description">Classic board game for family entertainment.</field>
+            <field name="status">available</field>
+            <field name="quantity_total">2</field>
+        </record>
+
+        <!-- ── Loans ────────────────────────────────────────────────── -->
+
+        <record id="loan_001" model="club.object.loan">
+            <field name="item_id" ref="item_tennis_racket"/>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="loan_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="quantity">1</field>
+            <field name="status">active</field>
+            <field name="notes">Tournament preparation loan.</field>
+        </record>
+
+        <record id="loan_002" model="club.object.loan">
+            <field name="item_id" ref="item_novel_cien"/>
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="loan_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="quantity">1</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="loan_003" model="club.object.loan">
+            <field name="item_id" ref="item_chess_set"/>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="loan_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="quantity">1</field>
+            <field name="status">active</field>
+            <field name="notes">Family game night.</field>
+        </record>
+
+    </data>
+</odoo>

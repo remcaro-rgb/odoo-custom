@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- PQR Categories -->
+        <record id="pqr_category_facilities" model="club.pqr.category">
+            <field name="name">Facilities</field>
+            <field name="description">Requests related to club facilities and infrastructure.</field>
+            <field name="sla_days">15</field>
+        </record>
+
+        <record id="pqr_category_staff" model="club.pqr.category">
+            <field name="name">Staff</field>
+            <field name="description">Requests related to club personnel and service quality.</field>
+            <field name="sla_days">10</field>
+        </record>
+
+        <record id="pqr_category_billing" model="club.pqr.category">
+            <field name="name">Billing</field>
+            <field name="description">Requests related to invoices, payments and billing issues.</field>
+            <field name="sla_days">7</field>
+        </record>
+
+        <!-- PQR Requests -->
+        <record id="pqr_request_001" model="club.pqr.request">
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="category_id" ref="pqr_category_facilities"/>
+            <field name="request_type">complaint</field>
+            <field name="subject">Pool area maintenance needed</field>
+            <field name="description">&lt;p&gt;The pool area has broken tiles that need urgent repair.&lt;/p&gt;</field>
+            <field name="priority">high</field>
+            <field name="status">submitted</field>
+            <field name="submit_date" eval="DateTime.today() - timedelta(days=5)"/>
+        </record>
+
+        <record id="pqr_request_002" model="club.pqr.request">
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="category_id" ref="pqr_category_staff"/>
+            <field name="request_type">petition</field>
+            <field name="subject">Request for extended gym hours</field>
+            <field name="description">&lt;p&gt;Please consider extending gym hours to 10 PM on weekdays.&lt;/p&gt;</field>
+            <field name="priority">medium</field>
+            <field name="status">in_progress</field>
+            <field name="submit_date" eval="DateTime.today() - timedelta(days=10)"/>
+        </record>
+
+        <record id="pqr_request_003" model="club.pqr.request">
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="category_id" ref="pqr_category_billing"/>
+            <field name="request_type">claim</field>
+            <field name="subject">Duplicate charge on monthly fee</field>
+            <field name="description">&lt;p&gt;I was charged twice for the March monthly fee. Please review and correct.&lt;/p&gt;</field>
+            <field name="priority">urgent</field>
+            <field name="status">resolved</field>
+            <field name="submit_date" eval="DateTime.today() - timedelta(days=20)"/>
+            <field name="resolution_date" eval="DateTime.today() - timedelta(days=3)"/>
+            <field name="resolution_notes">&lt;p&gt;Duplicate charge confirmed and refunded.&lt;/p&gt;</field>
+        </record>
+
+        <record id="pqr_request_004" model="club.pqr.request">
+            <field name="affiliate_id" ref="club_core.affiliate_005"/>
+            <field name="category_id" ref="pqr_category_facilities"/>
+            <field name="request_type">petition</field>
+            <field name="subject">New tennis court lighting</field>
+            <field name="description">&lt;p&gt;It would be great to add lighting to courts 3 and 4 for evening play.&lt;/p&gt;</field>
+            <field name="priority">low</field>
+            <field name="status">draft</field>
+        </record>
+
+        <record id="pqr_request_005" model="club.pqr.request">
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="category_id" ref="pqr_category_staff"/>
+            <field name="request_type">complaint</field>
+            <field name="subject">Delayed restaurant service</field>
+            <field name="description">&lt;p&gt;Service at the main restaurant has been consistently slow during lunch hours.&lt;/p&gt;</field>
+            <field name="priority">medium</field>
+            <field name="status">closed</field>
+            <field name="submit_date" eval="DateTime.today() - timedelta(days=30)"/>
+            <field name="resolution_date" eval="DateTime.today() - timedelta(days=10)"/>
+            <field name="resolution_notes">&lt;p&gt;Additional staff assigned to lunch shift. Issue resolved.&lt;/p&gt;</field>
+        </record>
+
+    </data>
+</odoo>

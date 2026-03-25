@@ -1,0 +1,320 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * club_guests
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_guests
+#: model:ir.model,name:club_guests.model_club_guest_policy
+msgid "Guest Policy"
+msgstr "Politica de Invitados"
+
+#. module: club_guests
+#: model:ir.model,name:club_guests.model_club_guest
+msgid "Club Guest"
+msgstr "Invitado del Club"
+
+#. module: club_guests
+#: model:ir.model,name:club_guests.model_club_guest_visit
+msgid "Guest Visit"
+msgstr "Visita de Invitado"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_policy__name
+msgid "Policy Name"
+msgstr "Nombre de Politica"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_policy__max_guests_per_visit
+msgid "Max Guests per Visit"
+msgstr "Maximo de Invitados por Visita"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_policy__max_visits_per_month
+msgid "Max Visits per Month"
+msgstr "Maximo de Visitas por Mes"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_policy__requires_advance_registration
+msgid "Requires Advance Registration"
+msgstr "Requiere Registro Previo"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_policy__guest_fee
+msgid "Guest Fee"
+msgstr "Tarifa de Invitado"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__name
+msgid "Guest Full Name"
+msgstr "Nombre Completo del Invitado"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__identification
+msgid "ID Number"
+msgstr "Numero de Identificacion"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__phone
+msgid "Phone"
+msgstr "Telefono"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__email
+msgid "Email"
+msgstr "Correo Electronico"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__relationship
+msgid "Relationship"
+msgstr "Relacion"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest__relationship,0
+msgid "Family"
+msgstr "Familia"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest__relationship,1
+msgid "Friend"
+msgstr "Amigo"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest__relationship,2
+msgid "Business"
+msgstr "Negocio"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest__relationship,3
+msgid "Other"
+msgstr "Otro"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__photo
+msgid "Photo"
+msgstr "Foto"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__visit_ids
+msgid "Visits"
+msgstr "Visitas"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__visit_count
+msgid "Visit Count"
+msgstr "Cantidad de Visitas"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__name
+msgid "Visit Number"
+msgstr "Numero de Visita"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__affiliate_id
+msgid "Host Affiliate"
+msgstr "Afiliado Anfitrion"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__guest_id
+msgid "Guest"
+msgstr "Invitado"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__date
+msgid "Visit Date"
+msgstr "Fecha de Visita"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__check_in_time
+msgid "Check-In Time"
+msgstr "Hora de Entrada"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__check_out_time
+msgid "Check-Out Time"
+msgstr "Hora de Salida"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__areas_accessed
+msgid "Area Accessed"
+msgstr "Area Accedida"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__areas_accessed,0
+msgid "Pool"
+msgstr "Piscina"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__areas_accessed,1
+msgid "Golf"
+msgstr "Golf"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__areas_accessed,2
+msgid "Tennis"
+msgstr "Tenis"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__areas_accessed,3
+msgid "Restaurant"
+msgstr "Restaurante"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__areas_accessed,4
+msgid "Social Area"
+msgstr "Area Social"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__areas_accessed,5
+msgid "Gym"
+msgstr "Gimnasio"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__areas_accessed,6
+msgid "General"
+msgstr "General"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__status,0
+msgid "Registered"
+msgstr "Registrado"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__status,1
+msgid "Checked In"
+msgstr "Ingreso Registrado"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__status,2
+msgid "Checked Out"
+msgstr "Salida Registrada"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__status,3
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_guests
+#: model:ir.model.fields,selection:club_guests.field_club_guest_visit__status,4
+msgid "No Show"
+msgstr "No se Presento"
+
+#. module: club_guests
+#: model:ir.model.fields,field_description:club_guests.field_club_guest_visit__policy_id
+msgid "Guest Policy"
+msgstr "Politica de Invitados"
+
+#. module: club_guests
+#: model:ir.actions.act_window,name:club_guests.action_club_guest_policy
+msgid "Guest Policies"
+msgstr "Politicas de Invitados"
+
+#. module: club_guests
+#: model:ir.actions.act_window,name:club_guests.action_club_guest
+msgid "Guest Registry"
+msgstr "Registro de Invitados"
+
+#. module: club_guests
+#: model:ir.actions.act_window,name:club_guests.action_club_guest_visit_today
+msgid "Today's Visits"
+msgstr "Visitas de Hoy"
+
+#. module: club_guests
+#: model:ir.actions.act_window,name:club_guests.action_club_guest_visit
+msgid "All Visits"
+msgstr "Todas las Visitas"
+
+#. module: club_guests
+#: model:ir.ui.menu,name:club_guests.menu_club_guests
+msgid "Guests"
+msgstr "Invitados"
+
+#. module: club_guests
+#: model:ir.ui.menu,name:club_guests.menu_club_guest_visits_today
+msgid "Today's Visits"
+msgstr "Visitas de Hoy"
+
+#. module: club_guests
+#: model:ir.ui.menu,name:club_guests.menu_club_guest_visits_all
+msgid "All Visits"
+msgstr "Todas las Visitas"
+
+#. module: club_guests
+#: model:ir.ui.menu,name:club_guests.menu_club_guest_registry
+msgid "Guest Registry"
+msgstr "Registro de Invitados"
+
+#. module: club_guests
+#: model:ir.ui.menu,name:club_guests.menu_club_config_guest_policies
+msgid "Guest Policies"
+msgstr "Politicas de Invitados"
+
+#. module: club_guests
+#: model:res.groups,name:club_guests.group_guest_staff
+msgid "Guest Staff"
+msgstr "Personal de Invitados"
+
+#. module: club_guests
+#: code:addons/club_guests/models/club_guest_visit.py:0
+#, python-format
+msgid "New"
+msgstr "Nuevo"
+
+#. module: club_guests
+#: code:addons/club_guests/models/club_guest_visit.py:0
+#, python-format
+msgid "Affiliate \"%(affiliate)s\" exceeds the maximum of %(max)d guests per visit on %(date)s."
+msgstr "El afiliado \"%(affiliate)s\" excede el maximo de %(max)d invitados por visita en %(date)s."
+
+#. module: club_guests
+#: code:addons/club_guests/models/club_guest_visit.py:0
+#, python-format
+msgid "Affiliate \"%(affiliate)s\" exceeds the maximum of %(max)d guest visits per month."
+msgstr "El afiliado \"%(affiliate)s\" excede el maximo de %(max)d visitas de invitados por mes."
+
+#. module: club_guests
+#: model_terms:ir.ui.view,arch_db:club_guests.view_club_guest_visit_form
+msgid "Check In"
+msgstr "Registrar Entrada"
+
+#. module: club_guests
+#: model_terms:ir.ui.view,arch_db:club_guests.view_club_guest_visit_form
+msgid "Check Out"
+msgstr "Registrar Salida"
+
+#. module: club_guests
+#: model_terms:ir.ui.view,arch_db:club_guests.view_club_guest_form
+msgid "Visit History"
+msgstr "Historial de Visitas"
+
+#. module: club_guests
+#: model_terms:ir.ui.view,arch_db:club_guests.view_club_guest_policy_form
+msgid "Limits"
+msgstr "Limites"
+
+#. module: club_guests
+#: model_terms:ir.ui.view,arch_db:club_guests.view_club_guest_policy_form
+msgid "Settings"
+msgstr "Configuracion"

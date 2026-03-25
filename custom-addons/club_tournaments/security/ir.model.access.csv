@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_tournament_admin,club.tournament admin,model_club_tournament,club_core.group_club_admin,1,1,1,1
+access_club_tournament_staff,club.tournament staff,model_club_tournament,club_tournaments.group_tournament_staff,1,1,1,1
+access_club_tournament_member,club.tournament member,model_club_tournament,club_core.group_club_member,1,0,0,0
+access_club_tournament_participant_admin,club.tournament.participant admin,model_club_tournament_participant,club_core.group_club_admin,1,1,1,1
+access_club_tournament_participant_staff,club.tournament.participant staff,model_club_tournament_participant,club_tournaments.group_tournament_staff,1,1,1,1
+access_club_tournament_participant_member,club.tournament.participant member,model_club_tournament_participant,club_core.group_club_member,1,0,0,0
+access_club_tournament_round_admin,club.tournament.round admin,model_club_tournament_round,club_core.group_club_admin,1,1,1,1
+access_club_tournament_round_staff,club.tournament.round staff,model_club_tournament_round,club_tournaments.group_tournament_staff,1,1,1,1
+access_club_tournament_round_member,club.tournament.round member,model_club_tournament_round,club_core.group_club_member,1,0,0,0
+access_club_tournament_match_admin,club.tournament.match admin,model_club_tournament_match,club_core.group_club_admin,1,1,1,1
+access_club_tournament_match_staff,club.tournament.match staff,model_club_tournament_match,club_tournaments.group_tournament_staff,1,1,1,1
+access_club_tournament_match_member,club.tournament.match member,model_club_tournament_match,club_core.group_club_member,1,0,0,0

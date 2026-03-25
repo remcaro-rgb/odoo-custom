@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- PQR sub-menu under Club root -->
+    <menuitem id="menu_club_pqr"
+        name="PQR"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <menuitem id="menu_club_pqr_all"
+        name="All Requests"
+        parent="menu_club_pqr"
+        action="action_club_pqr_request"
+        sequence="10"/>
+
+    <menuitem id="menu_club_pqr_my"
+        name="My Assigned"
+        parent="menu_club_pqr"
+        action="action_club_pqr_request_my"
+        sequence="20"/>
+
+    <!-- Categories under Configuration -->
+    <menuitem id="menu_club_pqr_config_categories"
+        name="PQR Categories"
+        parent="club_core.menu_club_config"
+        action="action_club_pqr_category"
+        sequence="20"/>
+
+</odoo>

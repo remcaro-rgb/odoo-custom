@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Object Loans sub-menu under Club root -->
+    <menuitem id="menu_club_object_loans"
+        name="Object Loans"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <menuitem id="menu_club_loans_list"
+        name="All Loans"
+        parent="menu_club_object_loans"
+        action="action_club_object_loan"
+        sequence="10"/>
+
+    <menuitem id="menu_club_items_list"
+        name="Items"
+        parent="menu_club_object_loans"
+        action="action_club_object_item"
+        sequence="20"/>
+
+    <!-- Categories under Configuration -->
+    <menuitem id="menu_club_config_object_categories"
+        name="Object Categories"
+        parent="club_core.menu_club_config"
+        action="action_club_object_category"
+        sequence="30"
+        groups="club_core.group_club_admin"/>
+
+</odoo>

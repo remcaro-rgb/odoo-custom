@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Tournaments ──────────────────────────────────────────── -->
+
+        <record id="tournament_golf_open" model="club.tournament">
+            <field name="title">Club Golf Open 2026</field>
+            <field name="sport">golf</field>
+            <field name="tournament_type">single_elimination</field>
+            <field name="description">&lt;p&gt;Annual golf open championship for all club members.&lt;/p&gt;</field>
+            <field name="start_date" eval="DateTime.now().strftime('%Y-04-15')"/>
+            <field name="end_date" eval="DateTime.now().strftime('%Y-04-20')"/>
+            <field name="max_participants">16</field>
+            <field name="entry_fee">50.0</field>
+            <field name="prize_description">1st Place: Trophy + $500 club credit
+2nd Place: $250 club credit
+3rd Place: $100 club credit</field>
+            <field name="status">registration</field>
+            <field name="organizer_id" ref="base.user_admin"/>
+        </record>
+
+        <record id="tournament_tennis_league" model="club.tournament">
+            <field name="title">Tennis Round Robin Spring 2026</field>
+            <field name="sport">tennis</field>
+            <field name="tournament_type">round_robin</field>
+            <field name="description">&lt;p&gt;Spring round-robin tennis tournament. All players face each other.&lt;/p&gt;</field>
+            <field name="start_date" eval="DateTime.now().strftime('%Y-05-01')"/>
+            <field name="end_date" eval="DateTime.now().strftime('%Y-05-31')"/>
+            <field name="max_participants">8</field>
+            <field name="entry_fee">30.0</field>
+            <field name="prize_description">Winner takes all: exclusive club tennis gear set.</field>
+            <field name="status">in_progress</field>
+            <field name="organizer_id" ref="base.user_admin"/>
+        </record>
+
+        <!-- ── Participants ─────────────────────────────────────────── -->
+
+        <!-- Golf participants -->
+        <record id="participant_golf_carlos" model="club.tournament.participant">
+            <field name="tournament_id" ref="tournament_golf_open"/>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="seed">1</field>
+            <field name="status">registered</field>
+        </record>
+
+        <record id="participant_golf_ana" model="club.tournament.participant">
+            <field name="tournament_id" ref="tournament_golf_open"/>
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="seed">2</field>
+            <field name="status">registered</field>
+        </record>
+
+        <record id="participant_golf_jorge" model="club.tournament.participant">
+            <field name="tournament_id" ref="tournament_golf_open"/>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="seed">3</field>
+            <field name="status">registered</field>
+        </record>
+
+        <record id="participant_golf_pedro" model="club.tournament.participant">
+            <field name="tournament_id" ref="tournament_golf_open"/>
+            <field name="affiliate_id" ref="club_core.affiliate_005"/>
+            <field name="seed">4</field>
+            <field name="status">registered</field>
+        </record>
+
+        <!-- Tennis participants -->
+        <record id="participant_tennis_carlos" model="club.tournament.participant">
+            <field name="tournament_id" ref="tournament_tennis_league"/>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="seed">1</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="participant_tennis_ana" model="club.tournament.participant">
+            <field name="tournament_id" ref="tournament_tennis_league"/>
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="seed">2</field>
+            <field name="status">active</field>
+        </record>
+
+        <record id="participant_tennis_pedro" model="club.tournament.participant">
+            <field name="tournament_id" ref="tournament_tennis_league"/>
+            <field name="affiliate_id" ref="club_core.affiliate_005"/>
+            <field name="seed">3</field>
+            <field name="status">active</field>
+        </record>
+
+        <!-- ── Rounds & Matches ─────────────────────────────────────── -->
+
+        <!-- Tennis Round 1 -->
+        <record id="round_tennis_1" model="club.tournament.round">
+            <field name="tournament_id" ref="tournament_tennis_league"/>
+            <field name="name">Round 1</field>
+            <field name="round_number">1</field>
+            <field name="date" eval="DateTime.now().strftime('%Y-05-03')"/>
+        </record>
+
+        <record id="match_tennis_1_1" model="club.tournament.match">
+            <field name="round_id" ref="round_tennis_1"/>
+            <field name="participant_1_id" ref="participant_tennis_carlos"/>
+            <field name="participant_2_id" ref="participant_tennis_ana"/>
+            <field name="score_1">6-4, 6-3</field>
+            <field name="score_2">4-6, 3-6</field>
+            <field name="winner_id" ref="participant_tennis_carlos"/>
+            <field name="status">completed</field>
+        </record>
+
+        <record id="match_tennis_1_2" model="club.tournament.match">
+            <field name="round_id" ref="round_tennis_1"/>
+            <field name="participant_1_id" ref="participant_tennis_carlos"/>
+            <field name="participant_2_id" ref="participant_tennis_pedro"/>
+            <field name="status">scheduled</field>
+        </record>
+
+        <record id="match_tennis_1_3" model="club.tournament.match">
+            <field name="round_id" ref="round_tennis_1"/>
+            <field name="participant_1_id" ref="participant_tennis_ana"/>
+            <field name="participant_2_id" ref="participant_tennis_pedro"/>
+            <field name="status">scheduled</field>
+        </record>
+
+    </data>
+</odoo>

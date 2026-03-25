@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Employee Types -->
+        <record id="employee_type_nanny" model="club.employee.type">
+            <field name="name">Nanny</field>
+        </record>
+
+        <record id="employee_type_nurse" model="club.employee.type">
+            <field name="name">Nurse</field>
+        </record>
+
+        <record id="employee_type_chauffeur" model="club.employee.type">
+            <field name="name">Chauffeur</field>
+        </record>
+
+        <record id="employee_type_housekeeper" model="club.employee.type">
+            <field name="name">Housekeeper</field>
+        </record>
+
+        <record id="employee_type_tutor" model="club.employee.type">
+            <field name="name">Tutor</field>
+        </record>
+
+        <!-- Employees -->
+        <record id="employee_rosa" model="club.affiliate.employee">
+            <field name="name">Rosa Castillo</field>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="employee_type_id" ref="employee_type_nanny"/>
+            <field name="identification_type">cc</field>
+            <field name="identification_number">52456789</field>
+            <field name="phone">+57 310 1111111</field>
+            <field name="email">rosa.castillo@email.com</field>
+            <field name="access_card_number">EMP-0001</field>
+            <field name="status">active</field>
+            <field name="start_date" eval="DateTime.now().strftime('%Y-01-15')"/>
+            <field name="emergency_contact">Juan Castillo</field>
+            <field name="emergency_phone">+57 310 9999999</field>
+        </record>
+
+        <record id="employee_andres" model="club.affiliate.employee">
+            <field name="name">Andres Morales</field>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="employee_type_id" ref="employee_type_chauffeur"/>
+            <field name="identification_type">cc</field>
+            <field name="identification_number">80123456</field>
+            <field name="phone">+57 311 2222222</field>
+            <field name="access_card_number">EMP-0002</field>
+            <field name="status">active</field>
+            <field name="start_date" eval="DateTime.now().strftime('%Y-02-01')"/>
+        </record>
+
+        <record id="employee_luz" model="club.affiliate.employee">
+            <field name="name">Luz Marina Ortiz</field>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="employee_type_id" ref="employee_type_nurse"/>
+            <field name="identification_type">cc</field>
+            <field name="identification_number">39876543</field>
+            <field name="phone">+57 312 3333333</field>
+            <field name="email">luz.ortiz@email.com</field>
+            <field name="access_card_number">EMP-0003</field>
+            <field name="status">active</field>
+            <field name="start_date" eval="DateTime.now().strftime('%Y-01-10')"/>
+        </record>
+
+        <record id="employee_martha" model="club.affiliate.employee">
+            <field name="name">Martha Reyes</field>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="employee_type_id" ref="employee_type_housekeeper"/>
+            <field name="identification_type">ce</field>
+            <field name="identification_number">E-456789</field>
+            <field name="phone">+57 313 4444444</field>
+            <field name="access_card_number">EMP-0004</field>
+            <field name="status">suspended</field>
+            <field name="start_date" eval="DateTime.now().strftime('%Y-03-01')"/>
+            <field name="notes">Suspended pending document renewal.</field>
+        </record>
+
+        <!-- Schedules -->
+        <record id="schedule_rosa_mon" model="club.affiliate.employee.schedule">
+            <field name="employee_id" ref="employee_rosa"/>
+            <field name="day_of_week">0</field>
+            <field name="time_from">8.0</field>
+            <field name="time_to">17.0</field>
+        </record>
+
+        <record id="schedule_rosa_wed" model="club.affiliate.employee.schedule">
+            <field name="employee_id" ref="employee_rosa"/>
+            <field name="day_of_week">2</field>
+            <field name="time_from">8.0</field>
+            <field name="time_to">17.0</field>
+        </record>
+
+        <record id="schedule_rosa_fri" model="club.affiliate.employee.schedule">
+            <field name="employee_id" ref="employee_rosa"/>
+            <field name="day_of_week">4</field>
+            <field name="time_from">8.0</field>
+            <field name="time_to">13.0</field>
+            <field name="notes">Half day on Fridays</field>
+        </record>
+
+        <record id="schedule_andres_daily" model="club.affiliate.employee.schedule">
+            <field name="employee_id" ref="employee_andres"/>
+            <field name="day_of_week">0</field>
+            <field name="time_from">7.0</field>
+            <field name="time_to">19.0</field>
+            <field name="notes">Full day driver schedule</field>
+        </record>
+
+        <record id="schedule_luz_tue" model="club.affiliate.employee.schedule">
+            <field name="employee_id" ref="employee_luz"/>
+            <field name="day_of_week">1</field>
+            <field name="time_from">9.0</field>
+            <field name="time_to">15.0</field>
+        </record>
+
+        <!-- Access Logs -->
+        <record id="access_log_rosa_1" model="club.affiliate.employee.access.log">
+            <field name="employee_id" ref="employee_rosa"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-03-10')"/>
+            <field name="check_in">8.0</field>
+            <field name="check_out">17.0</field>
+            <field name="area">Pool Area</field>
+        </record>
+
+        <record id="access_log_rosa_2" model="club.affiliate.employee.access.log">
+            <field name="employee_id" ref="employee_rosa"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-03-12')"/>
+            <field name="check_in">8.5</field>
+            <field name="check_out">16.5</field>
+            <field name="area">Kids Zone</field>
+        </record>
+
+        <record id="access_log_andres_1" model="club.affiliate.employee.access.log">
+            <field name="employee_id" ref="employee_andres"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-03-10')"/>
+            <field name="check_in">7.0</field>
+            <field name="check_out">19.0</field>
+            <field name="area">Parking / Main Entrance</field>
+        </record>
+
+        <record id="access_log_luz_1" model="club.affiliate.employee.access.log">
+            <field name="employee_id" ref="employee_luz"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-03-11')"/>
+            <field name="check_in">9.0</field>
+            <field name="check_out">15.0</field>
+            <field name="area">Spa / Wellness</field>
+        </record>
+
+        <record id="access_log_martha_1" model="club.affiliate.employee.access.log">
+            <field name="employee_id" ref="employee_martha"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-03-01')"/>
+            <field name="check_in">10.0</field>
+            <field name="check_out">14.0</field>
+            <field name="area">Main Building</field>
+            <field name="notes">Last access before suspension.</field>
+        </record>
+
+    </data>
+</odoo>

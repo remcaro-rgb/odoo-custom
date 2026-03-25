@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seq_club_object_item" model="ir.sequence">
+            <field name="name">Club Object Item Code</field>
+            <field name="code">club.object.item</field>
+            <field name="prefix">ITEM-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_club_object_loan" model="ir.sequence">
+            <field name="name">Club Object Loan Reference</field>
+            <field name="code">club.object.loan</field>
+            <field name="prefix">LOAN-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,293 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* club_affiliate_employees
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_affiliate_employees
+#: model:ir.model,name:club_affiliate_employees.model_club_employee_type
+msgid "Club Employee Type"
+msgstr "Tipo de Empleado del Club"
+
+#. module: club_affiliate_employees
+#: model:ir.model,name:club_affiliate_employees.model_club_affiliate_employee
+msgid "Club Affiliate Employee"
+msgstr "Empleado del Afiliado"
+
+#. module: club_affiliate_employees
+#: model:ir.model,name:club_affiliate_employees.model_club_affiliate_employee_schedule
+msgid "Club Affiliate Employee Schedule"
+msgstr "Horario del Empleado del Afiliado"
+
+#. module: club_affiliate_employees
+#: model:ir.model,name:club_affiliate_employees.model_club_affiliate_employee_access_log
+msgid "Club Affiliate Employee Access Log"
+msgstr "Registro de Acceso del Empleado"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_employee_type__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__name
+msgid "Full Name"
+msgstr "Nombre Completo"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__affiliate_id
+msgid "Employer (Affiliate)"
+msgstr "Empleador (Afiliado)"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__employee_type_id
+msgid "Employee Type"
+msgstr "Tipo de Empleado"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__identification_type
+msgid "Identification Type"
+msgstr "Tipo de Identificacion"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__identification_number
+msgid "Identification Number"
+msgstr "Numero de Identificacion"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__phone
+msgid "Phone"
+msgstr "Telefono"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__email
+msgid "Email"
+msgstr "Correo Electronico"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__photo
+msgid "Photo"
+msgstr "Foto"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__access_card_number
+msgid "Access Card Number"
+msgstr "Numero de Tarjeta de Acceso"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee__status
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee__status
+msgid "Suspended"
+msgstr "Suspendido"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee__status
+msgid "Inactive"
+msgstr "Inactivo"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__start_date
+msgid "Start Date"
+msgstr "Fecha de Inicio"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__end_date
+msgid "End Date"
+msgstr "Fecha de Fin"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__schedule_ids
+msgid "Schedule"
+msgstr "Horario"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__emergency_contact
+msgid "Emergency Contact"
+msgstr "Contacto de Emergencia"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__emergency_phone
+msgid "Emergency Phone"
+msgstr "Telefono de Emergencia"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee__identification_type
+msgid "CC - Cedula de Ciudadania"
+msgstr "CC - Cedula de Ciudadania"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee__identification_type
+msgid "CE - Cedula de Extranjeria"
+msgstr "CE - Cedula de Extranjeria"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee__identification_type
+msgid "Passport"
+msgstr "Pasaporte"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee__identification_type
+msgid "Other"
+msgstr "Otro"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_schedule__employee_id
+msgid "Employee"
+msgstr "Empleado"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_schedule__day_of_week
+msgid "Day of Week"
+msgstr "Dia de la Semana"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee_schedule__day_of_week
+msgid "Monday"
+msgstr "Lunes"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee_schedule__day_of_week
+msgid "Tuesday"
+msgstr "Martes"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee_schedule__day_of_week
+msgid "Wednesday"
+msgstr "Miercoles"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee_schedule__day_of_week
+msgid "Thursday"
+msgstr "Jueves"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee_schedule__day_of_week
+msgid "Friday"
+msgstr "Viernes"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee_schedule__day_of_week
+msgid "Saturday"
+msgstr "Sabado"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,selection:club_affiliate_employees.field_club_affiliate_employee_schedule__day_of_week
+msgid "Sunday"
+msgstr "Domingo"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_schedule__time_from
+msgid "From"
+msgstr "Desde"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_schedule__time_to
+msgid "To"
+msgstr "Hasta"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_access_log__employee_id
+msgid "Employee"
+msgstr "Empleado"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_access_log__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_access_log__check_in
+msgid "Check In"
+msgstr "Entrada"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_access_log__check_out
+msgid "Check Out"
+msgstr "Salida"
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,field_description:club_affiliate_employees.field_club_affiliate_employee_access_log__area
+msgid "Area"
+msgstr "Area"
+
+#. module: club_affiliate_employees
+#: model:ir.actions.act_window,name:club_affiliate_employees.action_club_affiliate_employee
+msgid "Affiliate Employees"
+msgstr "Empleados del Afiliado"
+
+#. module: club_affiliate_employees
+#: model:ir.actions.act_window,name:club_affiliate_employees.action_club_affiliate_employee_access_log
+msgid "Access Log"
+msgstr "Registro de Acceso"
+
+#. module: club_affiliate_employees
+#: model:ir.actions.act_window,name:club_affiliate_employees.action_club_employee_type
+msgid "Employee Types"
+msgstr "Tipos de Empleado"
+
+#. module: club_affiliate_employees
+#: model:ir.ui.menu,name:club_affiliate_employees.menu_club_affiliate_employees
+msgid "Affiliate Employees"
+msgstr "Empleados del Afiliado"
+
+#. module: club_affiliate_employees
+#: model:ir.ui.menu,name:club_affiliate_employees.menu_club_affiliate_employees_list
+msgid "All Employees"
+msgstr "Todos los Empleados"
+
+#. module: club_affiliate_employees
+#: model:ir.ui.menu,name:club_affiliate_employees.menu_club_affiliate_employees_access_log
+msgid "Access Log"
+msgstr "Registro de Acceso"
+
+#. module: club_affiliate_employees
+#: model:ir.ui.menu,name:club_affiliate_employees.menu_club_config_employee_types
+msgid "Employee Types"
+msgstr "Tipos de Empleado"
+
+#. module: club_affiliate_employees
+#: model:res.groups,name:club_affiliate_employees.group_employee_staff
+msgid "Affiliate Employees Staff"
+msgstr "Personal de Empleados de Afiliados"
+
+#. module: club_affiliate_employees
+#: code:addons/club_affiliate_employees/models/club_affiliate_employee.py:0
+#, python-format
+msgid "Identification number is required for employee \"%s\"."
+msgstr "El numero de identificacion es obligatorio para el empleado \"%s\"."
+
+#. module: club_affiliate_employees
+#: model_terms:ir.ui.view,arch_db:club_affiliate_employees.view_club_affiliate_employee_form
+msgid "Internal notes..."
+msgstr "Notas internas..."
+
+#. module: club_affiliate_employees
+#: model:ir.model.fields,help:club_affiliate_employees.field_club_affiliate_employee__access_card_number
+msgid "Access card number must be unique."
+msgstr "El numero de tarjeta de acceso debe ser unico."

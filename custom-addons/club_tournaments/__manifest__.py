@@ -1,0 +1,25 @@
+{
+    'name': 'Club Tournaments',
+    'version': '18.0.1.0.0',
+    'summary': 'Cross-sport tournament management for the club',
+    'description': 'Manage tournaments, participants, rounds, matches, results and prizes across all club sports.',
+    'category': 'Club Management',
+    'author': 'Manuel Caro',
+    'license': 'LGPL-3',
+    'depends': ['club_core', 'mail'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/sequences.xml',
+        'views/club_tournament_views.xml',
+        'views/club_tournament_participant_views.xml',
+        'views/club_tournament_round_views.xml',
+        'views/club_tournament_match_views.xml',
+        'views/club_tournament_menus.xml',
+    ],
+    'demo': [
+        'data/demo_data.xml',
+    ],
+    'installable': True,
+    'application': False,
+}

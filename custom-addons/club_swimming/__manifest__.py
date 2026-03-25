@@ -1,0 +1,25 @@
+{
+    'name': 'Club Swimming',
+    'version': '18.0.1.0.0',
+    'summary': 'Social Country Club — Swimming Pool Management',
+    'description': 'Swimming pool management: pools, lanes, bookings, lifeguards, swim classes.',
+    'category': 'Club Management',
+    'author': 'Manuel Caro',
+    'license': 'LGPL-3',
+    'depends': ['club_core'],
+    'data': [
+        'security/club_swimming_security.xml',
+        'security/ir.model.access.csv',
+        'views/club_swimming_pool_views.xml',
+        'views/club_swimming_lane_views.xml',
+        'views/club_swimming_booking_views.xml',
+        'views/club_swimming_lifeguard_views.xml',
+        'views/club_swimming_class_views.xml',
+        'views/club_swimming_menus.xml',
+    ],
+    'demo': [
+        'data/demo_data.xml',
+    ],
+    'installable': True,
+    'application': False,
+}

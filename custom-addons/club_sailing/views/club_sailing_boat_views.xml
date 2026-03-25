@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_sailing_boat_kanban" model="ir.ui.view">
+        <field name="name">club.sailing.boat.kanban</field>
+        <field name="model">club.sailing.boat</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="boat_type"/>
+                <field name="capacity"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong><br/>
+                            <span class="text-muted"><field name="boat_type"/></span><br/>
+                            <span>Capacity: <field name="capacity"/></span><br/>
+                            <field name="status" widget="badge"
+                                decoration-success="status == 'available'"
+                                decoration-info="status == 'in_use'"
+                                decoration-warning="status == 'maintenance'"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_sailing_boat_list" model="ir.ui.view">
+        <field name="name">club.sailing.boat.list</field>
+        <field name="model">club.sailing.boat</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="boat_type"/>
+                <field name="capacity"/>
+                <field name="registration_number"/>
+                <field name="owner_type"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'available'"
+                    decoration-info="status == 'in_use'"
+                    decoration-warning="status == 'maintenance'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_sailing_boat_form" model="ir.ui.view">
+        <field name="name">club.sailing.boat.form</field>
+        <field name="model">club.sailing.boat</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="boat_type"/>
+                            <field name="capacity"/>
+                            <field name="registration_number"/>
+                        </group>
+                        <group>
+                            <field name="owner_type"/>
+                            <field name="owner_id"
+                                invisible="owner_type != 'affiliate'"/>
+                            <field name="status" widget="badge"
+                                decoration-success="status == 'available'"
+                                decoration-info="status == 'in_use'"
+                                decoration-warning="status == 'maintenance'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_sailing_boat_search" model="ir.ui.view">
+        <field name="name">club.sailing.boat.search</field>
+        <field name="model">club.sailing.boat</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="registration_number"/>
+                <filter name="available" string="Available"
+                    domain="[('status','=','available')]"/>
+                <filter name="in_use" string="In Use"
+                    domain="[('status','=','in_use')]"/>
+                <filter name="maintenance" string="Maintenance"
+                    domain="[('status','=','maintenance')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Boat Type"
+                        context="{'group_by': 'boat_type'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_owner_type" string="Owner Type"
+                        context="{'group_by': 'owner_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_sailing_boat" model="ir.actions.act_window">
+        <field name="name">Boats</field>
+        <field name="res_model">club.sailing.boat</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_sailing_boat_search"/>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="path">club-sailing-boats</field>
+    </record>
+
+</odoo>

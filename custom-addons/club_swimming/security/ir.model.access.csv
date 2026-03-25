@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_swimming_pool_admin,club.swimming.pool admin,model_club_swimming_pool,club_core.group_club_admin,1,1,1,1
+access_club_swimming_pool_staff,club.swimming.pool staff,model_club_swimming_pool,club_swimming.group_swimming_staff,1,1,1,1
+access_club_swimming_pool_member,club.swimming.pool member,model_club_swimming_pool,club_core.group_club_member,1,0,0,0
+access_club_swimming_lane_admin,club.swimming.lane admin,model_club_swimming_lane,club_core.group_club_admin,1,1,1,1
+access_club_swimming_lane_staff,club.swimming.lane staff,model_club_swimming_lane,club_swimming.group_swimming_staff,1,1,1,1
+access_club_swimming_lane_member,club.swimming.lane member,model_club_swimming_lane,club_core.group_club_member,1,0,0,0
+access_club_swimming_booking_admin,club.swimming.booking admin,model_club_swimming_booking,club_core.group_club_admin,1,1,1,1
+access_club_swimming_booking_staff,club.swimming.booking staff,model_club_swimming_booking,club_swimming.group_swimming_staff,1,1,1,1
+access_club_swimming_booking_member,club.swimming.booking member,model_club_swimming_booking,club_core.group_club_member,1,0,0,0
+access_club_swimming_lifeguard_admin,club.swimming.lifeguard admin,model_club_swimming_lifeguard,club_core.group_club_admin,1,1,1,1
+access_club_swimming_lifeguard_staff,club.swimming.lifeguard staff,model_club_swimming_lifeguard,club_swimming.group_swimming_staff,1,1,1,1
+access_club_swimming_class_admin,club.swimming.class admin,model_club_swimming_class,club_core.group_club_admin,1,1,1,1
+access_club_swimming_class_staff,club.swimming.class staff,model_club_swimming_class,club_swimming.group_swimming_staff,1,1,1,1
+access_club_swimming_class_member,club.swimming.class member,model_club_swimming_class,club_core.group_club_member,1,0,0,0

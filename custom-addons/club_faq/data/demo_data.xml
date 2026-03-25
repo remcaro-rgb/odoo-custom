@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ── FAQ Categories ───────────────────────────────────────── -->
+
+        <record id="faq_category_memberships" model="club.faq.category">
+            <field name="name">Membresías</field>
+            <field name="sequence">10</field>
+            <field name="icon">fa fa-id-card</field>
+        </record>
+
+        <record id="faq_category_facilities" model="club.faq.category">
+            <field name="name">Instalaciones</field>
+            <field name="sequence">20</field>
+            <field name="icon">fa fa-building</field>
+        </record>
+
+        <record id="faq_category_sports" model="club.faq.category">
+            <field name="name">Deportes</field>
+            <field name="sequence">30</field>
+            <field name="icon">fa fa-futbol-o</field>
+        </record>
+
+        <record id="faq_category_billing" model="club.faq.category">
+            <field name="name">Facturación</field>
+            <field name="sequence">40</field>
+            <field name="icon">fa fa-credit-card</field>
+        </record>
+
+        <!-- ── FAQ Items — Membresías ───────────────────────────────── -->
+
+        <record id="faq_item_membership_01" model="club.faq.item">
+            <field name="category_id" ref="faq_category_memberships"/>
+            <field name="question">¿Cómo puedo adquirir una membresía del club?</field>
+            <field name="answer"><![CDATA[
+                <p>Para adquirir una membresía, debe visitar la oficina de administración
+                del club o contactarnos a través de nuestro portal en línea. Un asesor le
+                guiará a través de los planes disponibles (individual, familiar o corporativo)
+                y los beneficios de cada uno.</p>
+            ]]></field>
+            <field name="sequence">10</field>
+            <field name="is_published" eval="True"/>
+            <field name="author_id" ref="base.user_admin"/>
+        </record>
+
+        <record id="faq_item_membership_02" model="club.faq.item">
+            <field name="category_id" ref="faq_category_memberships"/>
+            <field name="question">¿Cuáles son los tipos de membresía disponibles?</field>
+            <field name="answer"><![CDATA[
+                <p>Ofrecemos los siguientes tipos de membresía:</p>
+                <ul>
+                    <li><strong>Individual:</strong> Acceso completo para una persona.</li>
+                    <li><strong>Familiar:</strong> Incluye al titular y sus beneficiarios directos.</li>
+                    <li><strong>Corporativa:</strong> Diseñada para empresas con empleados afiliados.</li>
+                </ul>
+            ]]></field>
+            <field name="sequence">20</field>
+            <field name="is_published" eval="True"/>
+            <field name="author_id" ref="base.user_admin"/>
+        </record>
+
+        <!-- ── FAQ Items — Instalaciones ────────────────────────────── -->
+
+        <record id="faq_item_facilities_01" model="club.faq.item">
+            <field name="category_id" ref="faq_category_facilities"/>
+            <field name="question">¿Cuál es el horario de atención de las instalaciones?</field>
+            <field name="answer"><![CDATA[
+                <p>Nuestras instalaciones están disponibles de lunes a viernes de 6:00 a.m.
+                a 10:00 p.m., y los fines de semana y festivos de 7:00 a.m. a 9:00 p.m.
+                Los horarios pueden variar en temporada especial.</p>
+            ]]></field>
+            <field name="sequence">10</field>
+            <field name="is_published" eval="True"/>
+            <field name="author_id" ref="base.user_admin"/>
+        </record>
+
+        <record id="faq_item_facilities_02" model="club.faq.item">
+            <field name="category_id" ref="faq_category_facilities"/>
+            <field name="question">¿Puedo reservar salones para eventos privados?</field>
+            <field name="answer"><![CDATA[
+                <p>Sí, el club cuenta con salones disponibles para eventos privados como
+                cumpleaños, reuniones corporativas y celebraciones familiares. Puede
+                realizar su reserva a través del portal o contactando al área de eventos
+                con al menos 15 días de anticipación.</p>
+            ]]></field>
+            <field name="sequence">20</field>
+            <field name="is_published" eval="True"/>
+            <field name="author_id" ref="base.user_admin"/>
+        </record>
+
+        <!-- ── FAQ Items — Deportes ─────────────────────────────────── -->
+
+        <record id="faq_item_sports_01" model="club.faq.item">
+            <field name="category_id" ref="faq_category_sports"/>
+            <field name="question">¿Qué disciplinas deportivas ofrece el club?</field>
+            <field name="answer"><![CDATA[
+                <p>El club ofrece una amplia variedad de disciplinas deportivas que
+                incluyen: natación, tenis, fútbol, baloncesto, voleibol, golf,
+                gimnasio, yoga y clases dirigidas de fitness. Consulte el calendario
+                de actividades para horarios específicos.</p>
+            ]]></field>
+            <field name="sequence">10</field>
+            <field name="is_published" eval="True"/>
+            <field name="author_id" ref="base.user_admin"/>
+        </record>
+
+        <record id="faq_item_sports_02" model="club.faq.item">
+            <field name="category_id" ref="faq_category_sports"/>
+            <field name="question">¿Cómo me inscribo en torneos y competencias?</field>
+            <field name="answer"><![CDATA[
+                <p>Las inscripciones a torneos y competencias se realizan a través del
+                portal del socio o directamente en la oficina de deportes. Las convocatorias
+                se publican con al menos 30 días de anticipación. Asegúrese de tener su
+                membresía activa para poder participar.</p>
+            ]]></field>
+            <field name="sequence">20</field>
+            <field name="is_published" eval="True"/>
+            <field name="author_id" ref="base.user_admin"/>
+        </record>
+
+        <!-- ── FAQ Items — Facturación ──────────────────────────────── -->
+
+        <record id="faq_item_billing_01" model="club.faq.item">
+            <field name="category_id" ref="faq_category_billing"/>
+            <field name="question">¿Cuáles son los métodos de pago aceptados?</field>
+            <field name="answer"><![CDATA[
+                <p>Aceptamos los siguientes métodos de pago:</p>
+                <ul>
+                    <li>Tarjeta de crédito y débito (Visa, Mastercard, American Express)</li>
+                    <li>Transferencia bancaria</li>
+                    <li>Débito automático</li>
+                    <li>Pago en efectivo en la caja del club</li>
+                </ul>
+                <p>Le recomendamos activar el débito automático para mayor comodidad.</p>
+            ]]></field>
+            <field name="sequence">10</field>
+            <field name="is_published" eval="True"/>
+            <field name="author_id" ref="base.user_admin"/>
+        </record>
+
+        <record id="faq_item_billing_02" model="club.faq.item">
+            <field name="category_id" ref="faq_category_billing"/>
+            <field name="question">¿Qué sucede si no pago mi cuota a tiempo?</field>
+            <field name="answer"><![CDATA[
+                <p>Si la cuota no se paga dentro de los primeros 15 días del mes, se
+                generará un recargo por mora. Si el atraso supera los 60 días, la
+                membresía será suspendida hasta que se regularice el pago. Puede
+                contactar al área de cartera para establecer un plan de pagos.</p>
+            ]]></field>
+            <field name="sequence">20</field>
+            <field name="is_published" eval="False"/>
+            <field name="author_id" ref="base.user_admin"/>
+        </record>
+
+    </data>
+</odoo>

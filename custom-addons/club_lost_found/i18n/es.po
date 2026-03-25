@@ -1,0 +1,336 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* club_lost_found
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_lost_found
+#: model:ir.model,name:club_lost_found.model_club_lost_item
+msgid "Club Lost Item"
+msgstr "Objeto Perdido del Club"
+
+#. module: club_lost_found
+#: model:ir.model,name:club_lost_found.model_club_found_item
+msgid "Club Found Item"
+msgstr "Objeto Encontrado del Club"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__name
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__name
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__reporter_id
+msgid "Reported By"
+msgstr "Reportado Por"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__description
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__description
+msgid "Description"
+msgstr "Descripcion"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__location_lost
+msgid "Location Lost"
+msgstr "Lugar de Perdida"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__date_lost
+msgid "Date Lost"
+msgstr "Fecha de Perdida"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__date_reported
+msgid "Date Reported"
+msgstr "Fecha de Reporte"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__category
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__category
+msgid "Category"
+msgstr "Categoria"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__photo
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__photo
+msgid "Photo"
+msgstr "Foto"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__status
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__matched_found_id
+msgid "Matched Found Item"
+msgstr "Objeto Encontrado Vinculado"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_lost_item__notes
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__found_by
+msgid "Found By"
+msgstr "Encontrado Por"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__found_by_affiliate_id
+msgid "Found By (Affiliate)"
+msgstr "Encontrado Por (Afiliado)"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__location_found
+msgid "Location Found"
+msgstr "Lugar del Hallazgo"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__date_found
+msgid "Date Found"
+msgstr "Fecha del Hallazgo"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__storage_location
+msgid "Storage Location"
+msgstr "Lugar de Almacenamiento"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__claimed_by_id
+msgid "Claimed By"
+msgstr "Reclamado Por"
+
+#. module: club_lost_found
+#: model:ir.model.fields,field_description:club_lost_found.field_club_found_item__claim_date
+msgid "Claim Date"
+msgstr "Fecha de Reclamo"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__category
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__category
+msgid "Electronics"
+msgstr "Electronicos"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__category
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__category
+msgid "Clothing"
+msgstr "Ropa"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__category
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__category
+msgid "Jewelry"
+msgstr "Joyeria"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__category
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__category
+msgid "Documents"
+msgstr "Documentos"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__category
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__category
+msgid "Sports Equipment"
+msgstr "Equipamiento Deportivo"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__category
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__category
+msgid "Other"
+msgstr "Otro"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__status
+msgid "Reported"
+msgstr "Reportado"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__status
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__status
+msgid "Matched"
+msgstr "Vinculado"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__status
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__status
+msgid "Claimed"
+msgstr "Reclamado"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_lost_item__status
+msgid "Closed"
+msgstr "Cerrado"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__status
+msgid "Registered"
+msgstr "Registrado"
+
+#. module: club_lost_found
+#: model:ir.model.fields,selection:club_lost_found.field_club_found_item__status
+msgid "Disposed"
+msgstr "Descartado"
+
+#. module: club_lost_found
+#: model:res.groups,name:club_lost_found.group_lost_found_staff
+msgid "Lost & Found Staff"
+msgstr "Personal de Objetos Perdidos"
+
+#. module: club_lost_found
+#: model:ir.actions.act_window,name:club_lost_found.action_club_lost_item
+msgid "Lost Items"
+msgstr "Objetos Perdidos"
+
+#. module: club_lost_found
+#: model:ir.actions.act_window,name:club_lost_found.action_club_found_item
+msgid "Found Items"
+msgstr "Objetos Encontrados"
+
+#. module: club_lost_found
+#: model:ir.ui.menu,name:club_lost_found.menu_club_lost_found
+msgid "Lost & Found"
+msgstr "Objetos Perdidos y Encontrados"
+
+#. module: club_lost_found
+#: model:ir.ui.menu,name:club_lost_found.menu_club_lost_items
+msgid "Lost Items"
+msgstr "Objetos Perdidos"
+
+#. module: club_lost_found
+#: model:ir.ui.menu,name:club_lost_found.menu_club_found_items
+msgid "Found Items"
+msgstr "Objetos Encontrados"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_lost_item_form
+msgid "Match"
+msgstr "Vincular"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_lost_item_form
+msgid "Close"
+msgstr "Cerrar"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_found_item_form
+msgid "Claim"
+msgstr "Reclamar"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_found_item_form
+msgid "Dispose"
+msgstr "Descartar"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_lost_item_search
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_found_item_search
+msgid "Group By"
+msgstr "Agrupar Por"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_lost_item_search
+msgid "Lost This Month"
+msgstr "Perdidos Este Mes"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_found_item_search
+msgid "Found This Month"
+msgstr "Encontrados Este Mes"
+
+#. module: club_lost_found
+#: code:addons/club_lost_found/models/club_lost_item.py:0
+#: code:addons/club_lost_found/models/club_found_item.py:0
+#, python-format
+msgid "New"
+msgstr "Nuevo"
+
+#. module: club_lost_found
+#: code:addons/club_lost_found/models/club_lost_item.py:0
+#, python-format
+msgid "The selected found item does not exist."
+msgstr "El objeto encontrado seleccionado no existe."
+
+#. module: club_lost_found
+#: code:addons/club_lost_found/models/club_lost_item.py:0
+#, python-format
+msgid "Only items with status \"Reported\" can be matched."
+msgstr "Solo objetos con estado \"Reportado\" pueden ser vinculados."
+
+#. module: club_lost_found
+#: code:addons/club_lost_found/models/club_lost_item.py:0
+#, python-format
+msgid "Only found items with status \"Registered\" can be matched."
+msgstr "Solo objetos encontrados con estado \"Registrado\" pueden ser vinculados."
+
+#. module: club_lost_found
+#: code:addons/club_lost_found/models/club_found_item.py:0
+#, python-format
+msgid "Only items with status \"Registered\" or \"Matched\" can be claimed."
+msgstr "Solo objetos con estado \"Registrado\" o \"Vinculado\" pueden ser reclamados."
+
+#. module: club_lost_found
+#: code:addons/club_lost_found/models/club_found_item.py:0
+#, python-format
+msgid "Only items with status \"Registered\" or \"Matched\" can be disposed."
+msgstr "Solo objetos con estado \"Registrado\" o \"Vinculado\" pueden ser descartados."
+
+#. module: club_lost_found
+#: model:ir.sequence,name:club_lost_found.seq_club_lost_item
+msgid "Club Lost Item"
+msgstr "Objeto Perdido del Club"
+
+#. module: club_lost_found
+#: model:ir.sequence,name:club_lost_found.seq_club_found_item
+msgid "Club Found Item"
+msgstr "Objeto Encontrado del Club"
+
+#. module: club_lost_found
+#: model:ir.rule,name:club_lost_found.rule_lost_item_portal_own
+msgid "Lost Item: portal sees own reports"
+msgstr "Objeto Perdido: portal ve sus propios reportes"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_lost_item_form
+msgid "Are you sure you want to close this lost item report?"
+msgstr "Esta seguro de que desea cerrar este reporte de objeto perdido?"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_found_item_form
+msgid "Are you sure you want to dispose of this item?"
+msgstr "Esta seguro de que desea descartar este objeto?"
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_lost_item_form
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_found_item_form
+msgid "Describe the lost item in detail..."
+msgstr "Describa el objeto perdido en detalle..."
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_found_item_form
+msgid "Describe the found item in detail..."
+msgstr "Describa el objeto encontrado en detalle..."
+
+#. module: club_lost_found
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_lost_item_form
+#: model_terms:ir.ui.view,arch_db:club_lost_found.view_club_found_item_form
+msgid "Additional notes..."
+msgstr "Notas adicionales..."

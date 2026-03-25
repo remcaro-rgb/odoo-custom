@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_swimming_lane_list" model="ir.ui.view">
+        <field name="name">club.swimming.lane.list</field>
+        <field name="model">club.swimming.lane</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="pool_id"/>
+                <field name="name"/>
+                <field name="lane_type"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'available'"
+                    decoration-warning="status == 'occupied'"
+                    decoration-danger="status == 'maintenance'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_swimming_lane_form" model="ir.ui.view">
+        <field name="name">club.swimming.lane.form</field>
+        <field name="model">club.swimming.lane</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Lane 1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="pool_id"/>
+                            <field name="lane_type"/>
+                        </group>
+                        <group>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_swimming_lane_search" model="ir.ui.view">
+        <field name="name">club.swimming.lane.search</field>
+        <field name="model">club.swimming.lane</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="pool_id"/>
+                <filter name="available" string="Available"
+                    domain="[('status', '=', 'available')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_pool" string="Pool"
+                        context="{'group_by': 'pool_id'}"/>
+                    <filter name="group_type" string="Lane Type"
+                        context="{'group_by': 'lane_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_swimming_lane" model="ir.actions.act_window">
+        <field name="name">Lanes</field>
+        <field name="res_model">club.swimming.lane</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_swimming_lane_search"/>
+        <field name="path">club-swimming-lanes</field>
+    </record>
+
+</odoo>

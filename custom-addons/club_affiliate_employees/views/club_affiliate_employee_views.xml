@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_affiliate_employee_kanban" model="ir.ui.view">
+        <field name="name">club.affiliate.employee.kanban</field>
+        <field name="model">club.affiliate.employee</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="affiliate_id"/>
+                <field name="employee_type_id"/>
+                <field name="status"/>
+                <field name="photo"/>
+                <field name="access_card_number"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click d-flex">
+                            <div class="me-2">
+                                <field name="photo" widget="image" options="{'preview_image': 'photo'}" class="o_kanban_image"/>
+                            </div>
+                            <div>
+                                <strong><field name="name"/></strong><br/>
+                                <span class="text-muted"><field name="employee_type_id"/></span><br/>
+                                <span class="text-muted"><field name="affiliate_id"/></span><br/>
+                                <field name="status" widget="badge"
+                                    decoration-success="status == 'active'"
+                                    decoration-warning="status == 'suspended'"
+                                    decoration-danger="status == 'inactive'"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_affiliate_employee_list" model="ir.ui.view">
+        <field name="name">club.affiliate.employee.list</field>
+        <field name="model">club.affiliate.employee</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="affiliate_id"/>
+                <field name="employee_type_id"/>
+                <field name="identification_type"/>
+                <field name="identification_number"/>
+                <field name="phone"/>
+                <field name="access_card_number"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'active'"
+                    decoration-warning="status == 'suspended'"
+                    decoration-danger="status == 'inactive'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_affiliate_employee_form" model="ir.ui.view">
+        <field name="name">club.affiliate.employee.form</field>
+        <field name="model">club.affiliate.employee</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar" options="{'preview_image': 'photo'}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Full Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="affiliate_id"/>
+                            <field name="employee_type_id"/>
+                            <field name="status" widget="badge"
+                                decoration-success="status == 'active'"
+                                decoration-warning="status == 'suspended'"
+                                decoration-danger="status == 'inactive'"/>
+                        </group>
+                        <group>
+                            <field name="identification_type"/>
+                            <field name="identification_number"/>
+                            <field name="access_card_number"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="email"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Schedule" name="schedule">
+                            <field name="schedule_ids">
+                                <list editable="bottom">
+                                    <field name="day_of_week"/>
+                                    <field name="time_from" widget="float_time"/>
+                                    <field name="time_to" widget="float_time"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Emergency" name="emergency">
+                            <group>
+                                <field name="emergency_contact"/>
+                                <field name="emergency_phone"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_affiliate_employee_search" model="ir.ui.view">
+        <field name="name">club.affiliate.employee.search</field>
+        <field name="model">club.affiliate.employee</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="affiliate_id"/>
+                <field name="employee_type_id"/>
+                <field name="identification_number"/>
+                <field name="access_card_number"/>
+                <filter name="active_employees" string="Active"
+                    domain="[('status', '=', 'active')]"/>
+                <filter name="suspended_employees" string="Suspended"
+                    domain="[('status', '=', 'suspended')]"/>
+                <filter name="inactive_employees" string="Inactive"
+                    domain="[('status', '=', 'inactive')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Employee Type"
+                        context="{'group_by': 'employee_type_id'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_affiliate" string="Affiliate"
+                        context="{'group_by': 'affiliate_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_affiliate_employee" model="ir.actions.act_window">
+        <field name="name">Affiliate Employees</field>
+        <field name="res_model">club.affiliate.employee</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_affiliate_employee_search"/>
+        <field name="context">{'search_default_active_employees': 1}</field>
+        <field name="path">club-affiliate-employees</field>
+    </record>
+
+</odoo>

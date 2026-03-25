@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_job_category_admin,club.job.category admin,model_club_job_category,club_core.group_club_admin,1,1,1,1
+access_club_job_category_staff,club.job.category staff,model_club_job_category,club_job_offers.group_job_staff,1,1,1,1
+access_club_job_category_member,club.job.category member,model_club_job_category,club_core.group_club_member,1,0,0,0
+access_club_job_offer_admin,club.job.offer admin,model_club_job_offer,club_core.group_club_admin,1,1,1,1
+access_club_job_offer_staff,club.job.offer staff,model_club_job_offer,club_job_offers.group_job_staff,1,1,1,1
+access_club_job_offer_member,club.job.offer member,model_club_job_offer,club_core.group_club_member,1,1,1,0
+access_club_job_application_admin,club.job.application admin,model_club_job_application,club_core.group_club_admin,1,1,1,1
+access_club_job_application_staff,club.job.application staff,model_club_job_application,club_job_offers.group_job_staff,1,1,1,1
+access_club_job_application_member,club.job.application member,model_club_job_application,club_core.group_club_member,1,1,1,0

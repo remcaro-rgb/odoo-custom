@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Categories ───────────────────────────────────────────── -->
+
+        <record id="category_general" model="club.news.category">
+            <field name="name">General</field>
+            <field name="color">1</field>
+        </record>
+
+        <record id="category_sports" model="club.news.category">
+            <field name="name">Sports</field>
+            <field name="color">2</field>
+        </record>
+
+        <record id="category_events" model="club.news.category">
+            <field name="name">Events</field>
+            <field name="color">4</field>
+        </record>
+
+        <!-- ── Tags ─────────────────────────────────────────────────── -->
+
+        <record id="tag_urgent" model="club.news.tag">
+            <field name="name">Urgent</field>
+            <field name="color">1</field>
+        </record>
+
+        <record id="tag_golf" model="club.news.tag">
+            <field name="name">Golf</field>
+            <field name="color">3</field>
+        </record>
+
+        <record id="tag_tennis" model="club.news.tag">
+            <field name="name">Tennis</field>
+            <field name="color">4</field>
+        </record>
+
+        <record id="tag_social" model="club.news.tag">
+            <field name="name">Social</field>
+            <field name="color">5</field>
+        </record>
+
+        <!-- ── Articles ─────────────────────────────────────────────── -->
+
+        <record id="article_welcome" model="club.news.article">
+            <field name="title">Welcome to the New Club Season</field>
+            <field name="category_id" ref="category_general"/>
+            <field name="author_id" ref="base.user_admin"/>
+            <field name="content">&lt;p&gt;We are excited to announce the opening of the new club season. All facilities are now fully operational with new improvements across the board.&lt;/p&gt;</field>
+            <field name="summary">New season kick-off with facility upgrades.</field>
+            <field name="status">published</field>
+            <field name="publish_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="is_featured" eval="True"/>
+            <field name="is_pinned" eval="True"/>
+            <field name="target_audience">all</field>
+            <field name="tag_ids" eval="[(6, 0, [ref('tag_social')])]"/>
+        </record>
+
+        <record id="article_golf_tournament" model="club.news.article">
+            <field name="title">Annual Golf Tournament Registration Open</field>
+            <field name="category_id" ref="category_sports"/>
+            <field name="author_id" ref="base.user_admin"/>
+            <field name="content">&lt;p&gt;Registration for the annual golf tournament is now open. Sign up before March 31 to secure your spot. Prizes include club credits and exclusive merchandise.&lt;/p&gt;</field>
+            <field name="summary">Register now for the annual golf tournament.</field>
+            <field name="status">published</field>
+            <field name="publish_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="is_featured" eval="True"/>
+            <field name="target_audience">members_only</field>
+            <field name="tag_ids" eval="[(6, 0, [ref('tag_golf')])]"/>
+        </record>
+
+        <record id="article_maintenance" model="club.news.article">
+            <field name="title">Pool Maintenance Schedule - March</field>
+            <field name="category_id" ref="category_general"/>
+            <field name="author_id" ref="base.user_admin"/>
+            <field name="content">&lt;p&gt;The main pool will undergo scheduled maintenance from March 15 to March 17. The secondary pool remains available during this period.&lt;/p&gt;</field>
+            <field name="summary">Main pool closed March 15-17 for maintenance.</field>
+            <field name="status">published</field>
+            <field name="publish_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="target_audience">all</field>
+            <field name="tag_ids" eval="[(6, 0, [ref('tag_urgent')])]"/>
+        </record>
+
+        <record id="article_staff_meeting" model="club.news.article">
+            <field name="title">Staff Quarterly Planning Meeting</field>
+            <field name="category_id" ref="category_events"/>
+            <field name="author_id" ref="base.user_admin"/>
+            <field name="content">&lt;p&gt;All staff members are invited to the quarterly planning meeting on April 5. Agenda includes summer activity proposals and resource allocation.&lt;/p&gt;</field>
+            <field name="summary">Quarterly staff meeting on April 5.</field>
+            <field name="status">draft</field>
+            <field name="target_audience">staff_only</field>
+        </record>
+
+        <record id="article_tennis_clinic" model="club.news.article">
+            <field name="title">Tennis Clinic for Beginners</field>
+            <field name="category_id" ref="category_sports"/>
+            <field name="author_id" ref="base.user_admin"/>
+            <field name="content">&lt;p&gt;Join our free tennis clinic for beginners every Saturday morning. Professional coaches will guide you through the basics. Equipment provided.&lt;/p&gt;</field>
+            <field name="summary">Free beginner tennis lessons every Saturday.</field>
+            <field name="status">draft</field>
+            <field name="target_audience">all</field>
+            <field name="tag_ids" eval="[(6, 0, [ref('tag_tennis'), ref('tag_social')])]"/>
+        </record>
+
+    </data>
+</odoo>

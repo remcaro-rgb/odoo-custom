@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Job Offers sub-menu under Club root -->
+    <menuitem id="menu_club_job_offers"
+        name="Job Offers"
+        parent="club_core.menu_club_root"
+        sequence="40"/>
+
+    <menuitem id="menu_club_job_offers_all"
+        name="All Offers"
+        parent="menu_club_job_offers"
+        action="action_club_job_offer"
+        sequence="10"/>
+
+    <menuitem id="menu_club_job_offers_my"
+        name="My Offers"
+        parent="menu_club_job_offers"
+        action="action_club_job_offer_my"
+        sequence="20"/>
+
+    <menuitem id="menu_club_job_applications"
+        name="Applications"
+        parent="menu_club_job_offers"
+        action="action_club_job_application"
+        sequence="30"/>
+
+    <!-- Categories under Configuration -->
+    <menuitem id="menu_club_job_config_categories"
+        name="Job Categories"
+        parent="club_core.menu_club_config"
+        action="action_club_job_category"
+        sequence="40"
+        groups="club_core.group_club_admin"/>
+
+</odoo>

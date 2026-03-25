@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_sailing_dock_list" model="ir.ui.view">
+        <field name="name">club.sailing.dock.list</field>
+        <field name="model">club.sailing.dock</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="location"/>
+                <field name="capacity"/>
+                <field name="under_maintenance" widget="boolean"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_sailing_dock_form" model="ir.ui.view">
+        <field name="name">club.sailing.dock.form</field>
+        <field name="model">club.sailing.dock</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="location"/>
+                            <field name="capacity"/>
+                        </group>
+                        <group>
+                            <field name="under_maintenance"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_sailing_dock_search" model="ir.ui.view">
+        <field name="name">club.sailing.dock.search</field>
+        <field name="model">club.sailing.dock</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="location"/>
+                <filter name="operational" string="Operational"
+                    domain="[('under_maintenance','=',False)]"/>
+                <filter name="maintenance" string="Under Maintenance"
+                    domain="[('under_maintenance','=',True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_sailing_dock" model="ir.actions.act_window">
+        <field name="name">Docks</field>
+        <field name="res_model">club.sailing.dock</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_sailing_dock_search"/>
+        <field name="path">club-sailing-docks</field>
+    </record>
+
+</odoo>

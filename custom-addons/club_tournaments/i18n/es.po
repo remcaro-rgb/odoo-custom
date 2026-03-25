@@ -1,0 +1,437 @@
+# Spanish translation for club_tournaments
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the club_tournaments module.
+#
+# Translators:
+# Manuel Caro, 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Club Tournaments 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_tournaments
+#: model:res.groups,name:club_tournaments.group_tournament_staff
+msgid "Tournament Staff"
+msgstr "Personal de Torneos"
+
+#. module: club_tournaments
+#: model:ir.model,name:club_tournaments.model_club_tournament
+msgid "Club Tournament"
+msgstr "Torneo del Club"
+
+#. module: club_tournaments
+#: model:ir.model,name:club_tournaments.model_club_tournament_participant
+msgid "Tournament Participant"
+msgstr "Participante de Torneo"
+
+#. module: club_tournaments
+#: model:ir.model,name:club_tournaments.model_club_tournament_round
+msgid "Tournament Round"
+msgstr "Ronda de Torneo"
+
+#. module: club_tournaments
+#: model:ir.model,name:club_tournaments.model_club_tournament_match
+msgid "Tournament Match"
+msgstr "Partido de Torneo"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__name
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__title
+msgid "Tournament Name"
+msgstr "Nombre del Torneo"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__sport
+msgid "Sport"
+msgstr "Deporte"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__sport__golf
+msgid "Golf"
+msgstr "Golf"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__sport__tennis
+msgid "Tennis"
+msgstr "Tenis"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__sport__equestrian
+msgid "Equestrian"
+msgstr "Ecuestre"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__sport__sailing
+msgid "Sailing"
+msgstr "Vela"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__sport__swimming
+msgid "Swimming"
+msgstr "Natacion"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__sport__other
+msgid "Other"
+msgstr "Otro"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__tournament_type
+msgid "Tournament Type"
+msgstr "Tipo de Torneo"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__tournament_type__single_elimination
+msgid "Single Elimination"
+msgstr "Eliminacion Simple"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__tournament_type__double_elimination
+msgid "Double Elimination"
+msgstr "Doble Eliminacion"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__tournament_type__round_robin
+msgid "Round Robin"
+msgstr "Todos contra Todos"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__tournament_type__league
+msgid "League"
+msgstr "Liga"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__description
+msgid "Description"
+msgstr "Descripcion"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__start_date
+msgid "Start Date"
+msgstr "Fecha de Inicio"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__end_date
+msgid "End Date"
+msgstr "Fecha de Fin"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__max_participants
+msgid "Max Participants"
+msgstr "Participantes Maximos"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__entry_fee
+msgid "Entry Fee"
+msgstr "Cuota de Inscripcion"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__prize_description
+msgid "Prize Description"
+msgstr "Descripcion del Premio"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__status__draft
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__status__registration
+msgid "Registration"
+msgstr "Inscripcion"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__status__in_progress
+msgid "In Progress"
+msgstr "En Curso"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__status__completed
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__organizer_id
+msgid "Organizer"
+msgstr "Organizador"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__participant_ids
+msgid "Participants"
+msgstr "Participantes"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__round_ids
+msgid "Rounds"
+msgstr "Rondas"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament__participant_count
+msgid "Participant Count"
+msgstr "Cantidad de Participantes"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_participant__tournament_id
+msgid "Tournament"
+msgstr "Torneo"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_participant__affiliate_id
+msgid "Affiliate"
+msgstr "Afiliado"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_participant__registration_date
+msgid "Registration Date"
+msgstr "Fecha de Inscripcion"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_participant__seed
+msgid "Seed"
+msgstr "Cabeza de Serie"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_participant__status__registered
+msgid "Registered"
+msgstr "Inscrito"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_participant__status__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_participant__status__eliminated
+msgid "Eliminated"
+msgstr "Eliminado"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_participant__status__winner
+msgid "Winner"
+msgstr "Ganador"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_participant__status__withdrawn
+msgid "Withdrawn"
+msgstr "Retirado"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_participant__final_position
+msgid "Final Position"
+msgstr "Posicion Final"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_participant__notes
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_match__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_round__name
+msgid "Round Name"
+msgstr "Nombre de Ronda"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_round__round_number
+msgid "Round Number"
+msgstr "Numero de Ronda"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_round__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_round__match_ids
+msgid "Matches"
+msgstr "Partidos"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_match__round_id
+msgid "Round"
+msgstr "Ronda"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_match__participant_1_id
+msgid "Participant 1"
+msgstr "Participante 1"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_match__participant_2_id
+msgid "Participant 2"
+msgstr "Participante 2"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_match__score_1
+msgid "Score 1"
+msgstr "Puntaje 1"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_match__score_2
+msgid "Score 2"
+msgstr "Puntaje 2"
+
+#. module: club_tournaments
+#: model:ir.model.fields,field_description:club_tournaments.field_club_tournament_match__winner_id
+msgid "Winner"
+msgstr "Ganador"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_match__status__scheduled
+msgid "Scheduled"
+msgstr "Programado"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_match__status__in_progress
+msgid "In Progress"
+msgstr "En Curso"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_match__status__completed
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_tournaments
+#: model:ir.model.fields.selection,name:club_tournaments.selection__club_tournament_match__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_tournaments
+#: model:ir.actions.act_window,name:club_tournaments.action_club_tournament
+msgid "Tournaments"
+msgstr "Torneos"
+
+#. module: club_tournaments
+#: model:ir.actions.act_window,name:club_tournaments.action_club_tournament_my
+msgid "My Tournaments"
+msgstr "Mis Torneos"
+
+#. module: club_tournaments
+#: model:ir.actions.act_window,name:club_tournaments.action_club_tournament_participant
+msgid "Participants"
+msgstr "Participantes"
+
+#. module: club_tournaments
+#: model:ir.actions.act_window,name:club_tournaments.action_club_tournament_round
+msgid "Rounds"
+msgstr "Rondas"
+
+#. module: club_tournaments
+#: model:ir.actions.act_window,name:club_tournaments.action_club_tournament_match
+msgid "Matches"
+msgstr "Partidos"
+
+#. module: club_tournaments
+#: model:ir.ui.menu,name:club_tournaments.menu_club_tournaments
+msgid "Tournaments"
+msgstr "Torneos"
+
+#. module: club_tournaments
+#: model:ir.ui.menu,name:club_tournaments.menu_club_tournaments_all
+msgid "All Tournaments"
+msgstr "Todos los Torneos"
+
+#. module: club_tournaments
+#: model:ir.ui.menu,name:club_tournaments.menu_club_tournaments_my
+msgid "My Tournaments"
+msgstr "Mis Torneos"
+
+#. module: club_tournaments
+#: code:addons/club_tournaments/models/club_tournament.py:0
+#, python-format
+msgid "Only draft tournaments can be opened for registration."
+msgstr "Solo los torneos en borrador pueden abrirse para inscripcion."
+
+#. module: club_tournaments
+#: code:addons/club_tournaments/models/club_tournament.py:0
+#, python-format
+msgid "Only tournaments in registration can be started."
+msgstr "Solo los torneos en inscripcion pueden iniciarse."
+
+#. module: club_tournaments
+#: code:addons/club_tournaments/models/club_tournament.py:0
+#, python-format
+msgid "Only in-progress tournaments can be completed."
+msgstr "Solo los torneos en curso pueden completarse."
+
+#. module: club_tournaments
+#: code:addons/club_tournaments/models/club_tournament.py:0
+#, python-format
+msgid "This tournament is already cancelled."
+msgstr "Este torneo ya esta cancelado."
+
+#. module: club_tournaments
+#: code:addons/club_tournaments/models/club_tournament.py:0
+#, python-format
+msgid "New"
+msgstr "Nuevo"
+
+#. module: club_tournaments
+#: code:addons/club_tournaments/models/club_tournament_participant.py:0
+#, python-format
+msgid "Tournament \"%(tournament)s\" has reached the maximum number of participants (%(max)s)."
+msgstr "El torneo \"%(tournament)s\" ha alcanzado el numero maximo de participantes (%(max)s)."
+
+#. module: club_tournaments
+#: model:ir.model.fields,help:club_tournaments.field_club_tournament__max_participants
+msgid "Maximum number of participants. 0 means unlimited."
+msgstr "Numero maximo de participantes. 0 significa ilimitado."
+
+#. module: club_tournaments
+#: model:ir.model.fields,help:club_tournaments.field_club_tournament_round__name
+msgid "e.g. Round 1, Quarterfinals, Semifinals, Final"
+msgstr "ej. Ronda 1, Cuartos de Final, Semifinales, Final"
+
+#. module: club_tournaments
+#: sql_constraint:club.tournament.participant:0
+msgid "An affiliate can only participate once per tournament."
+msgstr "Un afiliado solo puede participar una vez por torneo."
+
+#. module: club_tournaments
+#: model:ir.ui.view,arch_db:club_tournaments.view_club_tournament_form
+msgid "Open Registration"
+msgstr "Abrir Inscripcion"
+
+#. module: club_tournaments
+#: model:ir.ui.view,arch_db:club_tournaments.view_club_tournament_form
+msgid "Start Tournament"
+msgstr "Iniciar Torneo"
+
+#. module: club_tournaments
+#: model:ir.ui.view,arch_db:club_tournaments.view_club_tournament_form
+msgid "Complete"
+msgstr "Completar"
+
+#. module: club_tournaments
+#: model:ir.ui.view,arch_db:club_tournaments.view_club_tournament_form
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: club_tournaments
+#: model:ir.ui.view,arch_db:club_tournaments.view_club_tournament_form
+msgid "Prizes"
+msgstr "Premios"

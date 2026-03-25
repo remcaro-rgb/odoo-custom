@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Job Categories ────────────────────────────────────────── -->
+
+        <record id="category_domestic" model="club.job.category">
+            <field name="name">Domestic</field>
+        </record>
+
+        <record id="category_professional" model="club.job.category">
+            <field name="name">Professional</field>
+        </record>
+
+        <record id="category_childcare" model="club.job.category">
+            <field name="name">Childcare</field>
+        </record>
+
+        <!-- ── Job Offers ────────────────────────────────────────────── -->
+
+        <record id="offer_housekeeper" model="club.job.offer">
+            <field name="title">Full-Time Housekeeper</field>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="category_id" ref="category_domestic"/>
+            <field name="description">&lt;p&gt;Looking for an experienced full-time housekeeper for a family residence in the north zone. Must have references and experience with large homes.&lt;/p&gt;</field>
+            <field name="job_type">full_time</field>
+            <field name="salary_range">$1.5M-2M COP/month</field>
+            <field name="location">North Zone</field>
+            <field name="status">published</field>
+            <field name="publish_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="expiry_date" eval="(DateTime.now() + relativedelta(months=1)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <record id="offer_tutor" model="club.job.offer">
+            <field name="title">Math Tutor for High School Student</field>
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="category_id" ref="category_professional"/>
+            <field name="description">&lt;p&gt;Seeking a qualified math tutor for 10th grade student. Sessions 3 times per week, 2 hours each.&lt;/p&gt;</field>
+            <field name="job_type">part_time</field>
+            <field name="salary_range">$80K-100K COP/hour</field>
+            <field name="location">Club Facilities</field>
+            <field name="status">draft</field>
+        </record>
+
+        <record id="offer_nanny" model="club.job.offer">
+            <field name="title">Nanny for Two Children</field>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="category_id" ref="category_childcare"/>
+            <field name="description">&lt;p&gt;Looking for an experienced nanny for two children ages 3 and 5. Monday to Friday, 7am-5pm. Must have pediatric first aid certification.&lt;/p&gt;</field>
+            <field name="job_type">full_time</field>
+            <field name="salary_range">$1.8M-2.2M COP/month</field>
+            <field name="location">West Zone</field>
+            <field name="status">filled</field>
+            <field name="publish_date" eval="(DateTime.now() - relativedelta(months=1)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <!-- ── Applications ──────────────────────────────────────────── -->
+
+        <record id="application_01" model="club.job.application">
+            <field name="offer_id" ref="offer_housekeeper"/>
+            <field name="applicant_affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="applicant_name">Rosa Hernandez</field>
+            <field name="applicant_phone">+57 310 5551234</field>
+            <field name="applicant_email">rosa.h@example.com</field>
+            <field name="cover_note">Rosa has 10 years of experience as housekeeper for large residences. She comes highly recommended by several families in the area.</field>
+            <field name="status">reviewed</field>
+            <field name="submit_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+        </record>
+
+        <record id="application_02" model="club.job.application">
+            <field name="offer_id" ref="offer_housekeeper"/>
+            <field name="applicant_affiliate_id" ref="club_core.affiliate_005"/>
+            <field name="applicant_name">Carmen Diaz</field>
+            <field name="applicant_phone">+57 315 5559876</field>
+            <field name="applicant_email">carmen.d@example.com</field>
+            <field name="cover_note">Carmen previously worked for our family. Very reliable and thorough.</field>
+            <field name="status">submitted</field>
+            <field name="submit_date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+        </record>
+
+        <record id="application_03" model="club.job.application">
+            <field name="offer_id" ref="offer_nanny"/>
+            <field name="applicant_affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="applicant_name">Lucia Vargas</field>
+            <field name="applicant_phone">+57 320 5554567</field>
+            <field name="applicant_email">lucia.v@example.com</field>
+            <field name="cover_note">Lucia is a trained childhood education professional with first aid certification.</field>
+            <field name="status">accepted</field>
+            <field name="submit_date" eval="(DateTime.now() - relativedelta(weeks=2)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <record id="application_04" model="club.job.application">
+            <field name="offer_id" ref="offer_nanny"/>
+            <field name="applicant_affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="applicant_name">Patricia Rojas</field>
+            <field name="applicant_phone">+57 311 5557890</field>
+            <field name="applicant_email">patricia.r@example.com</field>
+            <field name="cover_note">Patricia has experience caring for young children. Available immediately.</field>
+            <field name="status">rejected</field>
+            <field name="submit_date" eval="(DateTime.now() - relativedelta(weeks=3)).strftime('%Y-%m-%d')"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_swimming_pool_list" model="ir.ui.view">
+        <field name="name">club.swimming.pool.list</field>
+        <field name="model">club.swimming.pool</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="pool_type"/>
+                <field name="lane_count"/>
+                <field name="max_capacity"/>
+                <field name="under_maintenance" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_swimming_pool_form" model="ir.ui.view">
+        <field name="name">club.swimming.pool.form</field>
+        <field name="model">club.swimming.pool</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Pool name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="pool_type"/>
+                            <field name="lane_count"/>
+                            <field name="max_capacity"/>
+                        </group>
+                        <group>
+                            <field name="under_maintenance"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lanes" name="lanes">
+                            <field name="lane_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="lane_type"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status == 'available'"
+                                        decoration-warning="status == 'occupied'"
+                                        decoration-danger="status == 'maintenance'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_swimming_pool_search" model="ir.ui.view">
+        <field name="name">club.swimming.pool.search</field>
+        <field name="model">club.swimming.pool</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="available" string="Available"
+                    domain="[('under_maintenance', '=', False)]"/>
+                <filter name="maintenance" string="Under Maintenance"
+                    domain="[('under_maintenance', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Pool Type"
+                        context="{'group_by': 'pool_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_swimming_pool" model="ir.actions.act_window">
+        <field name="name">Pools</field>
+        <field name="res_model">club.swimming.pool</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_swimming_pool_search"/>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="path">club-swimming-pools</field>
+    </record>
+
+</odoo>

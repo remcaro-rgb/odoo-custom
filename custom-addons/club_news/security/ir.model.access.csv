@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_news_category_admin,club.news.category admin,model_club_news_category,club_core.group_club_admin,1,1,1,1
+access_club_news_category_staff,club.news.category staff,model_club_news_category,club_news.group_news_staff,1,1,1,1
+access_club_news_category_member,club.news.category member,model_club_news_category,club_core.group_club_member,1,0,0,0
+access_club_news_tag_admin,club.news.tag admin,model_club_news_tag,club_core.group_club_admin,1,1,1,1
+access_club_news_tag_staff,club.news.tag staff,model_club_news_tag,club_news.group_news_staff,1,1,1,1
+access_club_news_tag_member,club.news.tag member,model_club_news_tag,club_core.group_club_member,1,0,0,0
+access_club_news_article_admin,club.news.article admin,model_club_news_article,club_core.group_club_admin,1,1,1,1
+access_club_news_article_staff,club.news.article staff,model_club_news_article,club_news.group_news_staff,1,1,1,1
+access_club_news_article_member,club.news.article member,model_club_news_article,club_core.group_club_member,1,0,0,0

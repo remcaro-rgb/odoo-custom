@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ── Boats ─────────────────────────────────────────────── -->
+
+        <record id="boat_sailboat" model="club.sailing.boat">
+            <field name="name">Viento del Mar</field>
+            <field name="boat_type">sailboat</field>
+            <field name="capacity">6</field>
+            <field name="owner_type">club</field>
+            <field name="registration_number">SB-001</field>
+            <field name="status">available</field>
+        </record>
+
+        <record id="boat_motorboat" model="club.sailing.boat">
+            <field name="name">Rayo Azul</field>
+            <field name="boat_type">motorboat</field>
+            <field name="capacity">8</field>
+            <field name="owner_type">club</field>
+            <field name="registration_number">MB-001</field>
+            <field name="status">available</field>
+        </record>
+
+        <record id="boat_kayak" model="club.sailing.boat">
+            <field name="name">Kayak K-01</field>
+            <field name="boat_type">kayak</field>
+            <field name="capacity">2</field>
+            <field name="owner_type">club</field>
+            <field name="registration_number">KY-001</field>
+            <field name="status">available</field>
+        </record>
+
+        <!-- ── Docks ─────────────────────────────────────────────── -->
+
+        <record id="dock_north" model="club.sailing.dock">
+            <field name="name">North Dock A</field>
+            <field name="location">North marina area</field>
+            <field name="capacity">10</field>
+            <field name="under_maintenance" eval="False"/>
+        </record>
+
+        <record id="dock_south" model="club.sailing.dock">
+            <field name="name">South Dock B</field>
+            <field name="location">South marina area</field>
+            <field name="capacity">8</field>
+            <field name="under_maintenance" eval="False"/>
+        </record>
+
+        <!-- ── Crew ──────────────────────────────────────────────── -->
+
+        <record id="partner_crew_captain" model="res.partner">
+            <field name="name">Ricardo Navarro</field>
+        </record>
+
+        <record id="crew_captain" model="club.sailing.crew">
+            <field name="name">Ricardo Navarro</field>
+            <field name="partner_id" ref="partner_crew_captain"/>
+            <field name="role">captain</field>
+            <field name="certification">Master Yachtsman License</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ── Demo Affiliates for Sailing ────────────────────────── -->
+
+        <record id="partner_sailing_demo_1" model="res.partner">
+            <field name="name">Daniela Vargas</field>
+            <field name="email">daniela@example.com</field>
+            <field name="phone">+57 300 2000001</field>
+        </record>
+        <record id="affiliate_sailing_1" model="club.affiliate">
+            <field name="partner_id" ref="partner_sailing_demo_1"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="partner_sailing_demo_2" model="res.partner">
+            <field name="name">Felipe Castillo</field>
+            <field name="email">felipe@example.com</field>
+            <field name="phone">+57 300 2000002</field>
+        </record>
+        <record id="affiliate_sailing_2" model="club.affiliate">
+            <field name="partner_id" ref="partner_sailing_demo_2"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <record id="partner_sailing_demo_3" model="res.partner">
+            <field name="name">Isabella Mendoza</field>
+            <field name="email">isabella@example.com</field>
+            <field name="phone">+57 300 2000003</field>
+        </record>
+        <record id="affiliate_sailing_3" model="club.affiliate">
+            <field name="partner_id" ref="partner_sailing_demo_3"/>
+            <field name="membership_type">individual</field>
+        </record>
+
+        <!-- ── Bookings ──────────────────────────────────────────── -->
+
+        <record id="booking_1" model="club.sailing.booking">
+            <field name="affiliate_id" ref="affiliate_sailing_1"/>
+            <field name="boat_id" ref="boat_sailboat"/>
+            <field name="dock_id" ref="dock_north"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">9.0</field>
+            <field name="duration">3.0</field>
+            <field name="passenger_count">4</field>
+            <field name="status">booked</field>
+        </record>
+
+        <record id="booking_2" model="club.sailing.booking">
+            <field name="affiliate_id" ref="affiliate_sailing_2"/>
+            <field name="boat_id" ref="boat_motorboat"/>
+            <field name="dock_id" ref="dock_south"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">10.0</field>
+            <field name="duration">2.0</field>
+            <field name="passenger_count">5</field>
+            <field name="status">booked</field>
+        </record>
+
+        <record id="booking_3" model="club.sailing.booking">
+            <field name="affiliate_id" ref="affiliate_sailing_3"/>
+            <field name="boat_id" ref="boat_kayak"/>
+            <field name="dock_id" ref="dock_north"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="time_slot">8.0</field>
+            <field name="duration">1.5</field>
+            <field name="passenger_count">2</field>
+            <field name="status">completed</field>
+        </record>
+
+    </data>
+</odoo>

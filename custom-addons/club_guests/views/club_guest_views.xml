@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_guest_list" model="ir.ui.view">
+        <field name="name">club.guest.list</field>
+        <field name="model">club.guest</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="identification"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="relationship"/>
+                <field name="visit_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_guest_form" model="ir.ui.view">
+        <field name="name">club.guest.form</field>
+        <field name="model">club.guest</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"
+                        options="{'preview_image': 'photo'}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Guest Full Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="identification"/>
+                            <field name="phone"/>
+                            <field name="email"/>
+                        </group>
+                        <group>
+                            <field name="relationship"/>
+                            <field name="visit_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Visit History" name="visits">
+                            <field name="visit_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="affiliate_id"/>
+                                    <field name="date"/>
+                                    <field name="areas_accessed"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status == 'checked_out'"
+                                        decoration-info="status == 'checked_in'"
+                                        decoration-warning="status == 'registered'"
+                                        decoration-danger="status in ('cancelled', 'no_show')"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Additional notes about this guest..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_guest_search" model="ir.ui.view">
+        <field name="name">club.guest.search</field>
+        <field name="model">club.guest</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="identification"/>
+                <field name="email"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_relationship" string="Relationship"
+                        context="{'group_by': 'relationship'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_guest" model="ir.actions.act_window">
+        <field name="name">Guest Registry</field>
+        <field name="res_model">club.guest</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_guest_search"/>
+        <field name="path">club-guests</field>
+    </record>
+
+</odoo>

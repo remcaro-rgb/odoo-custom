@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Lost & Found submenu under Club root -->
+    <menuitem id="menu_club_lost_found"
+        name="Lost &amp; Found"
+        parent="club_core.menu_club_root"
+        sequence="60"/>
+
+    <menuitem id="menu_club_lost_items"
+        name="Lost Items"
+        parent="menu_club_lost_found"
+        action="action_club_lost_item"
+        sequence="10"/>
+
+    <menuitem id="menu_club_found_items"
+        name="Found Items"
+        parent="menu_club_lost_found"
+        action="action_club_found_item"
+        sequence="20"/>
+
+</odoo>

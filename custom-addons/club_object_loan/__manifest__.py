@@ -1,0 +1,25 @@
+{
+    'name': 'Club Object Loans',
+    'version': '18.0.1.0.0',
+    'summary': 'Object & equipment lending for the club',
+    'description': 'Catalog of loanable items, loan records, due dates, and returns.',
+    'category': 'Club Management',
+    'author': 'Manuel Caro',
+    'license': 'LGPL-3',
+    'depends': ['club_core'],
+    'data': [
+        'security/club_security.xml',
+        'security/ir.model.access.csv',
+        'data/sequences.xml',
+        'data/cron.xml',
+        'views/club_object_category_views.xml',
+        'views/club_object_item_views.xml',
+        'views/club_object_loan_views.xml',
+        'views/club_menus.xml',
+    ],
+    'demo': [
+        'data/demo_data.xml',
+    ],
+    'installable': True,
+    'application': False,
+}

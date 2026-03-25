@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_faq_item_list" model="ir.ui.view">
+        <field name="name">club.faq.item.list</field>
+        <field name="model">club.faq.item</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="question"/>
+                <field name="category_id"/>
+                <field name="is_published" widget="boolean_toggle"/>
+                <field name="author_id"/>
+                <field name="helpful_count"/>
+                <field name="write_date" string="Last Updated"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_faq_item_form" model="ir.ui.view">
+        <field name="name">club.faq.item.form</field>
+        <field name="model">club.faq.item</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="question"/>
+                        <h1><field name="question" placeholder="Enter your FAQ question..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category_id"/>
+                            <field name="sequence"/>
+                            <field name="is_published"/>
+                        </group>
+                        <group>
+                            <field name="author_id"/>
+                            <field name="helpful_count"/>
+                            <field name="create_date" readonly="1"/>
+                            <field name="write_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Answer"/>
+                    <field name="answer" widget="html"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban view -->
+    <record id="view_club_faq_item_kanban" model="ir.ui.view">
+        <field name="name">club.faq.item.kanban</field>
+        <field name="model">club.faq.item</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="category_id">
+                <field name="question"/>
+                <field name="category_id"/>
+                <field name="is_published"/>
+                <field name="helpful_count"/>
+                <field name="sequence"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="question"/></strong>
+                            <div class="text-muted mt-1">
+                                <field name="category_id"/>
+                            </div>
+                            <div class="mt-1">
+                                <field name="is_published" widget="boolean_toggle"/>
+                                <span class="float-end text-muted">
+                                    <i class="fa fa-thumbs-up"/> <field name="helpful_count"/>
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_faq_item_search" model="ir.ui.view">
+        <field name="name">club.faq.item.search</field>
+        <field name="model">club.faq.item</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="question"/>
+                <field name="category_id"/>
+                <filter name="published" string="Published"
+                    domain="[('is_published', '=', True)]"/>
+                <filter name="unpublished" string="Unpublished"
+                    domain="[('is_published', '=', False)]"/>
+                <separator/>
+                <filter name="filter_category" string="Category"
+                    context="{'group_by': 'category_id'}"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_category" string="Category"
+                        context="{'group_by': 'category_id'}"/>
+                    <filter name="group_author" string="Author"
+                        context="{'group_by': 'author_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_faq_item" model="ir.actions.act_window">
+        <field name="name">FAQ Questions</field>
+        <field name="res_model">club.faq.item</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_club_faq_item_search"/>
+        <field name="context">{'search_default_published': 1}</field>
+        <field name="path">club-faq-questions</field>
+    </record>
+
+</odoo>

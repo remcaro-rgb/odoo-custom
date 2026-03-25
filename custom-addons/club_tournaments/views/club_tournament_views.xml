@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_tournament_kanban" model="ir.ui.view">
+        <field name="name">club.tournament.kanban</field>
+        <field name="model">club.tournament</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="sport"/>
+                <field name="status"/>
+                <field name="start_date"/>
+                <field name="participant_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="title"/></strong><br/>
+                            <span class="text-muted"><field name="name"/></span><br/>
+                            <field name="sport"/> |
+                            <field name="start_date"/><br/>
+                            <span class="badge rounded-pill text-bg-info">
+                                <field name="participant_count"/> participants
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_tournament_list" model="ir.ui.view">
+        <field name="name">club.tournament.list</field>
+        <field name="model">club.tournament</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="title"/>
+                <field name="sport"/>
+                <field name="tournament_type"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="participant_count"/>
+                <field name="status" widget="badge"
+                    decoration-info="status == 'draft'"
+                    decoration-warning="status == 'registration'"
+                    decoration-success="status == 'in_progress'"
+                    decoration-muted="status in ('completed', 'cancelled')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_tournament_form" model="ir.ui.view">
+        <field name="name">club.tournament.form</field>
+        <field name="model">club.tournament</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_registration" type="object"
+                        string="Open Registration" class="oe_highlight"
+                        invisible="status != 'draft'"/>
+                    <button name="action_start" type="object"
+                        string="Start Tournament" class="oe_highlight"
+                        invisible="status != 'registration'"/>
+                    <button name="action_complete" type="object"
+                        string="Complete" class="oe_highlight"
+                        invisible="status != 'in_progress'"/>
+                    <button name="action_cancel" type="object"
+                        string="Cancel"
+                        invisible="status in ('completed', 'cancelled')"
+                        confirm="Are you sure you want to cancel this tournament?"/>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="draft,registration,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title"/>
+                        <h1><field name="title" placeholder="Tournament Name"/></h1>
+                        <h4 class="text-muted">
+                            <field name="name" readonly="1"/>
+                        </h4>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sport"/>
+                            <field name="tournament_type"/>
+                            <field name="organizer_id"/>
+                            <field name="participant_count"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="max_participants"/>
+                            <field name="entry_fee"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Participants" name="participants">
+                            <field name="participant_ids">
+                                <list editable="bottom">
+                                    <field name="affiliate_id"/>
+                                    <field name="registration_date"/>
+                                    <field name="seed"/>
+                                    <field name="status" widget="badge"
+                                        decoration-info="status == 'registered'"
+                                        decoration-success="status in ('active', 'winner')"
+                                        decoration-danger="status == 'eliminated'"
+                                        decoration-muted="status == 'withdrawn'"/>
+                                    <field name="final_position"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Rounds" name="rounds">
+                            <field name="round_ids">
+                                <list>
+                                    <field name="round_number"/>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Prizes" name="prizes">
+                            <field name="prize_description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_tournament_search" model="ir.ui.view">
+        <field name="name">club.tournament.search</field>
+        <field name="model">club.tournament</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="title"/>
+                <field name="name"/>
+                <field name="organizer_id"/>
+                <separator/>
+                <filter name="filter_golf" string="Golf"
+                    domain="[('sport', '=', 'golf')]"/>
+                <filter name="filter_tennis" string="Tennis"
+                    domain="[('sport', '=', 'tennis')]"/>
+                <filter name="filter_equestrian" string="Equestrian"
+                    domain="[('sport', '=', 'equestrian')]"/>
+                <filter name="filter_sailing" string="Sailing"
+                    domain="[('sport', '=', 'sailing')]"/>
+                <filter name="filter_swimming" string="Swimming"
+                    domain="[('sport', '=', 'swimming')]"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft"
+                    domain="[('status', '=', 'draft')]"/>
+                <filter name="filter_registration" string="Registration"
+                    domain="[('status', '=', 'registration')]"/>
+                <filter name="filter_in_progress" string="In Progress"
+                    domain="[('status', '=', 'in_progress')]"/>
+                <filter name="filter_completed" string="Completed"
+                    domain="[('status', '=', 'completed')]"/>
+                <separator/>
+                <filter name="filter_this_month" string="This Month"
+                    domain="[('start_date', '&gt;=', (context_today()).strftime('%Y-%m-01'))]"/>
+                <filter name="filter_my_tournaments" string="My Tournaments"
+                    domain="[('organizer_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_sport" string="Sport"
+                        context="{'group_by': 'sport'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_type" string="Tournament Type"
+                        context="{'group_by': 'tournament_type'}"/>
+                    <filter name="group_start_date" string="Start Date"
+                        context="{'group_by': 'start_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_club_tournament" model="ir.actions.act_window">
+        <field name="name">Tournaments</field>
+        <field name="res_model">club.tournament</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_tournament_search"/>
+        <field name="path">club-tournaments</field>
+    </record>
+
+    <record id="action_club_tournament_my" model="ir.actions.act_window">
+        <field name="name">My Tournaments</field>
+        <field name="res_model">club.tournament</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_tournament_search"/>
+        <field name="context">{'search_default_filter_my_tournaments': 1}</field>
+        <field name="path">club-my-tournaments</field>
+    </record>
+
+</odoo>

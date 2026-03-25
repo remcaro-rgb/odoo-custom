@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_pqr_request_kanban" model="ir.ui.view">
+        <field name="name">club.pqr.request.kanban</field>
+        <field name="model">club.pqr.request</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status">
+                <field name="name"/>
+                <field name="subject"/>
+                <field name="affiliate_id"/>
+                <field name="priority"/>
+                <field name="due_date"/>
+                <field name="status"/>
+                <field name="is_overdue"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top mb-0">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <field name="priority" widget="priority"/>
+                            </div>
+                            <div class="mb-1">
+                                <field name="subject"/>
+                            </div>
+                            <div class="text-muted">
+                                <field name="affiliate_id"/>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <span t-if="record.due_date.raw_value"
+                                    t-attf-class="badge #{record.is_overdue.raw_value ? 'text-bg-danger' : 'text-bg-info'}">
+                                    <field name="due_date"/>
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_pqr_request_list" model="ir.ui.view">
+        <field name="name">club.pqr.request.list</field>
+        <field name="model">club.pqr.request</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" decoration-bf="1"/>
+                <field name="affiliate_id"/>
+                <field name="request_type"/>
+                <field name="subject"/>
+                <field name="category_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="assigned_to"/>
+                <field name="due_date"/>
+                <field name="is_overdue"/>
+                <field name="status" widget="badge"
+                    decoration-info="status == 'submitted'"
+                    decoration-warning="status == 'in_progress'"
+                    decoration-success="status in ('resolved', 'closed')"
+                    decoration-danger="status == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_pqr_request_form" model="ir.ui.view">
+        <field name="name">club.pqr.request.form</field>
+        <field name="model">club.pqr.request</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit"
+                        type="object" class="oe_highlight"
+                        invisible="status != 'draft'"/>
+                    <button name="action_assign" string="Start Progress"
+                        type="object" class="oe_highlight"
+                        invisible="status != 'submitted'"/>
+                    <button name="action_resolve" string="Resolve"
+                        type="object" class="oe_highlight"
+                        invisible="status != 'in_progress'"/>
+                    <button name="action_close" string="Close"
+                        type="object" class="oe_highlight"
+                        invisible="status != 'resolved'"/>
+                    <button name="action_reject" string="Reject"
+                        type="object"
+                        invisible="status not in ('submitted', 'in_progress')"/>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="draft,submitted,in_progress,resolved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="affiliate_id"/>
+                            <field name="request_type"/>
+                            <field name="category_id"/>
+                            <field name="priority" widget="priority"/>
+                        </group>
+                        <group>
+                            <field name="assigned_to"/>
+                            <field name="submit_date"/>
+                            <field name="due_date"/>
+                            <field name="resolution_date"/>
+                            <field name="is_overdue"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="subject"/>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Resolution" name="resolution">
+                            <field name="resolution_notes"
+                                placeholder="Enter resolution details..."/>
+                        </page>
+                        <page string="Attachments" name="attachments">
+                            <field name="attachment_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_pqr_request_search" model="ir.ui.view">
+        <field name="name">club.pqr.request.search</field>
+        <field name="model">club.pqr.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="subject"/>
+                <field name="affiliate_id"/>
+                <field name="assigned_to"/>
+                <separator/>
+                <filter name="my_requests" string="My Assigned"
+                    domain="[('assigned_to', '=', uid)]"/>
+                <filter name="overdue" string="Overdue"
+                    domain="[('is_overdue', '=', True)]"/>
+                <separator/>
+                <filter name="type_petition" string="Petitions"
+                    domain="[('request_type', '=', 'petition')]"/>
+                <filter name="type_complaint" string="Complaints"
+                    domain="[('request_type', '=', 'complaint')]"/>
+                <filter name="type_claim" string="Claims"
+                    domain="[('request_type', '=', 'claim')]"/>
+                <separator/>
+                <filter name="priority_high" string="High Priority"
+                    domain="[('priority', 'in', ('high', 'urgent'))]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_category" string="Category"
+                        context="{'group_by': 'category_id'}"/>
+                    <filter name="group_assigned" string="Assigned To"
+                        context="{'group_by': 'assigned_to'}"/>
+                    <filter name="group_type" string="Type"
+                        context="{'group_by': 'request_type'}"/>
+                    <filter name="group_priority" string="Priority"
+                        context="{'group_by': 'priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_club_pqr_request" model="ir.actions.act_window">
+        <field name="name">All PQR Requests</field>
+        <field name="res_model">club.pqr.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_pqr_request_search"/>
+        <field name="path">club-pqr-requests</field>
+    </record>
+
+    <record id="action_club_pqr_request_my" model="ir.actions.act_window">
+        <field name="name">My Assigned PQR</field>
+        <field name="res_model">club.pqr.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_pqr_request_search"/>
+        <field name="context">{'search_default_my_requests': 1}</field>
+        <field name="path">club-pqr-my</field>
+    </record>
+
+</odoo>

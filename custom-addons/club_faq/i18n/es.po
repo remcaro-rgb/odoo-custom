@@ -1,0 +1,170 @@
+# Spanish translation for club_faq
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the club_faq module.
+#
+# Translators:
+# Manuel Caro, 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Club FAQ 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_faq
+#: model:res.groups,name:club_faq.group_faq_staff
+msgid "FAQ Staff"
+msgstr "Personal de FAQ"
+
+#. module: club_faq
+#: model:ir.model,name:club_faq.model_club_faq_category
+msgid "FAQ Category"
+msgstr "Categoría de FAQ"
+
+#. module: club_faq
+#: model:ir.model,name:club_faq.model_club_faq_item
+msgid "FAQ Item"
+msgstr "Pregunta Frecuente"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_category__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_category__sequence
+msgid "Sequence"
+msgstr "Secuencia"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_category__icon
+msgid "Icon"
+msgstr "Icono"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_category__faq_ids
+msgid "FAQ Items"
+msgstr "Preguntas Frecuentes"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_category__faq_count
+msgid "FAQ Count"
+msgstr "Cantidad de FAQ"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_item__category_id
+msgid "Category"
+msgstr "Categoría"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_item__question
+msgid "Question"
+msgstr "Pregunta"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_item__answer
+msgid "Answer"
+msgstr "Respuesta"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_item__sequence
+msgid "Sequence"
+msgstr "Secuencia"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_item__is_published
+msgid "Published"
+msgstr "Publicado"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_item__author_id
+msgid "Author"
+msgstr "Autor"
+
+#. module: club_faq
+#: model:ir.model.fields,field_description:club_faq.field_club_faq_item__helpful_count
+msgid "Helpful Count"
+msgstr "Conteo de Utilidad"
+
+#. module: club_faq
+#: model:ir.actions.act_window,name:club_faq.action_club_faq_item
+msgid "FAQ Questions"
+msgstr "Preguntas Frecuentes"
+
+#. module: club_faq
+#: model:ir.actions.act_window,name:club_faq.action_club_faq_category
+msgid "FAQ Categories"
+msgstr "Categorías de FAQ"
+
+#. module: club_faq
+#: model:ir.ui.menu,name:club_faq.menu_club_faq
+msgid "FAQ"
+msgstr "FAQ"
+
+#. module: club_faq
+#: model:ir.ui.menu,name:club_faq.menu_club_faq_all
+msgid "All Questions"
+msgstr "Todas las Preguntas"
+
+#. module: club_faq
+#: model:ir.ui.menu,name:club_faq.menu_club_faq_categories
+msgid "FAQ Categories"
+msgstr "Categorías de FAQ"
+
+#. module: club_faq
+#: model_terms:ir.ui.view,arch_db:club_faq.view_club_faq_item_search:0
+msgid "Published"
+msgstr "Publicado"
+
+#. module: club_faq
+#: model_terms:ir.ui.view,arch_db:club_faq.view_club_faq_item_search:0
+msgid "Unpublished"
+msgstr "No Publicado"
+
+#. module: club_faq
+#: model_terms:ir.ui.view,arch_db:club_faq.view_club_faq_item_search:0
+msgid "Group By"
+msgstr "Agrupar Por"
+
+#. module: club_faq
+#: model_terms:ir.ui.view,arch_db:club_faq.view_club_faq_item_form:0
+msgid "Answer"
+msgstr "Respuesta"
+
+#. module: club_faq
+#: model_terms:ir.ui.view,arch_db:club_faq.view_club_faq_item_list:0
+msgid "Last Updated"
+msgstr "Última Actualización"
+
+#. module: club_faq
+#: model_terms:ir.ui.view,arch_db:club_faq.view_club_faq_category_list:0
+msgid "# FAQs"
+msgstr "# FAQs"
+
+#. module: club_faq
+#: model_terms:ir.ui.view,arch_db:club_faq.view_club_faq_category_form:0
+msgid "FAQ Items"
+msgstr "Preguntas Frecuentes"
+
+#. module: club_faq
+#: model:ir.model.fields,help:club_faq.field_club_faq_category__icon
+msgid "Optional CSS icon class"
+msgstr "Clase CSS de icono opcional"
+
+#. module: club_faq
+#: model:ir.rule,name:club_faq.rule_faq_item_portal_published
+msgid "FAQ Item: portal sees published only"
+msgstr "Pregunta FAQ: portal solo ve publicadas"
+
+#. module: club_faq
+#: model:ir.rule,name:club_faq.rule_faq_category_portal
+msgid "FAQ Category: portal can read all"
+msgstr "Categoría FAQ: portal puede leer todas"

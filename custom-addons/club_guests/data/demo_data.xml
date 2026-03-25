@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Guest Policy ────────────────────────────────────────── -->
+
+        <record id="policy_standard" model="club.guest.policy">
+            <field name="name">Standard Guest Policy</field>
+            <field name="max_guests_per_visit">4</field>
+            <field name="max_visits_per_month">8</field>
+            <field name="requires_advance_registration" eval="True"/>
+            <field name="guest_fee">25.00</field>
+        </record>
+
+        <!-- ── Guests ──────────────────────────────────────────────── -->
+
+        <record id="guest_miguel" model="club.guest">
+            <field name="name">Miguel Torres</field>
+            <field name="identification">1020304050</field>
+            <field name="phone">+57 310 5551001</field>
+            <field name="email">miguel.torres@example.com</field>
+            <field name="relationship">friend</field>
+        </record>
+
+        <record id="guest_sofia" model="club.guest">
+            <field name="name">Sofia Herrera</field>
+            <field name="identification">2030405060</field>
+            <field name="phone">+57 310 5551002</field>
+            <field name="email">sofia.herrera@example.com</field>
+            <field name="relationship">family</field>
+        </record>
+
+        <record id="guest_andres" model="club.guest">
+            <field name="name">Andres Ramirez</field>
+            <field name="identification">3040506070</field>
+            <field name="phone">+57 310 5551003</field>
+            <field name="email">andres.ramirez@example.com</field>
+            <field name="relationship">business</field>
+        </record>
+
+        <record id="guest_lucia" model="club.guest">
+            <field name="name">Lucia Mendoza</field>
+            <field name="identification">4050607080</field>
+            <field name="phone">+57 310 5551004</field>
+            <field name="email">lucia.mendoza@example.com</field>
+            <field name="relationship">other</field>
+        </record>
+
+        <!-- ── Guest Visits ────────────────────────────────────────── -->
+
+        <record id="visit_001" model="club.guest.visit">
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="guest_id" ref="guest_miguel"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-01')"/>
+            <field name="areas_accessed">pool</field>
+            <field name="status">checked_out</field>
+            <field name="check_in_time">9.0</field>
+            <field name="check_out_time">13.5</field>
+            <field name="policy_id" ref="policy_standard"/>
+        </record>
+
+        <record id="visit_002" model="club.guest.visit">
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="guest_id" ref="guest_sofia"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-05')"/>
+            <field name="areas_accessed">restaurant</field>
+            <field name="status">checked_out</field>
+            <field name="check_in_time">12.0</field>
+            <field name="check_out_time">15.0</field>
+            <field name="policy_id" ref="policy_standard"/>
+        </record>
+
+        <record id="visit_003" model="club.guest.visit">
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="guest_id" ref="guest_andres"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="areas_accessed">golf</field>
+            <field name="status">registered</field>
+            <field name="policy_id" ref="policy_standard"/>
+        </record>
+
+        <record id="visit_004" model="club.guest.visit">
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="guest_id" ref="guest_lucia"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-%d')"/>
+            <field name="areas_accessed">tennis</field>
+            <field name="status">checked_in</field>
+            <field name="check_in_time">10.5</field>
+            <field name="policy_id" ref="policy_standard"/>
+        </record>
+
+        <record id="visit_005" model="club.guest.visit">
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="guest_id" ref="guest_miguel"/>
+            <field name="date" eval="DateTime.now().strftime('%Y-%m-10')"/>
+            <field name="areas_accessed">gym</field>
+            <field name="status">cancelled</field>
+            <field name="policy_id" ref="policy_standard"/>
+        </record>
+
+    </data>
+</odoo>

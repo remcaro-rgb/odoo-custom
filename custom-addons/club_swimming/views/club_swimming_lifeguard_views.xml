@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_swimming_lifeguard_list" model="ir.ui.view">
+        <field name="name">club.swimming.lifeguard.list</field>
+        <field name="model">club.swimming.lifeguard</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="partner_id"/>
+                <field name="employee_number"/>
+                <field name="certification"/>
+                <field name="certification_expiry"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_swimming_lifeguard_form" model="ir.ui.view">
+        <field name="name">club.swimming.lifeguard.form</field>
+        <field name="model">club.swimming.lifeguard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="partner_id"/>
+                        <h1><field name="partner_id"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_number"/>
+                            <field name="certification"/>
+                        </group>
+                        <group>
+                            <field name="certification_expiry"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_swimming_lifeguard_search" model="ir.ui.view">
+        <field name="name">club.swimming.lifeguard.search</field>
+        <field name="model">club.swimming.lifeguard</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="employee_number"/>
+                <field name="certification"/>
+                <filter name="active_lifeguards" string="Active"
+                    domain="[('active', '=', True)]"/>
+                <filter name="archived" string="Archived"
+                    domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_swimming_lifeguard" model="ir.actions.act_window">
+        <field name="name">Lifeguards</field>
+        <field name="res_model">club.swimming.lifeguard</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_swimming_lifeguard_search"/>
+        <field name="path">club-swimming-lifeguards</field>
+    </record>
+
+</odoo>

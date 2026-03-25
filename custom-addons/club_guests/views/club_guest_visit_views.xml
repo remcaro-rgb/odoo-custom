@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_guest_visit_kanban" model="ir.ui.view">
+        <field name="name">club.guest.visit.kanban</field>
+        <field name="model">club.guest.visit</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status">
+                <field name="name"/>
+                <field name="guest_id"/>
+                <field name="affiliate_id"/>
+                <field name="date"/>
+                <field name="status"/>
+                <field name="areas_accessed"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div class="mt-1">
+                                <span class="fw-bold"><field name="guest_id"/></span>
+                            </div>
+                            <div class="text-muted">
+                                Host: <field name="affiliate_id"/>
+                            </div>
+                            <div class="mt-1">
+                                <field name="date"/> -
+                                <field name="areas_accessed"/>
+                            </div>
+                            <div class="mt-1">
+                                <field name="status" widget="badge"
+                                    decoration-success="status == 'checked_out'"
+                                    decoration-info="status == 'checked_in'"
+                                    decoration-warning="status == 'registered'"
+                                    decoration-danger="status in ('cancelled', 'no_show')"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_guest_visit_list" model="ir.ui.view">
+        <field name="name">club.guest.visit.list</field>
+        <field name="model">club.guest.visit</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="affiliate_id"/>
+                <field name="guest_id"/>
+                <field name="date"/>
+                <field name="check_in_time" widget="float_time"/>
+                <field name="check_out_time" widget="float_time"/>
+                <field name="areas_accessed"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'checked_out'"
+                    decoration-info="status == 'checked_in'"
+                    decoration-warning="status == 'registered'"
+                    decoration-danger="status in ('cancelled', 'no_show')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_guest_visit_form" model="ir.ui.view">
+        <field name="name">club.guest.visit.form</field>
+        <field name="model">club.guest.visit</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_check_in" type="object"
+                        string="Check In" class="btn-primary"
+                        invisible="status != 'registered'"/>
+                    <button name="action_check_out" type="object"
+                        string="Check Out" class="btn-primary"
+                        invisible="status != 'checked_in'"/>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="registered,checked_in,checked_out"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="affiliate_id"/>
+                            <field name="guest_id"/>
+                            <field name="date"/>
+                            <field name="policy_id"/>
+                        </group>
+                        <group>
+                            <field name="check_in_time" widget="float_time"/>
+                            <field name="check_out_time" widget="float_time"/>
+                            <field name="areas_accessed"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes"
+                                placeholder="Additional notes about this visit..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_guest_visit_search" model="ir.ui.view">
+        <field name="name">club.guest.visit.search</field>
+        <field name="model">club.guest.visit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="affiliate_id"/>
+                <field name="guest_id"/>
+                <filter name="today" string="Today's Visits"
+                    domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="registered" string="Registered"
+                    domain="[('status', '=', 'registered')]"/>
+                <filter name="checked_in" string="Checked In"
+                    domain="[('status', '=', 'checked_in')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_date" string="Visit Date"
+                        context="{'group_by': 'date'}"/>
+                    <filter name="group_affiliate" string="Affiliate"
+                        context="{'group_by': 'affiliate_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action: Today's Visits -->
+    <record id="action_club_guest_visit_today" model="ir.actions.act_window">
+        <field name="name">Today's Visits</field>
+        <field name="res_model">club.guest.visit</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_guest_visit_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="path">club-guest-visits-today</field>
+    </record>
+
+    <!-- Action: All Visits -->
+    <record id="action_club_guest_visit" model="ir.actions.act_window">
+        <field name="name">All Visits</field>
+        <field name="res_model">club.guest.visit</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_guest_visit_search"/>
+        <field name="path">club-guest-visits</field>
+    </record>
+
+</odoo>

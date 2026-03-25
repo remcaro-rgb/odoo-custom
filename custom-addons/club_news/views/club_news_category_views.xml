@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view (editable) -->
+    <record id="view_club_news_category_list" model="ir.ui.view">
+        <field name="name">club.news.category.list</field>
+        <field name="model">club.news.category</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_news_category" model="ir.actions.act_window">
+        <field name="name">News Categories</field>
+        <field name="res_model">club.news.category</field>
+        <field name="view_mode">list</field>
+        <field name="path">club-news-categories</field>
+    </record>
+
+</odoo>

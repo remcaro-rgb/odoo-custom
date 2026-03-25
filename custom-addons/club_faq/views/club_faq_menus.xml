@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- FAQ submenu under Club root -->
+    <menuitem id="menu_club_faq"
+        name="FAQ"
+        parent="club_core.menu_club_root"
+        sequence="40"/>
+
+    <menuitem id="menu_club_faq_all"
+        name="All Questions"
+        parent="menu_club_faq"
+        action="action_club_faq_item"
+        sequence="10"/>
+
+    <!-- Categories under Configuration -->
+    <menuitem id="menu_club_faq_categories"
+        name="FAQ Categories"
+        parent="club_core.menu_club_config"
+        action="action_club_faq_category"
+        sequence="30"/>
+
+</odoo>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sailing section under Club root menu -->
+    <menuitem id="menu_sailing_root"
+        name="Sailing"
+        parent="club_core.menu_club_root"
+        sequence="40"
+        groups="club_sailing.group_sailing_staff,club_core.group_club_admin"/>
+
+    <!-- Bookings -->
+    <menuitem id="menu_sailing_bookings"
+        name="Bookings"
+        parent="menu_sailing_root"
+        action="action_club_sailing_booking"
+        sequence="10"/>
+
+    <!-- Boats -->
+    <menuitem id="menu_sailing_boats"
+        name="Boats"
+        parent="menu_sailing_root"
+        action="action_club_sailing_boat"
+        sequence="20"/>
+
+    <!-- Docks -->
+    <menuitem id="menu_sailing_docks"
+        name="Docks"
+        parent="menu_sailing_root"
+        action="action_club_sailing_dock"
+        sequence="30"/>
+
+    <!-- Crew -->
+    <menuitem id="menu_sailing_crew"
+        name="Crew"
+        parent="menu_sailing_root"
+        action="action_club_sailing_crew"
+        sequence="40"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_sailing_config"
+        name="Configuration"
+        parent="menu_sailing_root"
+        sequence="100"
+        groups="club_core.group_club_admin"/>
+
+</odoo>

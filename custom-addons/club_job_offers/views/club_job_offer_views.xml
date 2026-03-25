@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_job_offer_kanban" model="ir.ui.view">
+        <field name="name">club.job.offer.kanban</field>
+        <field name="model">club.job.offer</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="affiliate_id"/>
+                <field name="category_id"/>
+                <field name="job_type"/>
+                <field name="status"/>
+                <field name="application_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="title"/></strong>
+                            <div class="text-muted">
+                                <field name="name"/>
+                            </div>
+                            <div>
+                                <field name="affiliate_id"/>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <field name="category_id" widget="badge"/>
+                                <span class="badge rounded-pill text-bg-info">
+                                    <field name="application_count"/> apps
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_job_offer_list" model="ir.ui.view">
+        <field name="name">club.job.offer.list</field>
+        <field name="model">club.job.offer</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" decoration-bf="1"/>
+                <field name="title"/>
+                <field name="affiliate_id"/>
+                <field name="category_id" optional="show"/>
+                <field name="job_type" optional="show"/>
+                <field name="salary_range" optional="hide"/>
+                <field name="location" optional="hide"/>
+                <field name="publish_date"/>
+                <field name="expiry_date" optional="show"/>
+                <field name="application_count" string="Apps"/>
+                <field name="status" widget="badge"
+                    decoration-info="status == 'draft'"
+                    decoration-success="status == 'published'"
+                    decoration-warning="status == 'filled'"
+                    decoration-danger="status == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_job_offer_form" model="ir.ui.view">
+        <field name="name">club.job.offer.form</field>
+        <field name="model">club.job.offer</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_publish" type="object"
+                        string="Publish" class="oe_highlight"
+                        invisible="status != 'draft'"/>
+                    <button name="action_fill" type="object"
+                        string="Mark as Filled" class="oe_highlight"
+                        invisible="status != 'published'"/>
+                    <button name="action_close" type="object"
+                        string="Close"
+                        invisible="status == 'closed'"/>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="draft,published,filled,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title"/>
+                        <h1><field name="title" placeholder="e.g. Full-Time Housekeeper"/></h1>
+                        <h4 class="text-muted">
+                            <field name="name" readonly="1"/>
+                        </h4>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="affiliate_id"/>
+                            <field name="category_id"/>
+                            <field name="job_type"/>
+                        </group>
+                        <group>
+                            <field name="salary_range" placeholder="e.g. $1M-2M COP/month"/>
+                            <field name="location"/>
+                            <field name="publish_date"/>
+                            <field name="expiry_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Detailed job requirements..."/>
+                        </page>
+                        <page string="Applications" name="applications">
+                            <field name="application_ids">
+                                <list>
+                                    <field name="applicant_name"/>
+                                    <field name="applicant_affiliate_id"/>
+                                    <field name="applicant_phone"/>
+                                    <field name="applicant_email"/>
+                                    <field name="submit_date"/>
+                                    <field name="status" widget="badge"
+                                        decoration-info="status == 'submitted'"
+                                        decoration-warning="status == 'reviewed'"
+                                        decoration-success="status == 'accepted'"
+                                        decoration-danger="status == 'rejected'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_job_offer_search" model="ir.ui.view">
+        <field name="name">club.job.offer.search</field>
+        <field name="model">club.job.offer</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="title"/>
+                <field name="name"/>
+                <field name="affiliate_id"/>
+                <field name="category_id"/>
+                <filter name="active_offers" string="Active Offers"
+                    domain="[('status', '=', 'published')]"/>
+                <filter name="my_offers" string="My Offers"
+                    domain="[('affiliate_id.partner_id', '=', uid)]"/>
+                <filter name="by_category" string="Category"
+                    context="{'group_by': 'category_id'}"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_category" string="Category"
+                        context="{'group_by': 'category_id'}"/>
+                    <filter name="group_type" string="Job Type"
+                        context="{'group_by': 'job_type'}"/>
+                    <filter name="group_affiliate" string="Posted By"
+                        context="{'group_by': 'affiliate_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_club_job_offer" model="ir.actions.act_window">
+        <field name="name">Job Offers</field>
+        <field name="res_model">club.job.offer</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_job_offer_search"/>
+        <field name="context">{'search_default_active_offers': 1}</field>
+        <field name="path">club-job-offers</field>
+    </record>
+
+    <record id="action_club_job_offer_my" model="ir.actions.act_window">
+        <field name="name">My Offers</field>
+        <field name="res_model">club.job.offer</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_job_offer_search"/>
+        <field name="context">{'search_default_my_offers': 1}</field>
+        <field name="path">club-job-offers-mine</field>
+    </record>
+
+</odoo>

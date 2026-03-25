@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Guests sub-menu under Club root -->
+    <menuitem id="menu_club_guests"
+        name="Guests"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <menuitem id="menu_club_guest_visits_today"
+        name="Today's Visits"
+        parent="menu_club_guests"
+        action="action_club_guest_visit_today"
+        sequence="10"/>
+
+    <menuitem id="menu_club_guest_visits_all"
+        name="All Visits"
+        parent="menu_club_guests"
+        action="action_club_guest_visit"
+        sequence="20"/>
+
+    <menuitem id="menu_club_guest_registry"
+        name="Guest Registry"
+        parent="menu_club_guests"
+        action="action_club_guest"
+        sequence="30"/>
+
+    <!-- Guest Policies under Configuration -->
+    <menuitem id="menu_club_config_guest_policies"
+        name="Guest Policies"
+        parent="club_core.menu_club_config"
+        action="action_club_guest_policy"
+        sequence="20"/>
+
+</odoo>

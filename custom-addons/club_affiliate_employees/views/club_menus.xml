@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Affiliate Employees sub-menu under Club root -->
+    <menuitem id="menu_club_affiliate_employees"
+        name="Affiliate Employees"
+        parent="club_core.menu_club_root"
+        sequence="25"/>
+
+    <menuitem id="menu_club_affiliate_employees_list"
+        name="All Employees"
+        parent="menu_club_affiliate_employees"
+        action="action_club_affiliate_employee"
+        sequence="10"/>
+
+    <menuitem id="menu_club_affiliate_employees_access_log"
+        name="Access Log"
+        parent="menu_club_affiliate_employees"
+        action="action_club_affiliate_employee_access_log"
+        sequence="20"/>
+
+    <!-- Employee Types under Configuration -->
+    <menuitem id="menu_club_config_employee_types"
+        name="Employee Types"
+        parent="club_core.menu_club_config"
+        action="action_club_employee_type"
+        sequence="40"/>
+
+</odoo>

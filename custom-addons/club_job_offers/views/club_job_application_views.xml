@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_job_application_list" model="ir.ui.view">
+        <field name="name">club.job.application.list</field>
+        <field name="model">club.job.application</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="offer_id"/>
+                <field name="applicant_name"/>
+                <field name="applicant_affiliate_id" optional="show"/>
+                <field name="applicant_phone" optional="show"/>
+                <field name="applicant_email" optional="show"/>
+                <field name="submit_date"/>
+                <field name="status" widget="badge"
+                    decoration-info="status == 'submitted'"
+                    decoration-warning="status == 'reviewed'"
+                    decoration-success="status == 'accepted'"
+                    decoration-danger="status == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_job_application_form" model="ir.ui.view">
+        <field name="name">club.job.application.form</field>
+        <field name="model">club.job.application</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="submitted,reviewed,accepted,rejected"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="offer_id"/>
+                            <field name="applicant_name"/>
+                            <field name="applicant_affiliate_id"/>
+                        </group>
+                        <group>
+                            <field name="applicant_phone"/>
+                            <field name="applicant_email"/>
+                            <field name="submit_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cover Note" name="cover_note">
+                            <field name="cover_note"
+                                placeholder="Why is this person a good fit..."/>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes"
+                                placeholder="Internal notes about this application..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_job_application_search" model="ir.ui.view">
+        <field name="name">club.job.application.search</field>
+        <field name="model">club.job.application</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="applicant_name"/>
+                <field name="offer_id"/>
+                <field name="applicant_affiliate_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_offer" string="Offer"
+                        context="{'group_by': 'offer_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_job_application" model="ir.actions.act_window">
+        <field name="name">Applications</field>
+        <field name="res_model">club.job.application</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_job_application_search"/>
+        <field name="path">club-job-applications</field>
+    </record>
+
+</odoo>

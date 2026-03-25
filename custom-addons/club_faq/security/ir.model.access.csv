@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_faq_category_admin,club.faq.category admin,model_club_faq_category,club_core.group_club_admin,1,1,1,1
+access_club_faq_category_staff,club.faq.category staff,model_club_faq_category,club_faq.group_faq_staff,1,1,1,1
+access_club_faq_category_member,club.faq.category member,model_club_faq_category,club_core.group_club_member,1,0,0,0
+access_club_faq_item_admin,club.faq.item admin,model_club_faq_item,club_core.group_club_admin,1,1,1,1
+access_club_faq_item_staff,club.faq.item staff,model_club_faq_item,club_faq.group_faq_staff,1,1,1,1
+access_club_faq_item_member,club.faq.item member,model_club_faq_item,club_core.group_club_member,1,0,0,0

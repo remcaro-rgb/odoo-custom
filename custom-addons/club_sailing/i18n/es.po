@@ -1,0 +1,395 @@
+# Spanish translation for club_sailing
+# Copyright (C) 2026 Manuel Caro
+# This file is distributed under the same license as the club_sailing module.
+#
+# Translators:
+# Manuel Caro, 2026
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Club Sailing 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: Manuel Caro\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_sailing
+#: model:res.groups,name:club_sailing.group_sailing_staff
+msgid "Sailing Staff"
+msgstr "Personal de Nautica"
+
+#. module: club_sailing
+#: model:ir.model,name:club_sailing.model_club_sailing_boat
+msgid "Sailing Boat"
+msgstr "Embarcacion"
+
+#. module: club_sailing
+#: model:ir.model,name:club_sailing.model_club_sailing_dock
+msgid "Sailing Dock"
+msgstr "Muelle"
+
+#. module: club_sailing
+#: model:ir.model,name:club_sailing.model_club_sailing_booking
+msgid "Sailing Booking"
+msgstr "Reserva de Navegacion"
+
+#. module: club_sailing
+#: model:ir.model,name:club_sailing.model_club_sailing_crew
+msgid "Sailing Crew Member"
+msgstr "Miembro de Tripulacion"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_boat__name
+msgid "Boat Name"
+msgstr "Nombre de la Embarcacion"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_boat__boat_type
+msgid "Boat Type"
+msgstr "Tipo de Embarcacion"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__boat_type__sailboat
+msgid "Sailboat"
+msgstr "Velero"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__boat_type__motorboat
+msgid "Motorboat"
+msgstr "Lancha a Motor"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__boat_type__kayak
+msgid "Kayak"
+msgstr "Kayak"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__boat_type__catamaran
+msgid "Catamaran"
+msgstr "Catamaran"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_boat__capacity
+msgid "Max Passengers"
+msgstr "Pasajeros Maximos"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_boat__owner_type
+msgid "Owner Type"
+msgstr "Tipo de Propietario"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__owner_type__club
+msgid "Club"
+msgstr "Club"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__owner_type__affiliate
+msgid "Affiliate"
+msgstr "Socio"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_boat__owner_id
+msgid "Owner"
+msgstr "Propietario"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_boat__registration_number
+msgid "Registration Number"
+msgstr "Numero de Registro"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_boat__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__status__available
+msgid "Available"
+msgstr "Disponible"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__status__in_use
+msgid "In Use"
+msgstr "En Uso"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_boat__status__maintenance
+msgid "Maintenance"
+msgstr "Mantenimiento"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_boat__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_dock__name
+msgid "Dock Name"
+msgstr "Nombre del Muelle"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_dock__location
+msgid "Location"
+msgstr "Ubicacion"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_dock__capacity
+msgid "Boat Capacity"
+msgstr "Capacidad de Embarcaciones"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_dock__under_maintenance
+msgid "Under Maintenance"
+msgstr "En Mantenimiento"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_booking__affiliate_id
+msgid "Affiliate"
+msgstr "Socio"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_booking__boat_id
+msgid "Boat"
+msgstr "Embarcacion"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_booking__dock_id
+msgid "Dock"
+msgstr "Muelle"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_booking__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_booking__time_slot
+msgid "Start Time"
+msgstr "Hora de Inicio"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_booking__duration
+msgid "Duration (hours)"
+msgstr "Duracion (horas)"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_booking__passenger_count
+msgid "Passenger Count"
+msgstr "Cantidad de Pasajeros"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_booking__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_booking__status__booked
+msgid "Booked"
+msgstr "Reservado"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_booking__status__in_progress
+msgid "In Progress"
+msgstr "En Progreso"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_booking__status__completed
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_booking__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_crew__name
+msgid "Crew Member Name"
+msgstr "Nombre del Tripulante"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_crew__partner_id
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_crew__role
+msgid "Role"
+msgstr "Rol"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_crew__role__captain
+msgid "Captain"
+msgstr "Capitan"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_crew__role__instructor
+msgid "Instructor"
+msgstr "Instructor"
+
+#. module: club_sailing
+#: model:ir.model.fields.selection,name:club_sailing.selection__club_sailing_crew__role__deckhand
+msgid "Deckhand"
+msgstr "Marinero"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_crew__certification
+msgid "Certification"
+msgstr "Certificacion"
+
+#. module: club_sailing
+#: model:ir.model.fields,field_description:club_sailing.field_club_sailing_crew__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_sailing
+#: model:ir.ui.menu,name:club_sailing.menu_sailing_root
+msgid "Sailing"
+msgstr "Nautica"
+
+#. module: club_sailing
+#: model:ir.ui.menu,name:club_sailing.menu_sailing_bookings
+msgid "Bookings"
+msgstr "Reservas"
+
+#. module: club_sailing
+#: model:ir.ui.menu,name:club_sailing.menu_sailing_boats
+msgid "Boats"
+msgstr "Embarcaciones"
+
+#. module: club_sailing
+#: model:ir.ui.menu,name:club_sailing.menu_sailing_docks
+msgid "Docks"
+msgstr "Muelles"
+
+#. module: club_sailing
+#: model:ir.ui.menu,name:club_sailing.menu_sailing_crew
+msgid "Crew"
+msgstr "Tripulacion"
+
+#. module: club_sailing
+#: model:ir.ui.menu,name:club_sailing.menu_sailing_config
+msgid "Configuration"
+msgstr "Configuracion"
+
+#. module: club_sailing
+#: model:ir.actions.act_window,name:club_sailing.action_club_sailing_boat
+msgid "Boats"
+msgstr "Embarcaciones"
+
+#. module: club_sailing
+#: model:ir.actions.act_window,name:club_sailing.action_club_sailing_dock
+msgid "Docks"
+msgstr "Muelles"
+
+#. module: club_sailing
+#: model:ir.actions.act_window,name:club_sailing.action_club_sailing_booking
+msgid "Bookings"
+msgstr "Reservas"
+
+#. module: club_sailing
+#: model:ir.actions.act_window,name:club_sailing.action_club_sailing_crew
+msgid "Crew"
+msgstr "Tripulacion"
+
+#. module: club_sailing
+#: code:addons/club_sailing/models/club_sailing_booking.py:0
+msgid "This boat is already booked for an overlapping time slot on this date."
+msgstr "Esta embarcacion ya esta reservada para un horario superpuesto en esta fecha."
+
+#. module: club_sailing
+#: code:addons/club_sailing/models/club_sailing_booking.py:0
+msgid "Passenger count (%d) exceeds boat capacity (%d)."
+msgstr "La cantidad de pasajeros (%d) excede la capacidad de la embarcacion (%d)."
+
+#. module: club_sailing
+#: code:addons/club_sailing/models/club_sailing_booking.py:0
+msgid "Booking duration cannot exceed 8 hours."
+msgstr "La duracion de la reserva no puede exceder 8 horas."
+
+#. module: club_sailing
+#: sql_constraint:club.sailing.boat:registration_number_uniq
+msgid "Registration number must be unique."
+msgstr "El numero de registro debe ser unico."
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_boat_search
+msgid "Available"
+msgstr "Disponible"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_boat_search
+msgid "In Use"
+msgstr "En Uso"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_boat_search
+msgid "Boat Type"
+msgstr "Tipo de Embarcacion"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_dock_search
+msgid "Operational"
+msgstr "Operativo"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_dock_search
+msgid "Under Maintenance"
+msgstr "En Mantenimiento"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_booking_search
+msgid "Booked"
+msgstr "Reservado"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_booking_search
+msgid "In Progress"
+msgstr "En Progreso"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_booking_search
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_booking_search
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_crew_search
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_crew_search
+msgid "Archived"
+msgstr "Archivado"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_crew_search
+msgid "Role"
+msgstr "Rol"
+
+#. module: club_sailing
+#: model:ir.rule,name:club_sailing.rule_booking_portal_own
+msgid "Booking: portal sees own bookings"
+msgstr "Reserva: portal ve sus propias reservas"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_boat_search
+msgid "Group By"
+msgstr "Agrupar Por"
+
+#. module: club_sailing
+#: model:ir.ui.view,arch_db:club_sailing.view_club_sailing_boat_search
+msgid "Owner Type"
+msgstr "Tipo de Propietario"

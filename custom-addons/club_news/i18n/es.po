@@ -1,0 +1,238 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * club_news
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 00:00+0000\n"
+"PO-Revision-Date: 2025-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. module: club_news
+#: model:ir.model,name:club_news.model_club_news_category
+msgid "News Category"
+msgstr "Categoria de Noticias"
+
+#. module: club_news
+#: model:ir.model,name:club_news.model_club_news_tag
+msgid "News Tag"
+msgstr "Etiqueta de Noticias"
+
+#. module: club_news
+#: model:ir.model,name:club_news.model_club_news_article
+msgid "News Article"
+msgstr "Articulo de Noticias"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__name
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__title
+msgid "Title"
+msgstr "Titulo"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__category_id
+msgid "Category"
+msgstr "Categoria"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__author_id
+msgid "Author"
+msgstr "Autor"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__content
+msgid "Content"
+msgstr "Contenido"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__summary
+msgid "Summary"
+msgstr "Resumen"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__cover_image
+msgid "Cover Image"
+msgstr "Imagen de Portada"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__publish_date
+msgid "Publish Date"
+msgstr "Fecha de Publicacion"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__expiry_date
+msgid "Expiry Date"
+msgstr "Fecha de Expiracion"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__is_featured
+msgid "Featured"
+msgstr "Destacado"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__is_pinned
+msgid "Pinned"
+msgstr "Fijado"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__target_audience
+msgid "Target Audience"
+msgstr "Audiencia Objetivo"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__tag_ids
+msgid "Tags"
+msgstr "Etiquetas"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_article__view_count
+msgid "Views"
+msgstr "Vistas"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_category__name
+#: model:ir.model.fields,field_description:club_news.field_club_news_tag__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: club_news
+#: model:ir.model.fields,field_description:club_news.field_club_news_category__color
+#: model:ir.model.fields,field_description:club_news.field_club_news_tag__color
+msgid "Color"
+msgstr "Color"
+
+#. module: club_news
+#: model:ir.model.fields,selection:club_news.field_club_news_article__status,draft
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: club_news
+#: model:ir.model.fields,selection:club_news.field_club_news_article__status,published
+msgid "Published"
+msgstr "Publicado"
+
+#. module: club_news
+#: model:ir.model.fields,selection:club_news.field_club_news_article__status,archived
+msgid "Archived"
+msgstr "Archivado"
+
+#. module: club_news
+#: model:ir.model.fields,selection:club_news.field_club_news_article__target_audience,all
+msgid "All"
+msgstr "Todos"
+
+#. module: club_news
+#: model:ir.model.fields,selection:club_news.field_club_news_article__target_audience,members_only
+msgid "Members Only"
+msgstr "Solo Miembros"
+
+#. module: club_news
+#: model:ir.model.fields,selection:club_news.field_club_news_article__target_audience,staff_only
+msgid "Staff Only"
+msgstr "Solo Personal"
+
+#. module: club_news
+#: model:ir.actions.act_window,name:club_news.action_club_news_article
+msgid "All Articles"
+msgstr "Todos los Articulos"
+
+#. module: club_news
+#: model:ir.actions.act_window,name:club_news.action_club_news_article_published
+msgid "Published Articles"
+msgstr "Articulos Publicados"
+
+#. module: club_news
+#: model:ir.actions.act_window,name:club_news.action_club_news_category
+msgid "News Categories"
+msgstr "Categorias de Noticias"
+
+#. module: club_news
+#: model:ir.actions.act_window,name:club_news.action_club_news_tag
+msgid "News Tags"
+msgstr "Etiquetas de Noticias"
+
+#. module: club_news
+#: model:res.groups,name:club_news.group_news_staff
+msgid "News Staff"
+msgstr "Personal de Noticias"
+
+#. module: club_news
+#: model:ir.ui.menu,name:club_news.menu_club_news
+msgid "News"
+msgstr "Noticias"
+
+#. module: club_news
+#: model:ir.ui.menu,name:club_news.menu_club_news_config_categories
+msgid "Categories"
+msgstr "Categorias"
+
+#. module: club_news
+#: model:ir.ui.menu,name:club_news.menu_club_news_config_tags
+msgid "Tags"
+msgstr "Etiquetas"
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_form
+msgid "Publish"
+msgstr "Publicar"
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_form
+msgid "Archive"
+msgstr "Archivar"
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_form
+msgid "Reset to Draft"
+msgstr "Restablecer a Borrador"
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_form
+msgid "Article Title"
+msgstr "Titulo del Articulo"
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_form
+msgid "Short excerpt..."
+msgstr "Extracto breve..."
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_form
+msgid "Article body..."
+msgstr "Cuerpo del articulo..."
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_search
+msgid "This Month"
+msgstr "Este Mes"
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_search
+msgid "Last Month"
+msgstr "Mes Pasado"
+
+#. module: club_news
+#: model_terms:ir.ui.view,arch_db:club_news.view_club_news_article_search
+msgid "Group By"
+msgstr "Agrupar Por"
+
+#. module: club_news
+#: code:0
+msgid "New"
+msgstr "Nuevo"

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_tournament_match_list" model="ir.ui.view">
+        <field name="name">club.tournament.match.list</field>
+        <field name="model">club.tournament.match</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="tournament_id"/>
+                <field name="round_id"/>
+                <field name="participant_1_id"/>
+                <field name="score_1"/>
+                <field name="score_2"/>
+                <field name="participant_2_id"/>
+                <field name="winner_id"/>
+                <field name="status" widget="badge"
+                    decoration-info="status == 'scheduled'"
+                    decoration-warning="status == 'in_progress'"
+                    decoration-success="status == 'completed'"
+                    decoration-danger="status == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_tournament_match_form" model="ir.ui.view">
+        <field name="name">club.tournament.match.form</field>
+        <field name="model">club.tournament.match</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="round_id"/>
+                            <field name="tournament_id"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="participant_1_id"/>
+                            <field name="score_1"/>
+                            <field name="participant_2_id"/>
+                            <field name="score_2"/>
+                            <field name="winner_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_tournament_match_search" model="ir.ui.view">
+        <field name="name">club.tournament.match.search</field>
+        <field name="model">club.tournament.match</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="tournament_id"/>
+                <field name="round_id"/>
+                <field name="participant_1_id"/>
+                <field name="participant_2_id"/>
+                <filter name="filter_scheduled" string="Scheduled"
+                    domain="[('status', '=', 'scheduled')]"/>
+                <filter name="filter_in_progress" string="In Progress"
+                    domain="[('status', '=', 'in_progress')]"/>
+                <filter name="filter_completed" string="Completed"
+                    domain="[('status', '=', 'completed')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_tournament" string="Tournament"
+                        context="{'group_by': 'tournament_id'}"/>
+                    <filter name="group_round" string="Round"
+                        context="{'group_by': 'round_id'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_tournament_match" model="ir.actions.act_window">
+        <field name="name">Matches</field>
+        <field name="res_model">club.tournament.match</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_tournament_match_search"/>
+        <field name="path">club-tournament-matches</field>
+    </record>
+
+</odoo>

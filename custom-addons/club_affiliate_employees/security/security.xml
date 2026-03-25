@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ── Security Groups ──────────────────────────────────────── -->
+
+        <record id="group_employee_staff" model="res.groups">
+            <field name="name">Affiliate Employees Staff</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- ── Record Rules ─────────────────────────────────────────── -->
+
+        <!-- Portal / Member: affiliate sees only own employees -->
+        <record id="rule_employee_portal_own" model="ir.rule">
+            <field name="name">Affiliate Employee: portal sees own</field>
+            <field name="model_id" ref="model_club_affiliate_employee"/>
+            <field name="domain_force">[('affiliate_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('club_core.group_club_member'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Portal / Member: affiliate sees only own employee schedules -->
+        <record id="rule_schedule_portal_own" model="ir.rule">
+            <field name="name">Employee Schedule: portal sees own</field>
+            <field name="model_id" ref="model_club_affiliate_employee_schedule"/>
+            <field name="domain_force">[('employee_id.affiliate_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('club_core.group_club_member'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Portal / Member: affiliate sees only own employee access logs -->
+        <record id="rule_access_log_portal_own" model="ir.rule">
+            <field name="name">Employee Access Log: portal sees own</field>
+            <field name="model_id" ref="model_club_affiliate_employee_access_log"/>
+            <field name="domain_force">[('employee_id.affiliate_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('club_core.group_club_member'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

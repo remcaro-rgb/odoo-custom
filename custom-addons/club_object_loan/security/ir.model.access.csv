@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_object_category_admin,club.object.category admin,model_club_object_category,club_core.group_club_admin,1,1,1,1
+access_club_object_category_staff,club.object.category staff,model_club_object_category,club_object_loan.group_loan_staff,1,1,1,0
+access_club_object_category_member,club.object.category member,model_club_object_category,club_core.group_club_member,1,0,0,0
+access_club_object_item_admin,club.object.item admin,model_club_object_item,club_core.group_club_admin,1,1,1,1
+access_club_object_item_staff,club.object.item staff,model_club_object_item,club_object_loan.group_loan_staff,1,1,1,0
+access_club_object_item_member,club.object.item member,model_club_object_item,club_core.group_club_member,1,0,0,0
+access_club_object_loan_admin,club.object.loan admin,model_club_object_loan,club_core.group_club_admin,1,1,1,1
+access_club_object_loan_staff,club.object.loan staff,model_club_object_loan,club_object_loan.group_loan_staff,1,1,1,0
+access_club_object_loan_member,club.object.loan member,model_club_object_loan,club_core.group_club_member,1,0,0,0

@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_pqr_category_admin,club.pqr.category admin,model_club_pqr_category,club_core.group_club_admin,1,1,1,1
+access_club_pqr_category_staff,club.pqr.category pqr_staff,model_club_pqr_category,club_pqr.group_pqr_staff,1,1,1,0
+access_club_pqr_category_member,club.pqr.category member,model_club_pqr_category,club_core.group_club_member,1,0,0,0
+access_club_pqr_request_admin,club.pqr.request admin,model_club_pqr_request,club_core.group_club_admin,1,1,1,1
+access_club_pqr_request_staff,club.pqr.request pqr_staff,model_club_pqr_request,club_pqr.group_pqr_staff,1,1,1,0
+access_club_pqr_request_member,club.pqr.request member,model_club_pqr_request,club_core.group_club_member,1,0,1,0

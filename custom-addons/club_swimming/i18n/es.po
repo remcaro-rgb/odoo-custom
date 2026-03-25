@@ -1,0 +1,350 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * club_swimming
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_swimming
+#: model:ir.model,name:club_swimming.model_club_swimming_pool
+msgid "Swimming Pool"
+msgstr "Piscina"
+
+#. module: club_swimming
+#: model:ir.model,name:club_swimming.model_club_swimming_lane
+msgid "Swimming Lane"
+msgstr "Carril de Piscina"
+
+#. module: club_swimming
+#: model:ir.model,name:club_swimming.model_club_swimming_booking
+msgid "Swimming Booking"
+msgstr "Reserva de Piscina"
+
+#. module: club_swimming
+#: model:ir.model,name:club_swimming.model_club_swimming_lifeguard
+msgid "Swimming Lifeguard"
+msgstr "Salvavidas"
+
+#. module: club_swimming
+#: model:ir.model,name:club_swimming.model_club_swimming_class
+msgid "Swimming Class"
+msgstr "Clase de Natacion"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_pool__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_pool__pool_type
+msgid "Pool Type"
+msgstr "Tipo de Piscina"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_pool__pool_type__olympic
+msgid "Olympic"
+msgstr "Olimpica"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_pool__pool_type__recreational
+msgid "Recreational"
+msgstr "Recreativa"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_pool__pool_type__kids
+msgid "Kids"
+msgstr "Infantil"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_pool__pool_type__therapy
+msgid "Therapy"
+msgstr "Terapia"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_pool__lane_count
+msgid "Lane Count"
+msgstr "Cantidad de Carriles"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_pool__max_capacity
+msgid "Max Capacity"
+msgstr "Capacidad Maxima"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_pool__under_maintenance
+msgid "Under Maintenance"
+msgstr "En Mantenimiento"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_pool__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_pool__lane_ids
+msgid "Lanes"
+msgstr "Carriles"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_lane__pool_id
+msgid "Pool"
+msgstr "Piscina"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_lane__lane_type
+msgid "Lane Type"
+msgstr "Tipo de Carril"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_lane__lane_type__free_swim
+msgid "Free Swim"
+msgstr "Nado Libre"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_lane__lane_type__lap
+msgid "Lap"
+msgstr "Vuelta"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_lane__lane_type__reserved
+msgid "Reserved"
+msgstr "Reservado"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_lane__lane_type__class
+msgid "Class"
+msgstr "Clase"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_lane__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_lane__status__available
+msgid "Available"
+msgstr "Disponible"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_lane__status__occupied
+msgid "Occupied"
+msgstr "Ocupado"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_lane__status__maintenance
+msgid "Maintenance"
+msgstr "Mantenimiento"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_booking__affiliate_id
+msgid "Affiliate"
+msgstr "Afiliado"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_booking__lane_id
+msgid "Lane"
+msgstr "Carril"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_booking__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_booking__time_slot
+msgid "Start Time"
+msgstr "Hora de Inicio"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_booking__duration
+msgid "Duration (hours)"
+msgstr "Duracion (horas)"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_booking__guest_count
+msgid "Guest Count"
+msgstr "Cantidad de Invitados"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_booking__status__booked
+msgid "Booked"
+msgstr "Reservado"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_booking__status__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_booking__status__completed
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_booking__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_lifeguard__partner_id
+msgid "Partner"
+msgstr "Contacto"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_lifeguard__employee_number
+msgid "Employee Number"
+msgstr "Numero de Empleado"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_lifeguard__certification
+msgid "Certification"
+msgstr "Certificacion"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_lifeguard__certification_expiry
+msgid "Certification Expiry"
+msgstr "Vencimiento de Certificacion"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_class__name
+msgid "Class Name"
+msgstr "Nombre de Clase"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_class__instructor_id
+msgid "Instructor"
+msgstr "Instructor"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_class__day_of_week
+msgid "Day of Week"
+msgstr "Dia de la Semana"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__day_of_week__0
+msgid "Monday"
+msgstr "Lunes"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__day_of_week__1
+msgid "Tuesday"
+msgstr "Martes"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__day_of_week__2
+msgid "Wednesday"
+msgstr "Miercoles"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__day_of_week__3
+msgid "Thursday"
+msgstr "Jueves"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__day_of_week__4
+msgid "Friday"
+msgstr "Viernes"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__day_of_week__5
+msgid "Saturday"
+msgstr "Sabado"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__day_of_week__6
+msgid "Sunday"
+msgstr "Domingo"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_class__max_students
+msgid "Max Students"
+msgstr "Maximo de Estudiantes"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_class__student_ids
+msgid "Students"
+msgstr "Estudiantes"
+
+#. module: club_swimming
+#: model:ir.model.fields,field_description:club_swimming.field_club_swimming_class__level
+msgid "Level"
+msgstr "Nivel"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__level__beginner
+msgid "Beginner"
+msgstr "Principiante"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__level__intermediate
+msgid "Intermediate"
+msgstr "Intermedio"
+
+#. module: club_swimming
+#: model:ir.model.fields.selection,name:club_swimming.selection__club_swimming_class__level__advanced
+msgid "Advanced"
+msgstr "Avanzado"
+
+#. module: club_swimming
+#: model:res.groups,name:club_swimming.group_swimming_staff
+msgid "Swimming Staff"
+msgstr "Personal de Piscina"
+
+#. module: club_swimming
+#: model:ir.actions.act_window,name:club_swimming.action_club_swimming_pool
+msgid "Pools"
+msgstr "Piscinas"
+
+#. module: club_swimming
+#: model:ir.actions.act_window,name:club_swimming.action_club_swimming_lane
+msgid "Lanes"
+msgstr "Carriles"
+
+#. module: club_swimming
+#: model:ir.actions.act_window,name:club_swimming.action_club_swimming_booking
+msgid "Bookings"
+msgstr "Reservas"
+
+#. module: club_swimming
+#: model:ir.actions.act_window,name:club_swimming.action_club_swimming_lifeguard
+msgid "Lifeguards"
+msgstr "Salvavidas"
+
+#. module: club_swimming
+#: model:ir.actions.act_window,name:club_swimming.action_club_swimming_class
+msgid "Classes"
+msgstr "Clases"
+
+#. module: club_swimming
+#: model:ir.ui.menu,name:club_swimming.menu_swimming_root
+msgid "Swimming"
+msgstr "Piscina"
+
+#. module: club_swimming
+#: code:addons/club_swimming/models/club_swimming_booking.py:0
+#, python-format
+msgid "Booking duration cannot exceed 3 hours."
+msgstr "La duracion de la reserva no puede exceder 3 horas."
+
+#. module: club_swimming
+#: code:addons/club_swimming/models/club_swimming_booking.py:0
+#, python-format
+msgid "Cannot book a pool that is currently under maintenance."
+msgstr "No se puede reservar una piscina que esta en mantenimiento."
+
+#. module: club_swimming
+#: code:addons/club_swimming/models/club_swimming_booking.py:0
+#, python-format
+msgid "This lane is already booked for an overlapping time slot."
+msgstr "Este carril ya esta reservado para un horario superpuesto."
