@@ -6,19 +6,15 @@ class ResPartner(models.Model):
 
     is_club_affiliate = fields.Boolean(
         compute='_compute_is_club_affiliate',
-        store=True,
         help='True if this partner is linked to an active club affiliate.',
     )
     club_affiliate_number = fields.Char(
         compute='_compute_is_club_affiliate',
-        store=True,
     )
     club_membership_status = fields.Char(
         compute='_compute_is_club_affiliate',
-        store=True,
     )
 
-    @api.depends()  # Recomputed on demand
     def _compute_is_club_affiliate(self):
         Affiliate = self.env['club.affiliate']
         for partner in self:
