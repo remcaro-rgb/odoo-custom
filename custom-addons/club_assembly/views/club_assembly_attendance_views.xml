@@ -14,7 +14,8 @@
                     decoration-warning="status == 'excused'"
                     decoration-danger="status == 'absent'"
                     decoration-info="status in ('invited', 'proxy')"/>
-                <field name="proxy_for_id"/>
+                <field name="proxy_holder_id" optional="show"/>
+                <field name="proxy_for_id" optional="hide"/>
                 <field name="check_in_time"/>
                 <field name="notes"/>
             </list>
@@ -33,11 +34,19 @@
                             <field name="assembly_id"/>
                             <field name="affiliate_id"/>
                             <field name="status"/>
-                        </group>
-                        <group>
-                            <field name="proxy_for_id"/>
                             <field name="check_in_time"/>
                         </group>
+                        <group>
+                            <field name="proxy_holder_id"
+                                invisible="status != 'proxy'"/>
+                            <field name="proxy_for_id"
+                                invisible="status != 'proxy'"/>
+                        </group>
+                    </group>
+                    <group string="Authorization Letter (Poder)"
+                        invisible="status != 'proxy'">
+                        <field name="proxy_document" filename="proxy_document_name"/>
+                        <field name="proxy_document_name" invisible="1"/>
                     </group>
                     <group>
                         <field name="notes"/>
