@@ -7,11 +7,12 @@
     'category': 'Club Management',
     'author': 'Manuel Caro',
     'license': 'LGPL-3',
-    'depends': ['club_core'],
+    'depends': ['club_core', 'mail'],
     'data': [
         'security/club_guests_security.xml',
         'security/ir.model.access.csv',
         'data/sequences.xml',
+        'data/mail_template.xml',
         'views/club_guest_policy_views.xml',
         'views/club_guest_views.xml',
         'views/club_guest_visit_views.xml',

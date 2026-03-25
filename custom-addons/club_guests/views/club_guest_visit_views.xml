@@ -73,6 +73,14 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button name="action_send_qr_email" type="object"
+                        string="Send QR via Email" class="btn-secondary"
+                        invisible="status != 'registered'"
+                        icon="fa-envelope"/>
+                    <button name="action_share_qr_whatsapp" type="object"
+                        string="Share via WhatsApp" class="btn-secondary"
+                        invisible="status != 'registered'"
+                        icon="fa-whatsapp"/>
                     <button name="action_check_in" type="object"
                         string="Check In" class="btn-primary"
                         invisible="status != 'registered'"/>

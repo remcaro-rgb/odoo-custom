@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="mail_template_guest_visit_qr" model="mail.template">
+            <field name="name">Guest Visit: QR Access Code</field>
+            <field name="model_id" ref="model_club_guest_visit"/>
+            <field name="email_from">{{ (object.affiliate_id.email or object.company_id.email or '') }}</field>
+            <field name="email_to">{{ object.guest_id.email }}</field>
+            <field name="subject">Your Club Visit QR Code — {{ object.name }}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px;">
+    <p>Dear <t t-out="object.guest_id.name"/>,</p>
+
+    <p>You have been invited to visit <b><t t-out="object.company_id.name"/></b>
+       by <b><t t-out="object.affiliate_id.name"/></b>.</p>
+
+    <table style="border-collapse: collapse; margin: 16px 0;">
+        <tr>
+            <td style="padding: 4px 16px 4px 0; font-weight: bold;">Visit Date:</td>
+            <td><t t-out="object.date"/></td>
+        </tr>
+        <tr>
+            <td style="padding: 4px 16px 4px 0; font-weight: bold;">Visit Number:</td>
+            <td><t t-out="object.name"/></td>
+        </tr>
+        <tr>
+            <td style="padding: 4px 16px 4px 0; font-weight: bold;">Party Size:</td>
+            <td><t t-out="object.party_count"/></td>
+        </tr>
+        <tr t-if="object.areas_accessed">
+            <td style="padding: 4px 16px 4px 0; font-weight: bold;">Area:</td>
+            <td><t t-out="object.areas_accessed"/></td>
+        </tr>
+        <tr t-if="object.vehicle_plate">
+            <td style="padding: 4px 16px 4px 0; font-weight: bold;">Vehicle Plate:</td>
+            <td><t t-out="object.vehicle_plate"/></td>
+        </tr>
+        <tr>
+            <td style="padding: 4px 16px 4px 0; font-weight: bold;">Independent Access:</td>
+            <td><t t-if="object.allow_independent_access">Yes — you may enter without your host</t>
+                <t t-else="">No — your host must be present</t></td>
+        </tr>
+    </table>
+
+    <p><b>Please present this QR code at the club entrance:</b></p>
+
+    <div style="text-align: center; margin: 24px 0;">
+        <img t-att-src="'data:image/png;base64,' + (object.qr_code.decode() if object.qr_code else '')"
+             width="250" height="250" alt="QR Access Code"
+             style="border: 2px solid #ccc; border-radius: 8px; padding: 8px;"/>
+    </div>
+
+    <p style="color: #666; font-size: 12px;">
+        This QR code is valid only for the date shown above.
+        The guard will scan it to verify your access.
+    </p>
+
+    <p>We look forward to your visit!</p>
+
+    <p style="margin-top: 24px;">
+        <i><t t-out="object.company_id.name"/></i>
+    </p>
+</div>
+            </field>
+            <field name="lang">{{ object.guest_id.lang or 'es_CO' }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

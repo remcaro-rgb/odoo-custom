@@ -21,7 +21,7 @@ class ClubGuestVisit(models.Model):
         help='Unique token embedded in the QR code for gate scanning.',
     )
     qr_code = fields.Binary(
-        string='QR Code', compute='_compute_qr_code', store=True,
+        string='QR Code', compute='_compute_qr_code',
         help='Scannable QR code containing visit data for gate access.',
     )
     affiliate_id = fields.Many2one(
@@ -199,6 +199,89 @@ class ClubGuestVisit(models.Model):
                       affiliate=visit.affiliate_id.name,
                       max=policy.max_visits_per_month)
                 )
+
+    def action_send_qr_email(self):
+        """Send the QR code to the guest via email using a mail template."""
+        self.ensure_one()
+        if not self.guest_id.email:
+            raise ValidationError(
+                _('Guest "%s" does not have an email address configured.') % self.guest_id.name
+            )
+        template = self.env.ref(
+            'club_guests.mail_template_guest_visit_qr', raise_if_not_found=False
+        )
+        if template:
+            template.send_mail(self.id, force_send=True)
+        else:
+            # Fallback: compose email manually
+            body = _(
+                '<p>Dear %(guest)s,</p>'
+                '<p>You have been invited to visit <b>%(club)s</b> by %(host)s.</p>'
+                '<p><b>Visit Date:</b> %(date)s<br/>'
+                '<b>Visit Number:</b> %(visit)s<br/>'
+                '<b>Party Size:</b> %(party)d</p>'
+                '<p>Please present this QR code at the club entrance:</p>'
+                '<p><img src="data:image/png;base64,%(qr)s" width="200"/></p>'
+                '<p>We look forward to your visit!</p>',
+                guest=self.guest_id.name,
+                club=self.env.company.name,
+                host=self.affiliate_id.name,
+                date=self.date,
+                visit=self.name,
+                party=self.party_count,
+                qr=self.qr_code.decode() if self.qr_code else '',
+            )
+            self.env['mail.mail'].create({
+                'subject': _('Your Club Visit QR Code — %s') % self.name,
+                'email_to': self.guest_id.email,
+                'body_html': body,
+            }).send()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Email Sent'),
+                'message': _('QR code sent to %s') % self.guest_id.email,
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    def action_share_qr_whatsapp(self):
+        """Open WhatsApp with a pre-filled message containing visit details."""
+        self.ensure_one()
+        phone = self.guest_id.phone or ''
+        # Strip non-numeric chars for WhatsApp URL
+        phone_clean = ''.join(c for c in phone if c.isdigit() or c == '+')
+
+        message = _(
+            "Hello %(guest)s! You've been invited to visit the club by %(host)s.\n\n"
+            "Visit Date: %(date)s\n"
+            "Visit Number: %(visit)s\n"
+            "Party Size: %(party)d\n\n"
+            "Please present your QR code at the entrance. "
+            "You can view it here: %(url)s",
+            guest=self.guest_id.name,
+            host=self.affiliate_id.name,
+            date=self.date,
+            visit=self.name,
+            party=self.party_count,
+            url='%s/my/guest-visit/%s' % (
+                self.env['ir.config_parameter'].sudo().get_param('web.base.url', ''),
+                self.id,
+            ),
+        )
+
+        import urllib.parse
+        wa_url = 'https://wa.me/%s?text=%s' % (
+            phone_clean,
+            urllib.parse.quote(message),
+        )
+        return {
+            'type': 'ir.actions.act_url',
+            'url': wa_url,
+            'target': 'new',
+        }
 
     def action_check_in(self):
         """Set check-in time to now and mark as checked in."""
