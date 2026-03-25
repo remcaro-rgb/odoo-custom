@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Assembly: Asamblea General Ordinaria 2026 -->
+        <record id="assembly_ordinaria_2026" model="club.assembly">
+            <field name="title">Asamblea General Ordinaria 2026</field>
+            <field name="assembly_type">ordinary</field>
+            <field name="description">&lt;p&gt;Asamblea general ordinaria anual del club para la
+                revisi&amp;oacute;n de estados financieros, elecci&amp;oacute;n de junta directiva y
+                aprobaci&amp;oacute;n de presupuesto 2027.&lt;/p&gt;</field>
+            <field name="date" eval="DateTime.now().replace(month=6, day=15, hour=14, minute=0, second=0)"/>
+            <field name="location">Salon Principal</field>
+            <field name="status">scheduled</field>
+            <field name="quorum_required">3</field>
+            <field name="member_ids" eval="[
+                (4, ref('club_core.affiliate_001')),
+                (4, ref('club_core.affiliate_002')),
+                (4, ref('club_core.affiliate_003')),
+                (4, ref('club_core.affiliate_004')),
+                (4, ref('club_core.affiliate_005')),
+                (4, ref('club_core.affiliate_corp_admin')),
+            ]"/>
+        </record>
+
+        <!-- Topics -->
+        <record id="topic_informe_financiero" model="club.assembly.topic">
+            <field name="assembly_id" ref="assembly_ordinaria_2026"/>
+            <field name="sequence">10</field>
+            <field name="name">Informe Financiero 2025</field>
+            <field name="description">&lt;p&gt;Presentaci&amp;oacute;n del informe financiero del a&amp;ntilde;o 2025,
+                incluyendo ingresos, gastos y balance general.&lt;/p&gt;</field>
+            <field name="topic_type">informative</field>
+            <field name="status">pending</field>
+        </record>
+
+        <record id="topic_reformas_estatutos" model="club.assembly.topic">
+            <field name="assembly_id" ref="assembly_ordinaria_2026"/>
+            <field name="sequence">20</field>
+            <field name="name">Reforma de Estatutos</field>
+            <field name="description">&lt;p&gt;Discusi&amp;oacute;n sobre las reformas propuestas a los estatutos
+                del club, incluyendo modificaci&amp;oacute;n de cuotas y requisitos de membres&amp;iacute;a.&lt;/p&gt;</field>
+            <field name="topic_type">discussion</field>
+            <field name="status">pending</field>
+        </record>
+
+        <record id="topic_presupuesto_2027" model="club.assembly.topic">
+            <field name="assembly_id" ref="assembly_ordinaria_2026"/>
+            <field name="sequence">30</field>
+            <field name="name">Aprobacion Presupuesto 2027</field>
+            <field name="description">&lt;p&gt;Votaci&amp;oacute;n para la aprobaci&amp;oacute;n del presupuesto
+                general del club para el a&amp;ntilde;o 2027.&lt;/p&gt;</field>
+            <field name="topic_type">voting</field>
+            <field name="status">pending</field>
+        </record>
+
+        <!-- Attendance -->
+        <record id="attendance_carlos" model="club.assembly.attendance">
+            <field name="assembly_id" ref="assembly_ordinaria_2026"/>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="status">present</field>
+            <field name="check_in_time" eval="DateTime.now().replace(month=6, day=15, hour=13, minute=45, second=0)"/>
+        </record>
+
+        <record id="attendance_ana" model="club.assembly.attendance">
+            <field name="assembly_id" ref="assembly_ordinaria_2026"/>
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="status">present</field>
+            <field name="check_in_time" eval="DateTime.now().replace(month=6, day=15, hour=13, minute=50, second=0)"/>
+        </record>
+
+        <record id="attendance_jorge" model="club.assembly.attendance">
+            <field name="assembly_id" ref="assembly_ordinaria_2026"/>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="status">present</field>
+            <field name="check_in_time" eval="DateTime.now().replace(month=6, day=15, hour=13, minute=55, second=0)"/>
+        </record>
+
+        <record id="attendance_pedro" model="club.assembly.attendance">
+            <field name="assembly_id" ref="assembly_ordinaria_2026"/>
+            <field name="affiliate_id" ref="club_core.affiliate_005"/>
+            <field name="status">excused</field>
+            <field name="notes">Viaje de negocios</field>
+        </record>
+
+        <!-- Votes on the voting topic -->
+        <record id="vote_carlos_presupuesto" model="club.assembly.vote">
+            <field name="topic_id" ref="topic_presupuesto_2027"/>
+            <field name="affiliate_id" ref="club_core.affiliate_001"/>
+            <field name="vote">for</field>
+            <field name="voted_at" eval="DateTime.now().replace(month=6, day=15, hour=15, minute=30, second=0)"/>
+        </record>
+
+        <record id="vote_ana_presupuesto" model="club.assembly.vote">
+            <field name="topic_id" ref="topic_presupuesto_2027"/>
+            <field name="affiliate_id" ref="club_core.affiliate_002"/>
+            <field name="vote">for</field>
+            <field name="voted_at" eval="DateTime.now().replace(month=6, day=15, hour=15, minute=31, second=0)"/>
+        </record>
+
+        <record id="vote_jorge_presupuesto" model="club.assembly.vote">
+            <field name="topic_id" ref="topic_presupuesto_2027"/>
+            <field name="affiliate_id" ref="club_core.affiliate_003"/>
+            <field name="vote">against</field>
+            <field name="voted_at" eval="DateTime.now().replace(month=6, day=15, hour=15, minute=32, second=0)"/>
+            <field name="notes">Requiere mayor detalle en partidas</field>
+        </record>
+
+    </data>
+</odoo>

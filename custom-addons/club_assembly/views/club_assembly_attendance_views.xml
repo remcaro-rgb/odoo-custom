@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_club_assembly_attendance_list" model="ir.ui.view">
+        <field name="name">club.assembly.attendance.list</field>
+        <field name="model">club.assembly.attendance</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="assembly_id"/>
+                <field name="affiliate_id"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'present'"
+                    decoration-warning="status == 'excused'"
+                    decoration-danger="status == 'absent'"
+                    decoration-info="status in ('invited', 'proxy')"/>
+                <field name="proxy_for_id"/>
+                <field name="check_in_time"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_assembly_attendance_form" model="ir.ui.view">
+        <field name="name">club.assembly.attendance.form</field>
+        <field name="model">club.assembly.attendance</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="assembly_id"/>
+                            <field name="affiliate_id"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="proxy_for_id"/>
+                            <field name="check_in_time"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_assembly_attendance_search" model="ir.ui.view">
+        <field name="name">club.assembly.attendance.search</field>
+        <field name="model">club.assembly.attendance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="affiliate_id"/>
+                <field name="assembly_id"/>
+                <filter name="filter_present" string="Present"
+                    domain="[('status', '=', 'present')]"/>
+                <filter name="filter_absent" string="Absent"
+                    domain="[('status', '=', 'absent')]"/>
+                <filter name="filter_excused" string="Excused"
+                    domain="[('status', '=', 'excused')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_assembly" string="Assembly"
+                        context="{'group_by': 'assembly_id'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_club_assembly_attendance" model="ir.actions.act_window">
+        <field name="name">Attendance</field>
+        <field name="res_model">club.assembly.attendance</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_club_assembly_attendance_search"/>
+        <field name="path">club-assembly-attendance</field>
+    </record>
+
+</odoo>

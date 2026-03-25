@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban view -->
+    <record id="view_club_assembly_kanban" model="ir.ui.view">
+        <field name="name">club.assembly.kanban</field>
+        <field name="model">club.assembly</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="date"/>
+                <field name="status"/>
+                <field name="member_count"/>
+                <field name="quorum_met"/>
+                <field name="assembly_type"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="title"/></strong>
+                            <div class="text-muted">
+                                <field name="name"/> -
+                                <field name="date"/>
+                            </div>
+                            <div class="mt-1">
+                                <span class="badge bg-primary me-1">
+                                    <field name="member_count"/> members
+                                </span>
+                                <span t-if="record.quorum_met.raw_value"
+                                      class="badge bg-success">Quorum</span>
+                                <span t-if="!record.quorum_met.raw_value"
+                                      class="badge bg-warning">No Quorum</span>
+                            </div>
+                            <div class="mt-1">
+                                <field name="status" widget="badge"
+                                    decoration-success="status in ('in_session', 'closed')"
+                                    decoration-info="status == 'scheduled'"
+                                    decoration-warning="status == 'voting'"
+                                    decoration-danger="status == 'cancelled'"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="view_club_assembly_list" model="ir.ui.view">
+        <field name="name">club.assembly.list</field>
+        <field name="model">club.assembly</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="title"/>
+                <field name="assembly_type"/>
+                <field name="date"/>
+                <field name="location"/>
+                <field name="member_count"/>
+                <field name="status" widget="badge"
+                    decoration-success="status in ('in_session', 'closed')"
+                    decoration-info="status == 'scheduled'"
+                    decoration-warning="status == 'voting'"
+                    decoration-danger="status == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_club_assembly_form" model="ir.ui.view">
+        <field name="name">club.assembly.form</field>
+        <field name="model">club.assembly</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_schedule" type="object"
+                        string="Schedule" class="btn-primary"
+                        invisible="status != 'draft'"/>
+                    <button name="action_send_invitations" type="object"
+                        string="Send Invitations" class="btn-primary"
+                        invisible="status != 'scheduled'"/>
+                    <button name="action_open_session" type="object"
+                        string="Open Session" class="btn-primary"
+                        invisible="status != 'scheduled'"/>
+                    <button name="action_start_voting" type="object"
+                        string="Start Voting" class="btn-primary"
+                        invisible="status != 'in_session'"/>
+                    <button name="action_close" type="object"
+                        string="Close" class="btn-primary"
+                        invisible="status not in ('in_session', 'voting')"/>
+                    <button name="action_cancel" type="object"
+                        string="Cancel" class="btn-secondary"
+                        invisible="status in ('closed', 'cancelled')"/>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="draft,scheduled,in_session,voting,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title"/>
+                        <h1><field name="title" placeholder="Assembly Title"/></h1>
+                        <h4 class="text-muted">
+                            <field name="name" readonly="1"/>
+                        </h4>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="assembly_type"/>
+                            <field name="date"/>
+                            <field name="location"/>
+                        </group>
+                        <group>
+                            <field name="president_id"/>
+                            <field name="secretary_id"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Members">
+                        <group>
+                            <field name="member_count"/>
+                            <field name="quorum_required"/>
+                            <field name="quorum_met"/>
+                        </group>
+                        <group>
+                            <button name="action_add_all_active_affiliates" type="object"
+                                string="Add All Active Affiliates" class="btn-secondary"
+                                invisible="status in ('closed', 'cancelled')"/>
+                        </group>
+                        <field name="member_ids" nolabel="1" colspan="2"
+                            widget="many2many_tags"/>
+                    </group>
+                    <notebook>
+                        <page string="Topics / Agenda" name="topics">
+                            <field name="topic_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="topic_type"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status in ('approved',)"
+                                        decoration-danger="status in ('rejected',)"
+                                        decoration-warning="status in ('voting_open', 'in_discussion')"
+                                        decoration-info="status == 'pending'"/>
+                                    <field name="votes_for"/>
+                                    <field name="votes_against"/>
+                                    <field name="votes_abstain"/>
+                                    <field name="vote_result"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Attendance" name="attendance">
+                            <field name="attendance_ids">
+                                <list editable="bottom">
+                                    <field name="affiliate_id"/>
+                                    <field name="status" widget="badge"
+                                        decoration-success="status == 'present'"
+                                        decoration-warning="status == 'excused'"
+                                        decoration-danger="status == 'absent'"
+                                        decoration-info="status in ('invited', 'proxy')"/>
+                                    <field name="proxy_for_id"/>
+                                    <field name="check_in_time"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Transcript" name="transcript">
+                            <field name="transcript" nolabel="1"/>
+                        </page>
+                        <page string="Summary" name="summary">
+                            <field name="summary" nolabel="1"/>
+                        </page>
+                        <page string="Attachments" name="attachments">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_club_assembly_search" model="ir.ui.view">
+        <field name="name">club.assembly.search</field>
+        <field name="model">club.assembly</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="title"/>
+                <field name="name"/>
+                <filter name="filter_draft" string="Draft"
+                    domain="[('status', '=', 'draft')]"/>
+                <filter name="filter_scheduled" string="Scheduled"
+                    domain="[('status', '=', 'scheduled')]"/>
+                <filter name="filter_in_session" string="In Session"
+                    domain="[('status', '=', 'in_session')]"/>
+                <filter name="filter_closed" string="Closed"
+                    domain="[('status', '=', 'closed')]"/>
+                <separator/>
+                <filter name="filter_ordinary" string="Ordinary"
+                    domain="[('assembly_type', '=', 'ordinary')]"/>
+                <filter name="filter_extraordinary" string="Extraordinary"
+                    domain="[('assembly_type', '=', 'extraordinary')]"/>
+                <separator/>
+                <filter name="filter_this_month" string="This Month"
+                    domain="[
+                        ('date', '&gt;=', (context_today()).strftime('%Y-%m-01')),
+                        ('date', '&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01')),
+                    ]"/>
+                <filter name="filter_this_year" string="This Year"
+                    domain="[
+                        ('date', '&gt;=', (context_today()).strftime('%Y-01-01')),
+                        ('date', '&lt;', (context_today() + relativedelta(years=1)).strftime('%Y-01-01')),
+                    ]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_type" string="Type"
+                        context="{'group_by': 'assembly_type'}"/>
+                    <filter name="group_date" string="Date"
+                        context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_club_assembly" model="ir.actions.act_window">
+        <field name="name">Assemblies</field>
+        <field name="res_model">club.assembly</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_club_assembly_search"/>
+        <field name="path">club-assemblies</field>
+    </record>
+
+    <record id="action_club_assembly_scheduled" model="ir.actions.act_window">
+        <field name="name">Scheduled Assemblies</field>
+        <field name="res_model">club.assembly</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_club_assembly_search"/>
+        <field name="domain">[('status', '=', 'scheduled')]</field>
+        <field name="path">club-assemblies-scheduled</field>
+    </record>
+
+</odoo>

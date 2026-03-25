@@ -1,0 +1,591 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * club_assembly
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_assembly
+#: model:ir.model,name:club_assembly.model_club_assembly
+msgid "Club Assembly"
+msgstr "Asamblea del Club"
+
+#. module: club_assembly
+#: model:ir.model,name:club_assembly.model_club_assembly_attendance
+msgid "Assembly Attendance"
+msgstr "Asistencia a Asamblea"
+
+#. module: club_assembly
+#: model:ir.model,name:club_assembly.model_club_assembly_topic
+msgid "Assembly Topic"
+msgstr "Tema de Asamblea"
+
+#. module: club_assembly
+#: model:ir.model,name:club_assembly.model_club_assembly_vote
+msgid "Assembly Vote"
+msgstr "Voto de Asamblea"
+
+#. module: club_assembly
+#: model:ir.actions.act_window,name:club_assembly.action_club_assembly
+msgid "Assemblies"
+msgstr "Asambleas"
+
+#. module: club_assembly
+#: model:ir.actions.act_window,name:club_assembly.action_club_assembly_scheduled
+msgid "Scheduled Assemblies"
+msgstr "Asambleas Programadas"
+
+#. module: club_assembly
+#: model:ir.actions.act_window,name:club_assembly.action_club_assembly_topic
+msgid "Topics"
+msgstr "Temas"
+
+#. module: club_assembly
+#: model:ir.actions.act_window,name:club_assembly.action_club_assembly_vote
+msgid "Votes"
+msgstr "Votos"
+
+#. module: club_assembly
+#: model:ir.actions.act_window,name:club_assembly.action_club_assembly_attendance
+msgid "Attendance"
+msgstr "Asistencia"
+
+#. module: club_assembly
+#: model_terms:ir.ui.menu,name:club_assembly.menu_club_assembly
+msgid "Assembly"
+msgstr "Asamblea"
+
+#. module: club_assembly
+#: model_terms:ir.ui.menu,name:club_assembly.menu_club_assembly_all
+msgid "All Assemblies"
+msgstr "Todas las Asambleas"
+
+#. module: club_assembly
+#: model_terms:ir.ui.menu,name:club_assembly.menu_club_assembly_scheduled
+msgid "Scheduled"
+msgstr "Programadas"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__name
+msgid "Number"
+msgstr "Numero"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__title
+msgid "Title"
+msgstr "Titulo"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__assembly_type
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__topic_type
+msgid "Type"
+msgstr "Tipo"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly__assembly_type__ordinary
+msgid "Ordinaria"
+msgstr "Ordinaria"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly__assembly_type__extraordinary
+msgid "Extraordinaria"
+msgstr "Extraordinaria"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__description
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__description
+msgid "Description"
+msgstr "Descripcion"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__location
+msgid "Location"
+msgstr "Ubicacion"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__status
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_attendance__status
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly__status__draft
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly__status__scheduled
+msgid "Scheduled"
+msgstr "Programada"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly__status__in_session
+msgid "In Session"
+msgstr "En Sesion"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly__status__voting
+msgid "Voting"
+msgstr "Votacion"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly__status__closed
+msgid "Closed"
+msgstr "Cerrada"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly__status__cancelled
+msgid "Cancelled"
+msgstr "Cancelada"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__president_id
+msgid "President"
+msgstr "Presidente"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__secretary_id
+msgid "Secretary"
+msgstr "Secretario"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__member_ids
+msgid "Assembly Members"
+msgstr "Miembros de la Asamblea"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__topic_ids
+msgid "Topics"
+msgstr "Temas"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__attendance_ids
+msgid "Attendance"
+msgstr "Asistencia"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__member_count
+msgid "Member Count"
+msgstr "Cantidad de Miembros"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__quorum_required
+msgid "Quorum Required"
+msgstr "Quorum Requerido"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__quorum_met
+msgid "Quorum Met"
+msgstr "Quorum Alcanzado"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__transcript
+msgid "Transcript"
+msgstr "Acta"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__summary
+msgid "Summary"
+msgstr "Resumen"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly__attachment_ids
+msgid "Attachments"
+msgstr "Adjuntos"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_attendance__assembly_id
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__assembly_id
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_vote__assembly_id
+msgid "Assembly"
+msgstr "Asamblea"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_attendance__affiliate_id
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_vote__affiliate_id
+msgid "Affiliate"
+msgstr "Afiliado"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_vote__affiliate_id
+msgid "Voter"
+msgstr "Votante"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_attendance__status__invited
+msgid "Invited"
+msgstr "Invitado"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_attendance__status__present
+msgid "Present"
+msgstr "Presente"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_attendance__status__absent
+msgid "Absent"
+msgstr "Ausente"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_attendance__status__excused
+msgid "Excused"
+msgstr "Excusado"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_attendance__status__proxy
+msgid "Proxy"
+msgstr "Apoderado"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_attendance__proxy_for_id
+msgid "Proxy For"
+msgstr "Apoderado de"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_attendance__check_in_time
+msgid "Check-in Time"
+msgstr "Hora de Registro"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_attendance__notes
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__notes
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_vote__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__sequence
+msgid "Sequence"
+msgstr "Secuencia"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__name
+msgid "Topic"
+msgstr "Tema"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__topic_type__informative
+msgid "Informative"
+msgstr "Informativo"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__topic_type__discussion
+msgid "Discussion"
+msgstr "Discusion"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__topic_type__voting
+msgid "Voting"
+msgstr "Votacion"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__status__pending
+msgid "Pending"
+msgstr "Pendiente"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__status__in_discussion
+msgid "In Discussion"
+msgstr "En Discusion"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__status__voting_open
+msgid "Voting Open"
+msgstr "Votacion Abierta"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__status__voting_closed
+msgid "Voting Closed"
+msgstr "Votacion Cerrada"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__status__approved
+msgid "Approved"
+msgstr "Aprobado"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__status__rejected
+msgid "Rejected"
+msgstr "Rechazado"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_topic__status__tabled
+msgid "Tabled"
+msgstr "Aplazado"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__vote_ids
+msgid "Votes"
+msgstr "Votos"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__votes_for
+msgid "Votes For"
+msgstr "Votos a Favor"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__votes_against
+msgid "Votes Against"
+msgstr "Votos en Contra"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__votes_abstain
+msgid "Votes Abstain"
+msgstr "Abstenciones"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__vote_result
+msgid "Vote Result"
+msgstr "Resultado de Votacion"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_topic__resolution
+msgid "Resolution"
+msgstr "Resolucion"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_vote__topic_id
+msgid "Topic"
+msgstr "Tema"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_vote__vote
+msgid "Vote"
+msgstr "Voto"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_vote__vote__for
+msgid "For"
+msgstr "A Favor"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_vote__vote__against
+msgid "Against"
+msgstr "En Contra"
+
+#. module: club_assembly
+#: model:ir.model.fields.selection,name:club_assembly.selection__club_assembly_vote__vote__abstain
+msgid "Abstain"
+msgstr "Abstencion"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_vote__voted_at
+msgid "Voted At"
+msgstr "Fecha de Voto"
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly.py:0
+#, python-format
+msgid "Only draft assemblies can be scheduled."
+msgstr "Solo las asambleas en borrador pueden ser programadas."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly.py:0
+#, python-format
+msgid "Invitations can only be sent for scheduled assemblies."
+msgstr "Las invitaciones solo pueden enviarse para asambleas programadas."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly.py:0
+#, python-format
+msgid "%d invitation(s) queued for sending."
+msgstr "%d invitacion(es) en cola para envio."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly.py:0
+#, python-format
+msgid "Only scheduled assemblies can be opened."
+msgstr "Solo las asambleas programadas pueden abrirse."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly.py:0
+#, python-format
+msgid "Quorum not met. Required: %(required)s, Present: %(present)s."
+msgstr "Quorum no alcanzado. Requerido: %(required)s, Presentes: %(present)s."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly.py:0
+#, python-format
+msgid "Only in-session assemblies can start voting."
+msgstr "Solo las asambleas en sesion pueden iniciar votacion."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly.py:0
+#, python-format
+msgid "Only in-session or voting assemblies can be closed."
+msgstr "Solo las asambleas en sesion o votacion pueden cerrarse."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly.py:0
+#, python-format
+msgid "Closed assemblies cannot be cancelled."
+msgstr "Las asambleas cerradas no pueden cancelarse."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly_topic.py:0
+#, python-format
+msgid "Only pending topics can be opened for discussion."
+msgstr "Solo los temas pendientes pueden abrirse para discusion."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly_topic.py:0
+#, python-format
+msgid "Only topics in discussion can be opened for voting."
+msgstr "Solo los temas en discusion pueden abrirse para votacion."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly_topic.py:0
+#, python-format
+msgid "Only topics with open voting can be closed."
+msgstr "Solo los temas con votacion abierta pueden cerrarse."
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly_topic.py:0
+#, python-format
+msgid "Aprobado (%s-%s-%s)"
+msgstr "Aprobado (%s-%s-%s)"
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly_topic.py:0
+#, python-format
+msgid "Rechazado (%s-%s-%s)"
+msgstr "Rechazado (%s-%s-%s)"
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly_topic.py:0
+#, python-format
+msgid "Pendiente"
+msgstr "Pendiente"
+
+#. module: club_assembly
+#: code:addons/club_assembly/models/club_assembly_vote.py:0
+#, python-format
+msgid "Voter \"%(voter)s\" is not a member of assembly \"%(assembly)s\"."
+msgstr "El votante \"%(voter)s\" no es miembro de la asamblea \"%(assembly)s\"."
+
+#. module: club_assembly
+#: model:ir.model.fields,help:club_assembly.field_club_assembly__quorum_required
+msgid "Minimum attendees for a valid session. 0 means no quorum check."
+msgstr "Minimo de asistentes para una sesion valida. 0 significa sin verificacion de quorum."
+
+#. module: club_assembly
+#: model:ir.model.fields,help:club_assembly.field_club_assembly_attendance__proxy_for_id
+msgid "If attending as proxy for another member."
+msgstr "Si asiste como apoderado de otro miembro."
+
+#. module: club_assembly
+#: model:res.groups,name:club_assembly.group_assembly_staff
+msgid "Assembly Staff"
+msgstr "Personal de Asamblea"
+
+#. module: club_assembly
+#: model:res.groups,name:club_assembly.group_assembly_president
+msgid "Assembly President"
+msgstr "Presidente de Asamblea"
+
+#. module: club_assembly
+#: model:mail.template,name:club_assembly.mail_template_assembly_invitation
+msgid "Assembly Invitation"
+msgstr "Invitacion a Asamblea"
+
+#. module: club_assembly
+#: model:ir.sequence,name:club_assembly.seq_club_assembly
+msgid "Club Assembly Number"
+msgstr "Numero de Asamblea del Club"
+
+#. module: club_assembly
+#: model:ir.model.fields,field_description:club_assembly.field_club_assembly_attendance__affiliate_id
+msgid "Affiliate"
+msgstr "Afiliado"
+
+#. module: club_assembly
+#: sql_constraint:club.assembly.attendance:0
+msgid "Each affiliate can only have one attendance record per assembly."
+msgstr "Cada afiliado solo puede tener un registro de asistencia por asamblea."
+
+#. module: club_assembly
+#: sql_constraint:club.assembly.vote:0
+msgid "Each affiliate can only vote once per topic."
+msgstr "Cada afiliado solo puede votar una vez por tema."
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Schedule"
+msgstr "Programar"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Send Invitations"
+msgstr "Enviar Invitaciones"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Open Session"
+msgstr "Abrir Sesion"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Start Voting"
+msgstr "Iniciar Votacion"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Close"
+msgstr "Cerrar"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Add All Active Affiliates"
+msgstr "Agregar Todos los Afiliados Activos"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Topics / Agenda"
+msgstr "Temas / Agenda"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_form
+msgid "Members"
+msgstr "Miembros"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_topic_form
+msgid "Open Discussion"
+msgstr "Abrir Discusion"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_topic_form
+msgid "Open Voting"
+msgstr "Abrir Votacion"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_topic_form
+msgid "Close Voting"
+msgstr "Cerrar Votacion"
+
+#. module: club_assembly
+#: model:ir.ui.view,arch_db:club_assembly.view_club_assembly_topic_form
+msgid "Table"
+msgstr "Aplazar"

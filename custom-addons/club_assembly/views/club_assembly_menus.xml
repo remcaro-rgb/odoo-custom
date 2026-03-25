@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Assembly parent menu under Club root -->
+    <menuitem id="menu_club_assembly"
+        name="Assembly"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <menuitem id="menu_club_assembly_all"
+        name="All Assemblies"
+        parent="menu_club_assembly"
+        action="action_club_assembly"
+        sequence="10"/>
+
+    <menuitem id="menu_club_assembly_scheduled"
+        name="Scheduled"
+        parent="menu_club_assembly"
+        action="action_club_assembly_scheduled"
+        sequence="20"/>
+
+</odoo>

@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_club_assembly_president,club.assembly president,model_club_assembly,club_assembly.group_assembly_president,1,1,1,1
+access_club_assembly_staff,club.assembly staff,model_club_assembly,club_assembly.group_assembly_staff,1,1,1,1
+access_club_assembly_admin,club.assembly admin,model_club_assembly,club_core.group_club_admin,1,1,1,1
+access_club_assembly_member,club.assembly member,model_club_assembly,club_core.group_club_member,1,0,0,0
+access_club_assembly_topic_president,club.assembly.topic president,model_club_assembly_topic,club_assembly.group_assembly_president,1,1,1,1
+access_club_assembly_topic_staff,club.assembly.topic staff,model_club_assembly_topic,club_assembly.group_assembly_staff,1,1,1,1
+access_club_assembly_topic_admin,club.assembly.topic admin,model_club_assembly_topic,club_core.group_club_admin,1,1,1,1
+access_club_assembly_topic_member,club.assembly.topic member,model_club_assembly_topic,club_core.group_club_member,1,0,0,0
+access_club_assembly_vote_president,club.assembly.vote president,model_club_assembly_vote,club_assembly.group_assembly_president,1,1,1,1
+access_club_assembly_vote_staff,club.assembly.vote staff,model_club_assembly_vote,club_assembly.group_assembly_staff,1,1,1,1
+access_club_assembly_vote_admin,club.assembly.vote admin,model_club_assembly_vote,club_core.group_club_admin,1,1,1,1
+access_club_assembly_vote_member,club.assembly.vote member,model_club_assembly_vote,club_core.group_club_member,1,0,1,0
+access_club_assembly_attendance_president,club.assembly.attendance president,model_club_assembly_attendance,club_assembly.group_assembly_president,1,1,1,1
+access_club_assembly_attendance_staff,club.assembly.attendance staff,model_club_assembly_attendance,club_assembly.group_assembly_staff,1,1,1,1
+access_club_assembly_attendance_admin,club.assembly.attendance admin,model_club_assembly_attendance,club_core.group_club_admin,1,1,1,1
+access_club_assembly_attendance_member,club.assembly.attendance member,model_club_assembly_attendance,club_core.group_club_member,1,0,0,0

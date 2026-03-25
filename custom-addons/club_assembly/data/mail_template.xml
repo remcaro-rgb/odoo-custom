@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="mail_template_assembly_invitation" model="mail.template">
+            <field name="name">Assembly Invitation</field>
+            <field name="model_id" ref="model_club_assembly"/>
+            <field name="email_from">{{ (object.president_id.email or user.email or '') }}</field>
+            <field name="subject">Invitation: {{ object.title }} — {{ object.date }}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px;">
+    <p>Dear Member,</p>
+
+    <p>You are cordially invited to attend the following assembly:</p>
+
+    <table style="border-collapse: collapse; margin: 16px 0; width: 100%;">
+        <tr>
+            <td style="padding: 8px 16px 8px 0; font-weight: bold; vertical-align: top;">Assembly:</td>
+            <td style="padding: 8px 0;"><t t-out="object.title"/></td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 16px 8px 0; font-weight: bold; vertical-align: top;">Number:</td>
+            <td style="padding: 8px 0;"><t t-out="object.name"/></td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 16px 8px 0; font-weight: bold; vertical-align: top;">Type:</td>
+            <td style="padding: 8px 0;">
+                <t t-if="object.assembly_type == 'ordinary'">Ordinaria</t>
+                <t t-if="object.assembly_type == 'extraordinary'">Extraordinaria</t>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 16px 8px 0; font-weight: bold; vertical-align: top;">Date:</td>
+            <td style="padding: 8px 0;"><t t-out="object.date"/></td>
+        </tr>
+        <tr t-if="object.location">
+            <td style="padding: 8px 16px 8px 0; font-weight: bold; vertical-align: top;">Location:</td>
+            <td style="padding: 8px 0;"><t t-out="object.location"/></td>
+        </tr>
+    </table>
+
+    <t t-if="object.description">
+        <p><b>Description:</b></p>
+        <div style="margin: 8px 0; padding: 12px; background: #f8f9fa; border-radius: 4px;">
+            <t t-out="object.description"/>
+        </div>
+    </t>
+
+    <t t-if="object.topic_ids">
+        <p><b>Agenda:</b></p>
+        <ol style="margin: 8px 0;">
+            <t t-foreach="object.topic_ids" t-as="topic">
+                <li style="padding: 4px 0;">
+                    <t t-out="topic.name"/>
+                    <span style="color: #888; font-size: 12px;">
+                        (<t t-out="topic.topic_type"/>)
+                    </span>
+                </li>
+            </t>
+        </ol>
+    </t>
+
+    <p>Your attendance is important. Please confirm your participation.</p>
+
+    <p style="margin-top: 24px;">
+        <i>Club Management</i>
+    </p>
+</div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+    </data>
+</odoo>
