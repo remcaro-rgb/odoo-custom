@@ -1,0 +1,272 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* club_affiliate_billing
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_affiliate_billing
+#: model:ir.model,name:club_affiliate_billing.model_club_affiliate_billing_run
+msgid "Affiliate Billing Run"
+msgstr "Corrida de Facturacion de Socios"
+
+#. module: club_affiliate_billing
+#: model:ir.model,name:club_affiliate_billing.model_club_affiliate_billing_invoice
+msgid "Affiliate Billing Invoice"
+msgstr "Factura de Facturacion de Socios"
+
+#. module: club_affiliate_billing
+#: model:ir.model,name:club_affiliate_billing.model_club_affiliate_billing_line
+msgid "Affiliate Billing Line"
+msgstr "Linea de Facturacion de Socios"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_run__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_run__period_start
+msgid "Period Start"
+msgstr "Inicio del Periodo"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_run__period_end
+msgid "Period End"
+msgstr "Fin del Periodo"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_run__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_run__run_date
+msgid "Run Date"
+msgstr "Fecha de Ejecucion"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_run__invoice_count
+msgid "Invoice Count"
+msgstr "Cantidad de Facturas"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_run__total_amount
+msgid "Total Amount"
+msgstr "Monto Total"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_run__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_invoice__billing_run_id
+msgid "Billing Run"
+msgstr "Corrida de Facturacion"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_invoice__affiliate_id
+msgid "Affiliate"
+msgstr "Socio"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_invoice__partner_id
+msgid "Partner"
+msgstr "Contacto"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_invoice__order_count
+msgid "Order Count"
+msgstr "Cantidad de Ordenes"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_invoice__invoice_id
+msgid "Invoice"
+msgstr "Factura"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_invoice__invoice_status
+msgid "Invoice Status"
+msgstr "Estado de Factura"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_invoice__error_message
+msgid "Error Message"
+msgstr "Mensaje de Error"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_line__billing_invoice_id
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_pos_order__cargo_socio_billing_invoice_id
+msgid "Billing Invoice"
+msgstr "Factura de Facturacion"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_line__pos_order_id
+msgid "POS Order"
+msgstr "Orden POS"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_line__order_date
+msgid "Order Date"
+msgstr "Fecha de Orden"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_line__order_ref
+msgid "Order Reference"
+msgstr "Referencia de Orden"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_line__amount
+msgid "Amount"
+msgstr "Monto"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_club_affiliate_billing_line__description
+msgid "Description"
+msgstr "Descripcion"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,field_description:club_affiliate_billing.field_pos_order__cargo_socio_billed
+msgid "Cargo a Socio Billed"
+msgstr "Cargo a Socio Facturado"
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,help:club_affiliate_billing.field_pos_order__cargo_socio_billed
+msgid "True if this order has been included in a monthly billing run."
+msgstr "Verdadero si esta orden ha sido incluida en una corrida de facturacion mensual."
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,help:club_affiliate_billing.field_club_affiliate_billing_run__period_start
+msgid "First day of the billing period."
+msgstr "Primer dia del periodo de facturacion."
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,help:club_affiliate_billing.field_club_affiliate_billing_run__period_end
+msgid "Last day of the billing period."
+msgstr "Ultimo dia del periodo de facturacion."
+
+#. module: club_affiliate_billing
+#: model:ir.model.fields,help:club_affiliate_billing.field_club_affiliate_billing_run__run_date
+msgid "Date when the billing run was executed."
+msgstr "Fecha en que se ejecuto la corrida de facturacion."
+
+#. module: club_affiliate_billing
+#: model:ir.actions.act_window,name:club_affiliate_billing.action_club_affiliate_billing_run
+#: model:ir.ui.menu,name:club_affiliate_billing.menu_club_billing_runs
+msgid "Billing Runs"
+msgstr "Corridas de Facturacion"
+
+#. module: club_affiliate_billing
+#: model:ir.actions.act_window,name:club_affiliate_billing.action_club_affiliate_billing_pending
+#: model:ir.ui.menu,name:club_affiliate_billing.menu_club_billing_pending
+msgid "Pending Invoices"
+msgstr "Facturas Pendientes"
+
+#. module: club_affiliate_billing
+#: model:ir.ui.menu,name:club_affiliate_billing.menu_club_billing
+msgid "Billing"
+msgstr "Facturacion"
+
+#. module: club_affiliate_billing
+#: model:res.groups,name:club_affiliate_billing.group_billing_staff
+msgid "Club Billing Staff"
+msgstr "Personal de Facturacion del Club"
+
+#. module: club_affiliate_billing
+#: model:ir.cron,name:club_affiliate_billing.cron_monthly_affiliate_billing
+msgid "Club: Monthly Affiliate Billing (Cargo a Socio)"
+msgstr "Club: Facturacion Mensual de Socios (Cargo a Socio)"
+
+#. module: club_affiliate_billing
+#: model:ir.sequence,name:club_affiliate_billing.seq_club_affiliate_billing_run
+msgid "Club Affiliate Billing Run"
+msgstr "Corrida de Facturacion de Socios del Club"
+
+#. module: club_affiliate_billing
+#. odoo-python
+#: code:addons/club_affiliate_billing/models/club_affiliate_billing_run.py:0
+msgid "Only draft billing runs can be generated."
+msgstr "Solo las corridas de facturacion en borrador pueden ser generadas."
+
+#. module: club_affiliate_billing
+#. odoo-python
+#: code:addons/club_affiliate_billing/models/club_affiliate_billing_run.py:0
+msgid "Only draft or processing billing runs can be cancelled."
+msgstr "Solo las corridas de facturacion en borrador o en proceso pueden ser canceladas."
+
+#. module: club_affiliate_billing
+#. odoo-python
+#: code:addons/club_affiliate_billing/models/club_affiliate_billing_run.py:0
+msgid "Only cancelled billing runs can be reset to draft."
+msgstr "Solo las corridas de facturacion canceladas pueden ser restablecidas a borrador."
+
+#. module: club_affiliate_billing
+#. odoo-python
+#: code:addons/club_affiliate_billing/models/club_affiliate_billing_run.py:0
+msgid "POS %s — %s"
+msgstr "POS %s — %s"
+
+#. module: club_affiliate_billing
+#. odoo-python
+#: code:addons/club_affiliate_billing/models/club_affiliate_billing_run.py:0
+msgid "Cargo a Socio"
+msgstr "Cargo a Socio"
+
+#. module: club_affiliate_billing
+#. odoo-python
+#: code:addons/club_affiliate_billing/models/club_affiliate_billing_run.py:0
+msgid "Invoices"
+msgstr "Facturas"
+
+#. module: club_affiliate_billing
+#. odoo-python
+#: code:addons/club_affiliate_billing/models/club_affiliate_billing_run.py:0
+msgid "Auto-generated monthly billing run."
+msgstr "Corrida de facturacion mensual generada automaticamente."
+
+#. module: club_affiliate_billing
+#: selection:club.affiliate.billing.run,status:0
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: club_affiliate_billing
+#: selection:club.affiliate.billing.run,status:0
+msgid "Processing"
+msgstr "Procesando"
+
+#. module: club_affiliate_billing
+#: selection:club.affiliate.billing.run,status:0
+msgid "Completed"
+msgstr "Completado"
+
+#. module: club_affiliate_billing
+#: selection:club.affiliate.billing.run,status:0
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: club_affiliate_billing
+#: selection:club.affiliate.billing.invoice,invoice_status:0
+msgid "Pending"
+msgstr "Pendiente"
+
+#. module: club_affiliate_billing
+#: selection:club.affiliate.billing.invoice,invoice_status:0
+msgid "Invoiced"
+msgstr "Facturado"
+
+#. module: club_affiliate_billing
+#: selection:club.affiliate.billing.invoice,invoice_status:0
+msgid "Error"
+msgstr "Error"

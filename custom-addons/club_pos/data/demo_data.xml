@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Demo journal for Cargo a Socio -->
+        <record id="journal_cargo_socio_demo" model="account.journal">
+            <field name="name">Cargo a Socio</field>
+            <field name="code">CSOC</field>
+            <field name="type">bank</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Demo payment method: Cargo a Socio -->
+        <record id="payment_method_cargo_socio_demo" model="pos.payment.method">
+            <field name="name">Cargo a Socio</field>
+            <field name="is_cargo_socio" eval="True"/>
+            <field name="split_transactions" eval="True"/>
+            <field name="journal_id" ref="journal_cargo_socio_demo"/>
+        </record>
+
+    </data>
+</odoo>

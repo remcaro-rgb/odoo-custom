@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pos_pos_form_inherit_club" model="ir.ui.view">
+        <field name="name">pos.order.form.inherit.club</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='extra']" position="after">
+                <page name="cargo_socio" string="Cargo a Socio"
+                      invisible="not has_cargo_socio">
+                    <field name="has_cargo_socio" invisible="1"/>
+                    <group string="Affiliate Signature &amp; Receipt">
+                        <group>
+                            <field name="cargo_socio_signature" widget="signature"/>
+                        </group>
+                        <group>
+                            <field name="cargo_socio_receipt_scan"
+                                   filename="cargo_socio_receipt_filename"
+                                   widget="binary"/>
+                            <field name="cargo_socio_receipt_filename" invisible="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

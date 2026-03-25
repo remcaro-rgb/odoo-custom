@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Billing sub-menu under Club root -->
+    <menuitem id="menu_club_billing"
+        name="Billing"
+        parent="club_core.menu_club_root"
+        sequence="30"/>
+
+    <menuitem id="menu_club_billing_runs"
+        name="Billing Runs"
+        parent="menu_club_billing"
+        action="action_club_affiliate_billing_run"
+        sequence="10"/>
+
+    <menuitem id="menu_club_billing_pending"
+        name="Pending Invoices"
+        parent="menu_club_billing"
+        action="action_club_affiliate_billing_pending"
+        sequence="20"/>
+
+</odoo>

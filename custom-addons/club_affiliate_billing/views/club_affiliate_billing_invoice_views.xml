@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Billing Invoice: List View ─────────────────────────────── -->
+
+    <record id="view_club_affiliate_billing_invoice_list" model="ir.ui.view">
+        <field name="name">club.affiliate.billing.invoice.list</field>
+        <field name="model">club.affiliate.billing.invoice</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="billing_run_id"/>
+                <field name="affiliate_id"/>
+                <field name="partner_id"/>
+                <field name="order_count"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="invoice_status" widget="badge"
+                       decoration-info="invoice_status == 'pending'"
+                       decoration-success="invoice_status == 'invoiced'"
+                       decoration-danger="invoice_status == 'error'"/>
+                <field name="invoice_id"/>
+                <field name="error_message" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Billing Invoice: Form View ─────────────────────────────── -->
+
+    <record id="view_club_affiliate_billing_invoice_form" model="ir.ui.view">
+        <field name="name">club.affiliate.billing.invoice.form</field>
+        <field name="model">club.affiliate.billing.invoice</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="billing_run_id"/>
+                            <field name="affiliate_id"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="order_count"/>
+                            <field name="total_amount"/>
+                            <field name="invoice_status" widget="badge"
+                                   decoration-info="invoice_status == 'pending'"
+                                   decoration-success="invoice_status == 'invoiced'"
+                                   decoration-danger="invoice_status == 'error'"/>
+                            <field name="invoice_id"/>
+                            <field name="error_message"
+                                   invisible="invoice_status != 'error'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Billing Lines" name="billing_lines">
+                            <field name="line_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="pos_order_id"/>
+                                    <field name="order_date"/>
+                                    <field name="order_ref"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="description"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="POS Orders" name="pos_orders">
+                            <field name="pos_order_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="pos_reference"/>
+                                    <field name="date_order"/>
+                                    <field name="amount_total"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Billing Invoice: Search View ───────────────────────────── -->
+
+    <record id="view_club_affiliate_billing_invoice_search" model="ir.ui.view">
+        <field name="name">club.affiliate.billing.invoice.search</field>
+        <field name="model">club.affiliate.billing.invoice</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="affiliate_id"/>
+                <field name="partner_id"/>
+                <field name="billing_run_id"/>
+                <filter name="filter_pending" string="Pending"
+                        domain="[('invoice_status', '=', 'pending')]"/>
+                <filter name="filter_invoiced" string="Invoiced"
+                        domain="[('invoice_status', '=', 'invoiced')]"/>
+                <filter name="filter_error" string="Error"
+                        domain="[('invoice_status', '=', 'error')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="groupby_status" string="Invoice Status"
+                            context="{'group_by': 'invoice_status'}"/>
+                    <filter name="groupby_affiliate" string="Affiliate"
+                            context="{'group_by': 'affiliate_id'}"/>
+                    <filter name="groupby_run" string="Billing Run"
+                            context="{'group_by': 'billing_run_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

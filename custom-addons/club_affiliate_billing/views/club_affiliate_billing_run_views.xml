@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Billing Run: List View ─────────────────────────────────── -->
+
+    <record id="view_club_affiliate_billing_run_list" model="ir.ui.view">
+        <field name="name">club.affiliate.billing.run.list</field>
+        <field name="model">club.affiliate.billing.run</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="run_date"/>
+                <field name="invoice_count"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="status" widget="badge"
+                       decoration-info="status == 'draft'"
+                       decoration-warning="status == 'processing'"
+                       decoration-success="status == 'completed'"
+                       decoration-danger="status == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Billing Run: Form View ─────────────────────────────────── -->
+
+    <record id="view_club_affiliate_billing_run_form" model="ir.ui.view">
+        <field name="name">club.affiliate.billing.run.form</field>
+        <field name="model">club.affiliate.billing.run</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate"
+                            string="Generate"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="status != 'draft'"/>
+                    <button name="action_create_invoices"
+                            string="Create Invoices"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="status != 'completed'"/>
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            invisible="status not in ('draft', 'processing')"/>
+                    <button name="action_draft"
+                            string="Reset to Draft"
+                            type="object"
+                            invisible="status != 'cancelled'"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,processing,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoices"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo"
+                                   string="Invoices"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                        <group>
+                            <field name="run_date"/>
+                            <field name="total_amount"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Invoice Details" name="invoice_details">
+                            <field name="invoice_ids" nolabel="1">
+                                <list>
+                                    <field name="affiliate_id"/>
+                                    <field name="partner_id"/>
+                                    <field name="order_count"/>
+                                    <field name="total_amount" sum="Total"/>
+                                    <field name="invoice_status" widget="badge"
+                                           decoration-info="invoice_status == 'pending'"
+                                           decoration-success="invoice_status == 'invoiced'"
+                                           decoration-danger="invoice_status == 'error'"/>
+                                    <field name="invoice_id"/>
+                                    <field name="error_message" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" nolabel="1"
+                                   placeholder="Add notes about this billing run..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Billing Run: Search View ───────────────────────────────── -->
+
+    <record id="view_club_affiliate_billing_run_search" model="ir.ui.view">
+        <field name="name">club.affiliate.billing.run.search</field>
+        <field name="model">club.affiliate.billing.run</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <filter name="filter_draft" string="Draft"
+                        domain="[('status', '=', 'draft')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('status', '=', 'completed')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('status', '=', 'cancelled')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="groupby_status" string="Status"
+                            context="{'group_by': 'status'}"/>
+                    <filter name="groupby_period" string="Period Start"
+                            context="{'group_by': 'period_start:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Billing Run: Action ────────────────────────────────────── -->
+
+    <record id="action_club_affiliate_billing_run" model="ir.actions.act_window">
+        <field name="name">Billing Runs</field>
+        <field name="res_model">club.affiliate.billing.run</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first billing run
+            </p>
+            <p>
+                Billing runs consolidate all POS "Cargo a Socio" charges
+                for a given period and generate invoices per affiliate.
+            </p>
+        </field>
+    </record>
+
+    <!-- ── Pending Invoices: Action (filtered) ────────────────────── -->
+
+    <record id="action_club_affiliate_billing_pending" model="ir.actions.act_window">
+        <field name="name">Pending Invoices</field>
+        <field name="res_model">club.affiliate.billing.invoice</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('invoice_status', '=', 'pending')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No pending billing invoices
+            </p>
+            <p>
+                Pending invoices will appear here after a billing run
+                has been generated but before actual invoices are created.
+            </p>
+        </field>
+    </record>
+
+</odoo>

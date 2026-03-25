@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_billing_run_staff,club.affiliate.billing.run staff,model_club_affiliate_billing_run,club_affiliate_billing.group_billing_staff,1,1,1,1
+access_billing_run_admin,club.affiliate.billing.run admin,model_club_affiliate_billing_run,club_core.group_club_admin,1,1,1,1
+access_billing_invoice_staff,club.affiliate.billing.invoice staff,model_club_affiliate_billing_invoice,club_affiliate_billing.group_billing_staff,1,1,1,1
+access_billing_invoice_admin,club.affiliate.billing.invoice admin,model_club_affiliate_billing_invoice,club_core.group_club_admin,1,1,1,1
+access_billing_invoice_member,club.affiliate.billing.invoice member,model_club_affiliate_billing_invoice,club_core.group_club_member,1,0,0,0
+access_billing_line_staff,club.affiliate.billing.line staff,model_club_affiliate_billing_line,club_affiliate_billing.group_billing_staff,1,1,1,1
+access_billing_line_admin,club.affiliate.billing.line admin,model_club_affiliate_billing_line,club_core.group_club_admin,1,1,1,1
+access_billing_line_member,club.affiliate.billing.line member,model_club_affiliate_billing_line,club_core.group_club_member,1,0,0,0

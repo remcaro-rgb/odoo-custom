@@ -1,0 +1,98 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * club_pos
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 00:00+0000\n"
+"PO-Revision-Date: 2025-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: club_pos
+#: model:ir.model.fields,field_description:club_pos.field_pos_payment_method__is_cargo_socio
+msgid "Cargo a Socio"
+msgstr "Cargo a Socio"
+
+#. module: club_pos
+#: model:ir.model.fields,help:club_pos.field_pos_payment_method__is_cargo_socio
+msgid "If enabled, this payment method charges the affiliate member account. Only usable when the customer is a club affiliate with active membership."
+msgstr "Si se activa, este metodo de pago genera un cargo a la cuenta del socio. Solo utilizable cuando el cliente es un socio del club con membresia activa."
+
+#. module: club_pos
+#: model:ir.model.fields,field_description:club_pos.field_pos_payment_method__cargo_socio_account_id
+msgid "Affiliate Payable Account"
+msgstr "Cuenta por Cobrar a Socios"
+
+#. module: club_pos
+#: model:ir.model.fields,help:club_pos.field_pos_payment_method__cargo_socio_account_id
+msgid "Account used for \"Cargo a Socio\" entries (e.g. Cuentas por Cobrar a Socios). Debit this account when charging to affiliate."
+msgstr "Cuenta utilizada para los asientos de \"Cargo a Socio\" (ej. Cuentas por Cobrar a Socios). Se debita esta cuenta al cargar al socio."
+
+#. module: club_pos
+#: model:ir.model.fields,field_description:club_pos.field_pos_payment__cargo_socio_signature
+#: model:ir.model.fields,field_description:club_pos.field_pos_order__cargo_socio_signature
+msgid "Client Signature"
+msgstr "Firma del Cliente"
+
+#. module: club_pos
+#: model:ir.model.fields,field_description:club_pos.field_pos_payment__cargo_socio_receipt_scan
+#: model:ir.model.fields,field_description:club_pos.field_pos_order__cargo_socio_receipt_scan
+msgid "Signed Receipt Scan"
+msgstr "Escaneo del Recibo Firmado"
+
+#. module: club_pos
+#: model:ir.model.fields,field_description:club_pos.field_pos_payment__cargo_socio_receipt_filename
+msgid "Receipt Filename"
+msgstr "Nombre del Archivo del Recibo"
+
+#. module: club_pos
+#: model:ir.model.fields,field_description:club_pos.field_pos_order__has_cargo_socio
+msgid "True if any payment uses Cargo a Socio method."
+msgstr "Verdadero si algun pago utiliza el metodo Cargo a Socio."
+
+#. module: club_pos
+#: model:ir.model.fields,field_description:club_pos.field_res_partner__is_club_affiliate
+msgid "True if this partner is linked to an active club affiliate."
+msgstr "Verdadero si este contacto esta vinculado a un socio activo del club."
+
+#. module: club_pos
+#: model_terms:ir.ui.view,arch_db:club_pos.view_pos_pos_form_inherit_club
+msgid "Affiliate Signature & Receipt"
+msgstr "Firma y Recibo del Socio"
+
+#. module: club_pos
+#: model_terms:ir.ui.view,arch_db:club_pos.view_pos_pos_form_inherit_club
+msgid "Cargo a Socio"
+msgstr "Cargo a Socio"
+
+#. module: club_pos
+#: code:addons/club_pos/models/pos_order.py:0
+#, python-format
+msgid "Cargo a Socio requires a customer. Please select an affiliate."
+msgstr "Cargo a Socio requiere un cliente. Por favor seleccione un socio."
+
+#. module: club_pos
+#: code:addons/club_pos/models/pos_order.py:0
+#, python-format
+msgid "Customer \"%s\" is not an active club affiliate. Cargo a Socio can only be used for active affiliates."
+msgstr "El cliente \"%s\" no es un socio activo del club. Cargo a Socio solo puede ser utilizado para socios activos."
+
+#. module: club_pos
+#: code:addons/club_pos/static/src/js/club_pos.js:0
+#, javascript-format
+msgid "Cargo a Socio requires an active club affiliate as customer."
+msgstr "Cargo a Socio requiere un socio activo del club como cliente."
+
+#. module: club_pos
+#: code:addons/club_pos/static/src/js/club_pos.js:0
+#, javascript-format
+msgid "The selected affiliate does not have an active membership."
+msgstr "El socio seleccionado no tiene una membresia activa."

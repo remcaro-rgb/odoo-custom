@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pos_payment_method_view_form_inherit_club" model="ir.ui.view">
+        <field name="name">pos.payment.method.form.inherit.club</field>
+        <field name="model">pos.payment.method</field>
+        <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='split_transactions']" position="before">
+                <field name="is_cargo_socio"/>
+                <field name="cargo_socio_account_id"
+                       invisible="not is_cargo_socio"
+                       required="is_cargo_socio"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

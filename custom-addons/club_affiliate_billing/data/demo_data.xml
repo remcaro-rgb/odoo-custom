@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Demo billing run: draft for the current month -->
+        <record id="demo_billing_run_current_month" model="club.affiliate.billing.run">
+            <field name="period_start" eval="DateTime.now().strftime('%Y-%m-01')"/>
+            <field name="period_end" eval="(DateTime.now().replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)"/>
+            <field name="status">draft</field>
+            <field name="notes">Demo billing run for testing purposes.</field>
+        </record>
+
+    </data>
+</odoo>
