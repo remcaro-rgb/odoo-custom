@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #   l10n_co_hr_payroll
-#   Copyright (C) 2024  Jorels SAS
+#   Copyright (C) 2026  Jorels SAS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published
@@ -24,7 +24,7 @@ from odoo import fields, models, api
 
 
 class HrContract(models.Model):
-    _inherit = 'hr.contract'
+    _inherit = "hr.version"
 
     type_worker_id = fields.Many2one(comodel_name="l10n_co_edi_jorels.type_workers", string="Type worker")
     subtype_worker_id = fields.Many2one(comodel_name="l10n_co_edi_jorels.subtype_workers", string="Subtype worker")

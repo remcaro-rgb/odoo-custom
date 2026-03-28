@@ -158,7 +158,7 @@
                         ]"/>
                 <separator/>
                 <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="State" name="groupby_state" context="{'group_by': 'state'}"/>
                     <filter string="Responsible" name="groupby_responsible" context="{'group_by': 'responsible_id'}"/>
                     <filter string="Period Type" name="groupby_period" context="{'group_by': 'period_type'}"/>

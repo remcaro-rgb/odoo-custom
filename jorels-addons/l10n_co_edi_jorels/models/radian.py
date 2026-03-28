@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Jorels S.A.S. - Copyright (2024)
+# Jorels S.A.S. - Copyright (2026)
 #
 # This file is part of l10n_co_edi_jorels.
 #
@@ -111,7 +111,7 @@ class Radian(models.Model):
         ('customer', 'Customer Event'),
         ('supplier', 'Supplier Event'),
     ], readonly=True, index=True, change_default=True,
-        default=lambda self: self._context.get('type', 'customer'), tracking=True)
+        default=lambda self: self.env.context.get('type', 'customer'), tracking=True)
 
     def dian_preview(self):
         for rec in self:

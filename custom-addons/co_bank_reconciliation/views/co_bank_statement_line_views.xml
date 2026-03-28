@@ -92,7 +92,7 @@
                 <filter name="filter_incoming" string="Incoming" domain="[('amount', '&gt;', 0)]"/>
                 <filter name="filter_outgoing" string="Outgoing" domain="[('amount', '&lt;', 0)]"/>
                 <separator/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="groupby_statement" string="Statement" context="{'group_by': 'statement_id'}"/>
                     <filter name="groupby_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
                     <filter name="groupby_date" string="Date" context="{'group_by': 'date:month'}"/>

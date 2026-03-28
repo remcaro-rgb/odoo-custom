@@ -13,7 +13,7 @@
                 <filter string="Preventive" name="preventive" domain="[('maintenance_type', '=', 'preventive')]"/>
                 <filter string="Corrective" name="corrective" domain="[('maintenance_type', '=', 'corrective')]"/>
                 <separator/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="Asset" name="group_asset" context="{'group_by': 'asset_id'}"/>
                     <filter string="Type" name="group_type" context="{'group_by': 'maintenance_type'}"/>
                     <filter string="Date" name="group_date" context="{'group_by': 'date:month'}"/>

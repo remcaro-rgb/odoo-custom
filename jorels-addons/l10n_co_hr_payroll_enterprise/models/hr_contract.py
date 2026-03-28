@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#   Jorels S.A.S. - Copyright (C) (2024)
+#   Jorels S.A.S. - Copyright (C) (2026)
 #
 #   This file is part of l10n_co_hr_payroll_enterprise.
 #
@@ -25,7 +25,7 @@ from odoo import fields, models, api
 
 
 class HrContract(models.Model):
-    _inherit = 'hr.contract'
+    _inherit = "hr.version"
 
     type_worker_id = fields.Many2one(comodel_name="l10n_co_edi_jorels.type_workers", string="Type worker")
     subtype_worker_id = fields.Many2one(comodel_name="l10n_co_edi_jorels.subtype_workers", string="Subtype worker")

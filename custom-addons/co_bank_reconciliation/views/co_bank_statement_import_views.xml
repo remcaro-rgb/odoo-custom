@@ -149,7 +149,7 @@
                 <filter name="filter_reconciled" string="Reconciled" domain="[('state', '=', 'reconciled')]"/>
                 <filter name="filter_done" string="Done" domain="[('state', '=', 'done')]"/>
                 <separator/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="groupby_journal" string="Journal" context="{'group_by': 'journal_id'}"/>
                     <filter name="groupby_format" string="Format" context="{'group_by': 'format_id'}"/>
                     <filter name="groupby_state" string="Status" context="{'group_by': 'state'}"/>

@@ -95,7 +95,7 @@
                 <separator/>
                 <filter name="filter_this_month" string="This Month"
                         domain="[('date', '>=', (context_today()).strftime('%%Y-%%m-01'))]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="groupby_waste_type" string="Waste Type"
                             context="{'group_by': 'waste_type'}"/>
                     <filter name="groupby_product" string="Product"

@@ -138,7 +138,7 @@
                 <filter name="filter_my" string="My Requests"
                         domain="[('user_id', '=', uid)]"/>
                 <separator/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_state" string="Status"
                             context="{'group_by': 'state'}"/>
                     <filter name="group_user" string="Requested By"

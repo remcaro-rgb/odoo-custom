@@ -30,6 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xfonts-base \
     nodejs \
     npm \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # wkhtmltopdf — patched-Qt build from wkhtmltopdf/packaging

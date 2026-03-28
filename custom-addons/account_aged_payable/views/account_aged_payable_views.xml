@@ -65,7 +65,7 @@
                 <filter name="filter_over_120"
                         string="Más de 120 días"
                         domain="[('aging_bucket', '=', 'over_120')]"/>
-                <group expand="0" string="Agrupar Por">
+                <group>
                     <filter name="group_by_partner" string="Proveedor"
                             context="{'group_by': 'partner_id'}"/>
                     <filter name="group_by_aging_bucket" string="Rango de Vencimiento"

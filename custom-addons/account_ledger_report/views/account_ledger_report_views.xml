@@ -52,7 +52,7 @@
                        filter_domain="[('date', '&lt;=', self)]"/>
                 <separator/>
                 <filter string="Date" name="filter_date" date="date"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="Account" name="group_by_account"
                             context="{'group_by': 'account_id'}"/>
                     <filter string="Partner" name="group_by_partner"

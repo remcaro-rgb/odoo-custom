@@ -61,7 +61,7 @@
                         domain="[('concept_type', '=', 'employer')]"/>
                 <filter name="provisions" string="Provisions"
                         domain="[('concept_type', '=', 'provision')]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_type" string="Type"
                             context="{'group_by': 'concept_type'}"/>
                 </group>

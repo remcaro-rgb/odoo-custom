@@ -145,7 +145,7 @@
                         domain="[('state', '=', 'validated')]"/>
                 <filter name="error" string="Con errores"
                         domain="[('state', '=', 'error')]"/>
-                <group expand="0" string="Agrupar por">
+                <group>
                     <filter name="group_year" string="Ano gravable"
                             context="{'group_by': 'fiscal_year'}"/>
                     <filter name="group_state" string="Estado"

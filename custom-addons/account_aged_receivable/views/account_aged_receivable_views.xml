@@ -58,7 +58,7 @@
                 <filter name="filter_90"
                         string="90+ días"
                         domain="[('days_overdue', '>', 90)]"/>
-                <group expand="0" string="Agrupar Por">
+                <group>
                     <filter name="group_by_partner" string="Contacto"
                             context="{'group_by': 'partner_id'}"/>
                     <filter name="group_by_aging_bucket" string="Rango de Vencimiento"

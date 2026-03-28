@@ -56,7 +56,7 @@
                 <field name="relationship"/>
                 <filter name="dependents" string="Tax Dependents"
                         domain="[('is_dependent_for_tax', '=', True)]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_employee" string="Employee"
                             context="{'group_by': 'employee_id'}"/>
                     <filter name="group_relationship" string="Relationship"

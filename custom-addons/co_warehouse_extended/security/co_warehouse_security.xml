@@ -8,13 +8,11 @@
 
     <record id="group_purchase_request_user" model="res.groups">
         <field name="name">Purchase Request User</field>
-        <field name="category_id" ref="module_category_co_warehouse"/>
         <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
     </record>
 
     <record id="group_purchase_request_manager" model="res.groups">
         <field name="name">Purchase Request Manager</field>
-        <field name="category_id" ref="module_category_co_warehouse"/>
         <field name="implied_ids" eval="[(4, ref('group_purchase_request_user'))]"/>
     </record>
 

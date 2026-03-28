@@ -49,7 +49,7 @@
                                  ('date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%%Y-%%m-%%d'))]"/>
                 <filter name="filter_this_month" string="This Month"
                         domain="[('date', '>=', (context_today()).strftime('%%Y-%%m-01'))]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="groupby_product" string="Product"
                             context="{'group_by': 'product_id'}"/>
                     <filter name="groupby_product_categ" string="Product Category"

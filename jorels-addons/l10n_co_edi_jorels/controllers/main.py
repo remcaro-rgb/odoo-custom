@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Jorels S.A.S. - Copyright (2024)
+# Jorels S.A.S. - Copyright (2026)
 #
 # This file is part of l10n_co_edi_jorels.
 #
@@ -30,9 +30,13 @@ _logger = logging.getLogger(__name__)
 
 
 class Webhooks(http.Controller):
-
-    @http.route('/l10n_co_edi_jorels/webhook/in_invoice/<company_id>', type='json', auth='public', methods=['POST'],
-                csrf=False)
+    @http.route(
+        "/l10n_co_edi_jorels/webhook/in_invoice/<company_id>",
+        type="jsonrpc",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+    )
     def webhook_in_invoice(self, company_id, **args):
         # journal_id = 2
         # partner_id = 1

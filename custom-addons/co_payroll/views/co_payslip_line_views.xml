@@ -27,7 +27,7 @@
                 <field name="code"/>
                 <field name="name"/>
                 <field name="line_type"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_employee" string="Employee"
                             context="{'group_by': 'employee_id'}"/>
                     <filter name="group_type" string="Type"

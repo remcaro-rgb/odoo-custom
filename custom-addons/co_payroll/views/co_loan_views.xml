@@ -92,7 +92,7 @@
                         domain="[('state', 'in', ['approved', 'paying'])]"/>
                 <filter name="paid_loans" string="Paid"
                         domain="[('state', '=', 'paid')]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_employee" string="Employee"
                             context="{'group_by': 'employee_id'}"/>
                     <filter name="group_state" string="Status"

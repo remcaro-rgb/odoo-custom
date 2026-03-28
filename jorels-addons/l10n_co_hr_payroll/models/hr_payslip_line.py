@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #   l10n_co_hr_payroll
-#   Copyright (C) 2024  Jorels SAS
+#   Copyright (C) 2026  Jorels SAS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published
@@ -21,13 +21,12 @@
 
 
 from odoo import fields, models, api
-from odoo.addons import decimal_precision as dp
 
 
 class HrPayslipLine(models.Model):
     _inherit = 'hr.payslip.line'
 
-    edi_rate = fields.Float(string='Edi Rate (%)', digits=dp.get_precision('Payroll Rate'),
+    edi_rate = fields.Float(string='Edi Rate (%)', digits='Payroll Rate',
                             default=100.0, compute="compute_edi_rate", store=True, required=True)
 
     edi_quantity = fields.Float(string='Edi Quantity', default=0, compute="compute_edi_quantity", required=True,

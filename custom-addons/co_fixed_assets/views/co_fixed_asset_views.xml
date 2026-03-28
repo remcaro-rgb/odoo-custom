@@ -20,7 +20,7 @@
                 <separator/>
                 <filter string="Active" name="active" domain="[('state', 'in', ['draft', 'running'])]"/>
                 <separator/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="Category" name="group_category" context="{'group_by': 'category_id'}"/>
                     <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="Responsible" name="group_responsible" context="{'group_by': 'responsible_id'}"/>

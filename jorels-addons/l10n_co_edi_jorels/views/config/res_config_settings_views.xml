@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--Jorels S.A.S. - Copyright (2024)-->
+<!--Jorels S.A.S. - Copyright (2026)-->
 
 <!--This file is part of l10n_co_edi_jorels.-->
 
@@ -221,7 +221,7 @@
             <field name="res_model">res.config.settings</field>
             <field name="view_id" ref="res_config_settings_view_form"/>
             <field name="view_mode">form</field>
-            <field name="target">inline</field>
+            <field name="target">current</field>
             <field name="context">{'module': 'l10n_co_edi_jorels'}</field>
         </record>
 

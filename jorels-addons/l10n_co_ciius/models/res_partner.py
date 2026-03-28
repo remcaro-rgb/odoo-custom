@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Jorels S.A.S. - Copyright (2024)
+# Jorels S.A.S. - Copyright (2026)
 #
 # This file is part of l10n_co_ciius.
 #
@@ -23,8 +23,8 @@
 from odoo import fields, models
 
 
-class Partner(models.Model):
-    _inherit = ['res.partner']
+class ResPartner(models.Model):
+    _inherit = "res.partner"
 
     # Fiscal information
     ciiu_ids = fields.Many2many(comodel_name='l10n_co_ciius.ciiu', string="CIIU's")

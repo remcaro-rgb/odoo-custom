@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     l10n_co_hr_payroll
-    Copyright (C) 2024  Jorels SAS
+    Copyright (C) 2026  Jorels SAS
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -165,11 +165,11 @@
                         domain="['&amp;',('edi_is_valid','=',False),'|',('state','=','draft'),('state','=','posted')]"
                 />
                 <separator/>
-                <filter domain="[('user_id','=',uid)]" name="myevents" help="My Events"/>
-                <group expand="0" string="Invoice">
+                <filter domain="[('user_id','=',uid)]" name="myevents" help="My Events" string="My Events"/>
+                <group>
                     <filter name="groupby_move" context="{'group_by' : 'move_id'}" string="Invoice"/>
                 </group>
-                <group expand="0" string="Event">
+                <group>
                     <filter name="groupby_event" context="{'group_by' : 'event_id'}" string="Event"/>
                 </group>
                 <separator/>

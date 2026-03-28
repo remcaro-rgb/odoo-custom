@@ -62,7 +62,7 @@
                 <field name="format_code"/>
                 <filter name="active" string="Activos"
                         domain="[('active', '=', True)]"/>
-                <group expand="0" string="Agrupar por">
+                <group>
                     <filter name="group_format" string="Formato"
                             context="{'group_by': 'format_code'}"/>
                 </group>
@@ -109,7 +109,7 @@
     <!-- Configuration menu -->
     <menuitem id="menu_co_exogena_config"
               name="Exogena"
-              parent="account.account_management_menu"
+              parent="account.menu_finance_configuration"
               sequence="90"/>
 
     <menuitem id="menu_co_exogena_concept"

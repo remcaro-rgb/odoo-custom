@@ -81,7 +81,7 @@
                 <field name="partner_name"/>
                 <field name="concept_code"/>
                 <field name="format_code"/>
-                <group expand="0" string="Agrupar por">
+                <group>
                     <filter name="group_format" string="Formato"
                             context="{'group_by': 'format_code'}"/>
                     <filter name="group_partner" string="NIT"

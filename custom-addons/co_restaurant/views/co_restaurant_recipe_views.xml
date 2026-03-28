@@ -162,7 +162,7 @@
                 <separator/>
                 <filter name="filter_high_cost" string="Food Cost > 35%"
                         domain="[('food_cost_pct', '>', 35)]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="groupby_category" string="Category"
                             context="{'group_by': 'category_id'}"/>
                     <filter name="groupby_state" string="Status"

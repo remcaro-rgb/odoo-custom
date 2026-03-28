@@ -30,6 +30,23 @@ if [ -n "$UPDATE_MODULES" ]; then
     UPDATE_FLAG="--update=$UPDATE_MODULES"
 fi
 
+# RESET_DB: set to "1" to drop and recreate the database (for major version upgrades)
+if [ "${RESET_DB:-}" = "1" ]; then
+    echo "RESET_DB=1 — Dropping and recreating database '$DB_NAME'..."
+    export PGPASSWORD="$DB_PASSWORD"
+    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres \
+        -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='$DB_NAME' AND pid <> pg_backend_pid();" 2>/dev/null || true
+    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres \
+        -c "DROP DATABASE IF EXISTS \"$DB_NAME\";" 2>/dev/null || true
+    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres \
+        -c "CREATE DATABASE \"$DB_NAME\" OWNER \"$DB_USER\" ENCODING 'UTF8';" 2>/dev/null || true
+    echo "Database '$DB_NAME' recreated."
+    # Auto-init base after reset
+    if [ -z "$INIT_MODULES" ] || [ "$INIT_MODULES" = "x" ]; then
+        INIT_MODULES="base"
+    fi
+fi
+
 # STOP_AFTER_INIT: set to "1" to exit after init/update (useful for one-shot migrations)
 STOP_FLAG=""
 if [ "${STOP_AFTER_INIT:-}" = "1" ]; then

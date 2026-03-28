@@ -36,7 +36,7 @@
                         domain="[('cost_variance_pct', '>', 10)]"/>
                 <filter name="filter_this_month" string="This Month"
                         domain="[('date', '>=', (context_today()).strftime('%%Y-%%m-01'))]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="groupby_recipe" string="Recipe"
                             context="{'group_by': 'recipe_id'}"/>
                     <filter name="groupby_category" string="Category"

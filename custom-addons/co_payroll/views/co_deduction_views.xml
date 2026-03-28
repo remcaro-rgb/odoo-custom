@@ -50,7 +50,7 @@
                 <field name="deduction_type"/>
                 <filter name="not_applied" string="Not Applied"
                         domain="[('applied', '=', False)]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_employee" string="Employee"
                             context="{'group_by': 'employee_id'}"/>
                     <filter name="group_type" string="Type"

@@ -95,7 +95,7 @@
             <search>
                 <field name="format_code"/>
                 <field name="report_id"/>
-                <group expand="0" string="Agrupar por">
+                <group>
                     <filter name="group_format" string="Formato"
                             context="{'group_by': 'format_code'}"/>
                     <filter name="group_report" string="Reporte"

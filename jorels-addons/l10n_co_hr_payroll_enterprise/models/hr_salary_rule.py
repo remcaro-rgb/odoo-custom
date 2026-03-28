@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#   Jorels S.A.S. - Copyright (C) (2024)
+#   Jorels S.A.S. - Copyright (C) (2026)
 #
 #   This file is part of l10n_co_hr_payroll_enterprise.
 #
@@ -22,7 +22,6 @@
 
 
 from odoo import fields, models, api, _
-from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
@@ -127,7 +126,7 @@ class HrSalaryRule(models.Model):
                     # Note: returned value have to be set in the variable 'percent'
 
                     result = inputs.example * 0.10''')
-    edi_percent_fix = fields.Float(string='Fixed Percent', digits=dp.get_precision('Payroll'), default=0.0)
+    edi_percent_fix = fields.Float(string='Fixed Percent', digits='Payroll', default=0.0)
 
     edi_is_detailed = fields.Boolean(string="Edi detailed", default=False)
 

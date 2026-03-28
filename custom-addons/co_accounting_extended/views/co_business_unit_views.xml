@@ -83,7 +83,7 @@
                 <field name="analytic_account_id"/>
                 <filter name="archived" string="Archived"
                         domain="[('active', '=', False)]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_responsible" string="Responsible"
                             context="{'group_by': 'responsible_id'}"/>
                 </group>

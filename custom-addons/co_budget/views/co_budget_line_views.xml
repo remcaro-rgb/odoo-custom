@@ -127,7 +127,7 @@
                 <filter string="Confirmed Budgets" name="confirmed"
                         domain="[('budget_state', '=', 'confirmed')]"/>
                 <separator/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="Budget" name="groupby_budget" context="{'group_by': 'budget_id'}"/>
                     <filter string="Account" name="groupby_account" context="{'group_by': 'account_id'}"/>
                     <filter string="Analytic Account" name="groupby_analytic" context="{'group_by': 'analytic_account_id'}"/>

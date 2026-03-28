@@ -59,7 +59,7 @@
                         domain="[('account_class', '=', '2')]"/>
                 <filter name="class_patrimonio" string="Patrimonio"
                         domain="[('account_class', '=', '3')]"/>
-                <group expand="0" string="Agrupar Por">
+                <group>
                     <filter name="group_by_account_class" string="Clase"
                             context="{'group_by': 'account_class'}"/>
                     <filter name="group_by_account" string="Cuenta"

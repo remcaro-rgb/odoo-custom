@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-#   Jorels S.A.S. - Copyright (C) (2024)
+#   Jorels S.A.S. - Copyright (C) (2026)
 #
 #   This file is part of l10n_co_hr_payroll_enterprise.
 #
@@ -37,8 +37,8 @@ HR_WRITABLE_FIELDS = [
 ]
 
 
-class User(models.Model):
-    _inherit = ['res.users']
+class ResUsers(models.Model):
+    _inherit = "res.users"
 
     private_postal_id = fields.Many2one(related='employee_id.private_postal_id', string="Postal", readonly=False,
                                         related_sudo=False)

@@ -8,13 +8,11 @@
 
     <record id="group_co_payroll_user" model="res.groups">
         <field name="name">User</field>
-        <field name="category_id" ref="module_category_co_payroll"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
     <record id="group_co_payroll_manager" model="res.groups">
         <field name="name">Manager</field>
-        <field name="category_id" ref="module_category_co_payroll"/>
         <field name="implied_ids" eval="[(4, ref('group_co_payroll_user'))]"/>
     </record>
 

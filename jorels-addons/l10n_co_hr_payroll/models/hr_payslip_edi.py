@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #   l10n_co_hr_payroll
-#   Copyright (C) 2024  Jorels SAS
+#   Copyright (C) 2026  Jorels SAS
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published
@@ -40,7 +40,7 @@ class HrPayslipEdi(models.Model):
     _description = "Payslip Edi"
 
     note = fields.Text(string='Internal Note', readonly=True)
-    contract_id = fields.Many2one('hr.contract', string='Contract', readonly=True)
+    contract_id = fields.Many2one('hr.version', string='Contract', readonly=True)
     credit_note = fields.Boolean(string='Adjustment note', readonly=True,
                                  help="Indicates this edi payslip has a refund of another")
     origin_payslip_id = fields.Many2one(comodel_name="hr.payslip.edi", string="Origin Edi payslip", readonly=True,

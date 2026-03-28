@@ -138,7 +138,7 @@
                         domain="[('origin', '=', 'manual')]"/>
                 <filter name="filter_pos" string="POS"
                         domain="[('origin', '=', 'pos')]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="groupby_recipe" string="Recipe"
                             context="{'group_by': 'recipe_id'}"/>
                     <filter name="groupby_date" string="Date"

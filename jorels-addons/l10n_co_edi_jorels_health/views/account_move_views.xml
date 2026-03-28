@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--Jorels S.A.S. - Copyright (2025)-->
+<!--Jorels S.A.S. - Copyright (2026)-->
 
 <!--This file is part of l10n_co_edi_jorels_health.-->
 
@@ -40,7 +40,7 @@
                                 <field name="ei_health_partner_id" widget="many2one_avatar" readonly="state != 'draft'"
                                        context="{'show_address': 1, 'show_vat': True}"
                                        options="{'always_reload': True, 'no_quick_create': True}"
-                                       domain="[('is_company', '=', False)]"/>/>
+                                       domain="[('is_company', '=', False)]"/>
                             </group>
                         </group>
                     </page>
