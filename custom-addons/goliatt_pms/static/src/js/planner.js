@@ -390,6 +390,9 @@ class PmsPlanner extends Component {
             return;
         }
         this._resizing = null;
+
+        // Always reset _moved so next cell click works
+        setTimeout(() => { this._moved = false; }, 50);
     }
 
     // ── Stubs (grid-level — not used now) ─────────────────
