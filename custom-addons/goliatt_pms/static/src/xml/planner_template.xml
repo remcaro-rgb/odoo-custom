@@ -39,7 +39,7 @@
                 <!-- Room rows -->
                 <t t-foreach="state.rooms" t-as="room" t-key="room.id">
                     <!-- Room label -->
-                    <div class="pms-planner-room-label">
+                    <div t-attf-class="pms-planner-room-label {{ room.isVirtual ? 'unassigned-row' : '' }}">
                         <span class="room-number"><t t-esc="room.name"/></span>
                         <span class="room-type"><t t-esc="room.room_type"/></span>
                     </div>

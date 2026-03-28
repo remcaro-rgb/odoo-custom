@@ -141,6 +141,13 @@
     background: #fdf2f8;
 }
 
+/* Unassigned row */
+.pms-planner-room-label.unassigned-row {
+    background: #fff3cd;
+    font-style: italic;
+    border-bottom: 2px solid #ffc107;
+}
+
 /* Reservation bars */
 .pms-reservation-bar {
     position: absolute;

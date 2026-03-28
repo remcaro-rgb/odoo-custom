@@ -82,11 +82,15 @@ class PmsPlanner extends Component {
         const rooms = await this.orm.searchRead("pms.room", [["active", "=", true]],
             ["name", "room_type_id", "floor", "status", "housekeeping_status"],
             { order: "name", limit: 200 });
-        this.state.rooms = rooms.map(r => ({
-            id: r.id, name: r.name,
-            room_type: r.room_type_id ? r.room_type_id[1] : "",
-            floor: r.floor, status: r.status,
-        }));
+        // Add virtual "Unassigned" row at top for reservations without a room
+        this.state.rooms = [
+            { id: 0, name: "Sin Asignar", room_type: "Unassigned", floor: "", status: "available", isVirtual: true },
+            ...rooms.map(r => ({
+                id: r.id, name: r.name,
+                room_type: r.room_type_id ? r.room_type_id[1] : "",
+                floor: r.floor, status: r.status,
+            })),
+        ];
 
         const reservations = await this.orm.searchRead("pms.reservation",
             [["checkin_date", "<", endISO], ["checkout_date", ">", startISO], ["state", "not in", ["cancelled"]]],
@@ -140,8 +144,8 @@ class PmsPlanner extends Component {
         }
 
         for (const res of this.state.reservations) {
-            if (!res.room_id) continue;
-            const roomId = res.room_id[0];
+            // Unassigned reservations go to virtual row (id=0)
+            const roomId = res.room_id ? res.room_id[0] : 0;
             const rp = roomPositions[roomId];
             if (!rp) continue;
 
@@ -354,7 +358,7 @@ class PmsPlanner extends Component {
                             await this.orm.write("pms.reservation", [resId], {
                                 checkin_date: newCheckin,
                                 checkout_date: newCheckout,
-                                room_id: newRoom.id,
+                                room_id: newRoom.id || false,
                             });
                             this.notification.add(_t("Reservation moved"), { type: "success" });
                         } catch (e) {
