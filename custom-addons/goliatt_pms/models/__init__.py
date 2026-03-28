@@ -10,3 +10,7 @@ from . import pms_housekeeping
 from . import pms_channel
 from . import pms_availability
 from . import pms_night_audit
+from . import pms_revenue_rule
+from . import pms_revenue_recommendation
+from . import pms_revenue_log
+from . import pms_kiosk_session

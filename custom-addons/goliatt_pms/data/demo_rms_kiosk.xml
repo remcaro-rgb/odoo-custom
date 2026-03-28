@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ══════════════════════════════════════════════════════════
+             REVENUE RULES (8 rules covering all types)
+             ══════════════════════════════════════════════════════════ -->
+
+        <!-- 1. Occupancy High (70-89%): +15% -->
+        <record id="demo_rule_occ_high" model="pms.revenue.rule">
+            <field name="name">High Occupancy Premium</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="rule_type">occupancy_based</field>
+            <field name="priority">10</field>
+            <field name="is_active" eval="True"/>
+            <field name="occupancy_min">70</field>
+            <field name="occupancy_max">89</field>
+            <field name="action_type">multiplier</field>
+            <field name="multiplier">1.15</field>
+            <field name="notes">Increase rate by 15% when occupancy is between 70-89%.</field>
+        </record>
+
+        <!-- 2. Occupancy Peak (90%+): +30% -->
+        <record id="demo_rule_occ_peak" model="pms.revenue.rule">
+            <field name="name">Peak Occupancy Surge</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="rule_type">occupancy_based</field>
+            <field name="priority">5</field>
+            <field name="is_active" eval="True"/>
+            <field name="occupancy_min">90</field>
+            <field name="occupancy_max">100</field>
+            <field name="action_type">multiplier</field>
+            <field name="multiplier">1.30</field>
+            <field name="notes">Increase rate by 30% when occupancy exceeds 90%.</field>
+        </record>
+
+        <!-- 3. Weekend Premium (Fri-Sat): +20% -->
+        <record id="demo_rule_weekend" model="pms.revenue.rule">
+            <field name="name">Weekend Premium</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="rule_type">day_of_week</field>
+            <field name="priority">20</field>
+            <field name="is_active" eval="True"/>
+            <field name="day_of_week_ids">4,5</field>
+            <field name="action_type">multiplier</field>
+            <field name="multiplier">1.20</field>
+            <field name="notes">20% premium on Friday and Saturday nights.</field>
+        </record>
+
+        <!-- 4. Low Season Discount (Jan-Feb): -10% -->
+        <record id="demo_rule_low_season" model="pms.revenue.rule">
+            <field name="name">Low Season Discount</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="rule_type">season</field>
+            <field name="priority">30</field>
+            <field name="is_active" eval="True"/>
+            <field name="date_from">2026-01-10</field>
+            <field name="date_to">2026-02-28</field>
+            <field name="action_type">multiplier</field>
+            <field name="multiplier">0.90</field>
+            <field name="notes">10% discount during the low season (Jan-Feb).</field>
+        </record>
+
+        <!-- 5. Last Minute Deal: -15% -->
+        <record id="demo_rule_last_minute" model="pms.revenue.rule">
+            <field name="name">Last Minute Deal</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="rule_type">last_minute</field>
+            <field name="priority">40</field>
+            <field name="is_active" eval="True"/>
+            <field name="action_type">multiplier</field>
+            <field name="multiplier">0.85</field>
+            <field name="notes">15% discount for last-minute bookings (within 2 days, low occupancy).</field>
+        </record>
+
+        <!-- 6. Demand Surge: +25% -->
+        <record id="demo_rule_demand_surge" model="pms.revenue.rule">
+            <field name="name">Demand Surge Pricing</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="rule_type">demand_surge</field>
+            <field name="priority">8</field>
+            <field name="is_active" eval="True"/>
+            <field name="action_type">multiplier</field>
+            <field name="multiplier">1.25</field>
+            <field name="notes">25% increase when demand level reaches peak or critical.</field>
+        </record>
+
+        <!-- 7. Early Bird (30+ days lead time): -10% -->
+        <record id="demo_rule_early_bird" model="pms.revenue.rule">
+            <field name="name">Early Bird Discount</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="rule_type">lead_time</field>
+            <field name="priority">25</field>
+            <field name="is_active" eval="True"/>
+            <field name="lead_time_min">30</field>
+            <field name="lead_time_max">365</field>
+            <field name="action_type">multiplier</field>
+            <field name="multiplier">0.90</field>
+            <field name="notes">10% discount for bookings made 30+ days in advance.</field>
+        </record>
+
+        <!-- 8. Rate Floor: minimum rate -->
+        <record id="demo_rule_rate_floor" model="pms.revenue.rule">
+            <field name="name">Rate Floor Protection</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="rule_type">competitor</field>
+            <field name="priority">99</field>
+            <field name="is_active" eval="True"/>
+            <field name="action_type">set_min_rate</field>
+            <field name="min_rate">120000</field>
+            <field name="notes">Minimum rate floor. Rate must never go below 120,000.</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════
+             KIOSK SESSIONS (2 demo sessions)
+             ══════════════════════════════════════════════════════════ -->
+
+        <!-- Completed kiosk session -->
+        <record id="demo_kiosk_session_completed" model="pms.kiosk.session">
+            <field name="name">KIOSK-00001</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="session_type">checkin</field>
+            <field name="status">completed</field>
+            <field name="id_document_type">passport</field>
+            <field name="id_document_number">AB1234567</field>
+            <field name="id_scan_data">Scanned: passport AB1234567</field>
+            <field name="room_assigned">101</field>
+            <field name="key_issued" eval="True"/>
+            <field name="start_time">2026-03-27 14:00:00</field>
+            <field name="end_time">2026-03-27 14:05:00</field>
+            <field name="notes">Demo: successful self-check-in.</field>
+        </record>
+
+        <!-- Abandoned kiosk session -->
+        <record id="demo_kiosk_session_abandoned" model="pms.kiosk.session">
+            <field name="name">KIOSK-00002</field>
+            <field name="property_id" ref="goliatt_pms.property_bogota"/>
+            <field name="session_type">checkin</field>
+            <field name="status">abandoned</field>
+            <field name="start_time">2026-03-27 16:30:00</field>
+            <field name="notes">Demo: guest abandoned the kiosk and went to the front desk.</field>
+        </record>
+
+    </data>
+</odoo>

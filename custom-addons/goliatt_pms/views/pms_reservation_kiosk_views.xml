@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit reservation form to add "Kiosk Check-In" button -->
+    <record id="view_pms_reservation_form_kiosk" model="ir.ui.view">
+        <field name="name">pms.reservation.form.kiosk</field>
+        <field name="model">pms.reservation</field>
+        <field name="inherit_id" ref="goliatt_pms.view_pms_reservation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_checkin']" position="after">
+                <button name="action_kiosk_checkin"
+                    string="Kiosk Check-In"
+                    type="object"
+                    class="btn-secondary"
+                    invisible="state not in ('confirmed', 'guaranteed')"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

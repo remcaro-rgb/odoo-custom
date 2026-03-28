@@ -1,6 +1,6 @@
 {
     'name': 'Goliatt PMS',
-    'version': '19.0.1.0.0',
+    'version': '19.0.2.0.0',
     'summary': 'Full-featured Property Management System for hotels, resorts, and hospitality',
     'description': (
         'Goliatt PMS — Full-featured Property Management System for hotels, '
@@ -24,6 +24,7 @@
         'security/pms_security.xml',
         'security/ir.model.access.csv',
         'data/sequences.xml',
+        'data/rms_kiosk_data.xml',
         'views/pms_property_views.xml',
         'views/pms_amenity_views.xml',
         'views/pms_room_type_views.xml',
@@ -36,10 +37,18 @@
         'views/pms_channel_views.xml',
         'views/pms_availability_views.xml',
         'views/pms_night_audit_views.xml',
+        'views/pms_revenue_rule_views.xml',
+        'views/pms_revenue_recommendation_views.xml',
+        'views/pms_revenue_log_views.xml',
+        'views/pms_kiosk_session_views.xml',
+        'views/pms_kiosk_lookup_views.xml',
+        'views/pms_property_rms_views.xml',
+        'views/pms_reservation_kiosk_views.xml',
         'views/pms_menus.xml',
     ],
     'demo': [
         'data/demo_data.xml',
+        'data/demo_rms_kiosk.xml',
     ],
     'assets': {
         'web.assets_backend': [

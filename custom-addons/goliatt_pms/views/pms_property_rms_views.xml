@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit property form to add "Run RMS" button -->
+    <record id="view_pms_property_form_rms" model="ir.ui.view">
+        <field name="name">pms.property.form.rms</field>
+        <field name="model">pms.property</field>
+        <field name="inherit_id" ref="goliatt_pms.view_pms_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_run_rms"
+                        string="Run RMS Engine"
+                        type="object"
+                        class="btn-primary"
+                        groups="goliatt_pms.group_pms_manager"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

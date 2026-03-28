@@ -260,3 +260,34 @@ class PmsReservation(models.Model):
             'domain': [('reservation_id', '=', self.id)],
             'context': {'default_reservation_id': self.id},
         }
+
+    # ---- Kiosk actions -----------------------------------------------------
+
+    def action_kiosk_checkin(self):
+        """Initiate kiosk self-check-in for this reservation."""
+        self.ensure_one()
+        if self.state not in ('confirmed', 'guaranteed'):
+            raise UserError(
+                _('Only confirmed reservations can use kiosk check-in.')
+            )
+        session = self.env['pms.kiosk.session'].create({
+            'property_id': self.property_id.id,
+            'reservation_id': self.id,
+            'guest_id': self.guest_id.id,
+            'session_type': 'checkin',
+            'status': 'started',
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Kiosk Check-In'),
+            'res_model': 'pms.kiosk.session',
+            'res_id': session.id,
+            'view_mode': 'form',
+            'views': [[
+                self.env.ref(
+                    'goliatt_pms.view_pms_kiosk_session_form_kiosk'
+                ).id,
+                'form',
+            ]],
+            'target': 'new',
+        }

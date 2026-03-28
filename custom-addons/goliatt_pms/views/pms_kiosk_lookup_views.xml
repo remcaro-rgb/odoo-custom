@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kiosk Lookup Wizard Form -->
+    <record id="view_pms_kiosk_lookup_form" model="ir.ui.view">
+        <field name="name">pms.kiosk.lookup.form</field>
+        <field name="model">pms.kiosk.lookup</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="text-center p-3">
+                        <h1>Self Check-In</h1>
+                        <h4 class="text-muted mb-4">
+                            Enter your confirmation number or scan your ID
+                        </h4>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="lookup_type" widget="radio"/>
+                            <field name="lookup_value"
+                                placeholder="Enter confirmation number or ID number..."
+                                class="fs-4"/>
+                        </group>
+                    </group>
+                    <div class="text-center mb-3">
+                        <button name="action_search" type="object"
+                            string="Search"
+                            class="btn btn-primary btn-lg"/>
+                    </div>
+                    <div invisible="not message" class="text-center mb-3">
+                        <div class="alert alert-info">
+                            <field name="message" readonly="1"/>
+                        </div>
+                    </div>
+                    <div invisible="not result_reservation_id" class="text-center">
+                        <group>
+                            <field name="result_reservation_id" readonly="1"/>
+                        </group>
+                        <button name="action_proceed" type="object"
+                            string="Proceed to Check-In"
+                            class="btn btn-success btn-lg"/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open the lookup wizard -->
+    <record id="action_pms_kiosk_lookup" model="ir.actions.act_window">
+        <field name="name">Self Check-In</field>
+        <field name="res_model">pms.kiosk.lookup</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="path">pms-kiosk-checkin</field>
+    </record>
+
+</odoo>

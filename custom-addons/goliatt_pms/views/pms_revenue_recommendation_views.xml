@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view -->
+    <record id="view_pms_revenue_recommendation_list" model="ir.ui.view">
+        <field name="name">pms.revenue.recommendation.list</field>
+        <field name="model">pms.revenue.recommendation</field>
+        <field name="arch" type="xml">
+            <list multi_edit="1"
+                decoration-danger="demand_level == 'critical'"
+                decoration-warning="demand_level == 'peak'"
+                decoration-info="demand_level == 'high'"
+                decoration-muted="status in ('rejected',)">
+                <field name="date"/>
+                <field name="property_id"/>
+                <field name="room_type_id"/>
+                <field name="current_rate"/>
+                <field name="recommended_rate"/>
+                <field name="adjustment_pct" widget="badge"
+                    decoration-success="adjustment_pct &gt; 0"
+                    decoration-danger="adjustment_pct &lt; 0"/>
+                <field name="occupancy_forecast"/>
+                <field name="demand_level" widget="badge"
+                    decoration-danger="demand_level == 'critical'"
+                    decoration-warning="demand_level == 'peak'"
+                    decoration-info="demand_level == 'high'"
+                    decoration-success="demand_level == 'moderate'"
+                    decoration-muted="demand_level == 'low'"/>
+                <field name="rules_applied"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'accepted'"
+                    decoration-danger="status == 'rejected'"
+                    decoration-info="status == 'pending'"
+                    decoration-warning="status == 'auto_applied'"/>
+                <button name="action_accept" type="object"
+                    string="Accept" class="btn-success"
+                    invisible="status != 'pending'"/>
+                <button name="action_reject" type="object"
+                    string="Reject" class="btn-link"
+                    invisible="status != 'pending'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_pms_revenue_recommendation_form" model="ir.ui.view">
+        <field name="name">pms.revenue.recommendation.form</field>
+        <field name="model">pms.revenue.recommendation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_accept" string="Accept Recommendation"
+                        type="object" class="btn-primary"
+                        invisible="status != 'pending'"/>
+                    <button name="action_reject" string="Reject"
+                        type="object"
+                        invisible="status != 'pending'"/>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="pending,accepted"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Details">
+                            <field name="property_id"/>
+                            <field name="room_type_id"/>
+                            <field name="date"/>
+                            <field name="demand_level" widget="badge"
+                                decoration-danger="demand_level == 'critical'"
+                                decoration-warning="demand_level == 'peak'"
+                                decoration-info="demand_level == 'high'"
+                                decoration-success="demand_level == 'moderate'"
+                                decoration-muted="demand_level == 'low'"/>
+                            <field name="occupancy_forecast"/>
+                        </group>
+                        <group string="Rate Comparison">
+                            <field name="current_rate"/>
+                            <field name="recommended_rate"/>
+                            <field name="adjustment_pct"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Rules Applied">
+                            <field name="rules_applied" nolabel="1"/>
+                        </group>
+                        <group string="Application Info">
+                            <field name="applied_by"/>
+                            <field name="applied_date"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban view -->
+    <record id="view_pms_revenue_recommendation_kanban" model="ir.ui.view">
+        <field name="name">pms.revenue.recommendation.kanban</field>
+        <field name="model">pms.revenue.recommendation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="demand_level">
+                <field name="date"/>
+                <field name="property_id"/>
+                <field name="room_type_id"/>
+                <field name="current_rate"/>
+                <field name="recommended_rate"/>
+                <field name="adjustment_pct"/>
+                <field name="demand_level"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="d-flex justify-content-between">
+                                <strong><field name="date"/></strong>
+                                <field name="status" widget="badge"
+                                    decoration-success="status == 'accepted'"
+                                    decoration-danger="status == 'rejected'"
+                                    decoration-info="status == 'pending'"/>
+                            </div>
+                            <div class="text-muted">
+                                <field name="room_type_id"/>
+                            </div>
+                            <div>
+                                <span class="text-muted">Current: </span>
+                                <field name="current_rate" widget="monetary"/>
+                            </div>
+                            <div>
+                                <strong>
+                                    <span>Suggested: </span>
+                                    <field name="recommended_rate" widget="monetary"/>
+                                </strong>
+                                <span class="ms-2">
+                                    (<field name="adjustment_pct"/>%)
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_pms_revenue_recommendation_search" model="ir.ui.view">
+        <field name="name">pms.revenue.recommendation.search</field>
+        <field name="model">pms.revenue.recommendation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="property_id"/>
+                <field name="room_type_id"/>
+                <field name="date"/>
+                <separator/>
+                <filter name="pending" string="Pending"
+                    domain="[('status', '=', 'pending')]"/>
+                <filter name="accepted" string="Accepted"
+                    domain="[('status', '=', 'accepted')]"/>
+                <filter name="rejected" string="Rejected"
+                    domain="[('status', '=', 'rejected')]"/>
+                <separator/>
+                <filter name="today" string="Today"
+                    domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="this_week" string="This Week"
+                    domain="[
+                        ('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                        ('date', '&lt;=', (context_today() + datetime.timedelta(days=6 - context_today().weekday())).strftime('%Y-%m-%d')),
+                    ]"/>
+                <separator/>
+                <filter name="demand_low" string="Low Demand"
+                    domain="[('demand_level', '=', 'low')]"/>
+                <filter name="demand_moderate" string="Moderate Demand"
+                    domain="[('demand_level', '=', 'moderate')]"/>
+                <filter name="demand_high" string="High Demand"
+                    domain="[('demand_level', '=', 'high')]"/>
+                <filter name="demand_peak" string="Peak Demand"
+                    domain="[('demand_level', '=', 'peak')]"/>
+                <filter name="demand_critical" string="Critical Demand"
+                    domain="[('demand_level', '=', 'critical')]"/>
+                <separator/>
+                <group>
+                    <filter name="group_demand" string="Demand Level"
+                        context="{'group_by': 'demand_level'}"/>
+                    <filter name="group_room_type" string="Room Type"
+                        context="{'group_by': 'room_type_id'}"/>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_date" string="Date"
+                        context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_pms_revenue_recommendation" model="ir.actions.act_window">
+        <field name="name">AI Recommendations</field>
+        <field name="res_model">pms.revenue.recommendation</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_pms_revenue_recommendation_search"/>
+        <field name="context">{'search_default_pending': 1}</field>
+        <field name="path">pms-revenue-recommendations</field>
+    </record>
+
+</odoo>

@@ -19,3 +19,12 @@ access_pms_channel_admin,pms.channel.admin,model_pms_channel,goliatt_pms.group_p
 access_pms_availability_user,pms.availability.user,model_pms_availability,goliatt_pms.group_pms_user,1,0,0,0
 access_pms_availability_manager,pms.availability.manager,model_pms_availability,goliatt_pms.group_pms_manager,1,1,1,1
 access_pms_night_audit_manager,pms.night.audit.manager,model_pms_night_audit,goliatt_pms.group_pms_manager,1,1,1,1
+access_pms_revenue_rule_user,pms.revenue.rule.user,model_pms_revenue_rule,goliatt_pms.group_pms_user,1,0,0,0
+access_pms_revenue_rule_manager,pms.revenue.rule.manager,model_pms_revenue_rule,goliatt_pms.group_pms_manager,1,1,1,1
+access_pms_revenue_recommendation_user,pms.revenue.recommendation.user,model_pms_revenue_recommendation,goliatt_pms.group_pms_user,1,1,0,0
+access_pms_revenue_recommendation_manager,pms.revenue.recommendation.manager,model_pms_revenue_recommendation,goliatt_pms.group_pms_manager,1,1,1,1
+access_pms_revenue_log_user,pms.revenue.log.user,model_pms_revenue_log,goliatt_pms.group_pms_user,1,0,0,0
+access_pms_revenue_log_manager,pms.revenue.log.manager,model_pms_revenue_log,goliatt_pms.group_pms_manager,1,0,0,0
+access_pms_kiosk_session_user,pms.kiosk.session.user,model_pms_kiosk_session,goliatt_pms.group_pms_user,1,1,1,1
+access_pms_kiosk_session_manager,pms.kiosk.session.manager,model_pms_kiosk_session,goliatt_pms.group_pms_manager,1,1,1,1
+access_pms_kiosk_lookup_user,pms.kiosk.lookup.user,model_pms_kiosk_lookup,goliatt_pms.group_pms_user,1,1,1,1

@@ -887,3 +887,511 @@ msgstr "Ultima Estadia"
 #: model:ir.model.fields,field_description:goliatt_pms.field_res_partner__preference_notes
 msgid "Guest Preferences"
 msgstr "Preferencias del Huesped"
+
+# ══════════════════════════════════════════════════════════════════
+# Revenue Management System (RMS)
+# ══════════════════════════════════════════════════════════════════
+
+#. module: goliatt_pms
+#: model:ir.model,name:goliatt_pms.model_pms_revenue_rule
+msgid "Revenue Management Rule"
+msgstr "Regla de Gestion de Ingresos"
+
+#. module: goliatt_pms
+#: model:ir.model,name:goliatt_pms.model_pms_revenue_recommendation
+msgid "Revenue Recommendation"
+msgstr "Recomendacion de Ingresos"
+
+#. module: goliatt_pms
+#: model:ir.model,name:goliatt_pms.model_pms_revenue_log
+msgid "Revenue Change Log"
+msgstr "Registro de Cambios de Ingresos"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__name
+msgid "Rule Name"
+msgstr "Nombre de Regla"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__rule_type
+msgid "Rule Type"
+msgstr "Tipo de Regla"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__rule_type__occupancy_based
+msgid "Occupancy Based"
+msgstr "Basado en Ocupacion"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__rule_type__lead_time
+msgid "Lead Time"
+msgstr "Tiempo de Anticipacion"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__rule_type__day_of_week
+msgid "Day of Week"
+msgstr "Dia de la Semana"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__rule_type__season
+msgid "Seasonal"
+msgstr "Estacional"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__rule_type__demand_surge
+msgid "Demand Surge"
+msgstr "Aumento de Demanda"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__rule_type__last_minute
+msgid "Last Minute"
+msgstr "Ultimo Minuto"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__rule_type__competitor
+msgid "Competitor"
+msgstr "Competencia"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__priority
+msgid "Priority"
+msgstr "Prioridad"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__is_active
+msgid "Active"
+msgstr "Activo"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__occupancy_min
+msgid "Occupancy Min (%)"
+msgstr "Ocupacion Min (%)"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__occupancy_max
+msgid "Occupancy Max (%)"
+msgstr "Ocupacion Max (%)"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__lead_time_min
+msgid "Lead Time Min (days)"
+msgstr "Anticipacion Min (dias)"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__lead_time_max
+msgid "Lead Time Max (days)"
+msgstr "Anticipacion Max (dias)"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__day_of_week_ids
+msgid "Days of Week"
+msgstr "Dias de la Semana"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__date_from
+msgid "Season Start"
+msgstr "Inicio de Temporada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__date_to
+msgid "Season End"
+msgstr "Fin de Temporada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__action_type
+msgid "Action Type"
+msgstr "Tipo de Accion"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__action_type__multiplier
+msgid "Multiplier"
+msgstr "Multiplicador"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__action_type__fixed_adjustment
+msgid "Fixed Adjustment"
+msgstr "Ajuste Fijo"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__action_type__set_min_rate
+msgid "Set Minimum Rate"
+msgstr "Establecer Tarifa Minima"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__action_type__set_max_rate
+msgid "Set Maximum Rate"
+msgstr "Establecer Tarifa Maxima"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__action_type__close_rate
+msgid "Close Rate"
+msgstr "Cerrar Tarifa"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_rule__action_type__open_rate
+msgid "Open Rate"
+msgstr "Abrir Tarifa"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__multiplier
+msgid "Multiplier"
+msgstr "Multiplicador"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__fixed_amount
+msgid "Fixed Amount"
+msgstr "Monto Fijo"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__min_rate
+msgid "Minimum Rate (floor)"
+msgstr "Tarifa Minima (piso)"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__max_rate
+msgid "Maximum Rate (ceiling)"
+msgstr "Tarifa Maxima (techo)"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_rule__room_type_ids
+msgid "Room Types"
+msgstr "Tipos de Habitacion"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__current_rate
+msgid "Current Rate"
+msgstr "Tarifa Actual"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__recommended_rate
+msgid "Recommended Rate"
+msgstr "Tarifa Recomendada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__adjustment_pct
+msgid "Adjustment %"
+msgstr "Ajuste %"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__occupancy_forecast
+msgid "Occupancy Forecast (%)"
+msgstr "Pronostico de Ocupacion (%)"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__demand_level
+msgid "Demand Level"
+msgstr "Nivel de Demanda"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__demand_level__low
+msgid "Low"
+msgstr "Bajo"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__demand_level__moderate
+msgid "Moderate"
+msgstr "Moderado"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__demand_level__high
+msgid "High"
+msgstr "Alto"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__demand_level__peak
+msgid "Peak"
+msgstr "Pico"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__demand_level__critical
+msgid "Critical"
+msgstr "Critico"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__rules_applied
+msgid "Rules Applied"
+msgstr "Reglas Aplicadas"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__status__pending
+msgid "Pending"
+msgstr "Pendiente"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__status__accepted
+msgid "Accepted"
+msgstr "Aceptada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__status__rejected
+msgid "Rejected"
+msgstr "Rechazada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_revenue_recommendation__status__auto_applied
+msgid "Auto Applied"
+msgstr "Aplicada Automaticamente"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__applied_by
+msgid "Applied By"
+msgstr "Aplicada Por"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_recommendation__applied_date
+msgid "Applied Date"
+msgstr "Fecha de Aplicacion"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_log__old_rate
+msgid "Old Rate"
+msgstr "Tarifa Anterior"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_log__new_rate
+msgid "New Rate"
+msgstr "Tarifa Nueva"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_log__change_pct
+msgid "Change %"
+msgstr "Cambio %"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_log__reason
+msgid "Reason"
+msgstr "Razon"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_log__changed_by
+msgid "Changed By"
+msgstr "Cambiado Por"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_revenue_log__change_datetime
+msgid "Changed At"
+msgstr "Cambiado En"
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/models/pms_property.py:0
+msgid "RMS Engine"
+msgstr "Motor RMS"
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/models/pms_property.py:0
+msgid "Revenue recommendations generated for the next 90 days."
+msgstr "Recomendaciones de ingresos generadas para los proximos 90 dias."
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/models/pms_revenue_recommendation.py:0
+msgid "Only pending recommendations can be accepted."
+msgstr "Solo las recomendaciones pendientes pueden ser aceptadas."
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/models/pms_revenue_recommendation.py:0
+msgid "Only pending recommendations can be rejected."
+msgstr "Solo las recomendaciones pendientes pueden ser rechazadas."
+
+# ══════════════════════════════════════════════════════════════════
+# Auto Check-in Kiosk
+# ══════════════════════════════════════════════════════════════════
+
+#. module: goliatt_pms
+#: model:ir.model,name:goliatt_pms.model_pms_kiosk_session
+msgid "Kiosk Session"
+msgstr "Sesion de Kiosco"
+
+#. module: goliatt_pms
+#: model:ir.model,name:goliatt_pms.model_pms_kiosk_lookup
+msgid "Kiosk Reservation Lookup"
+msgstr "Busqueda de Reserva en Kiosco"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__name
+msgid "Session No."
+msgstr "No. de Sesion"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__session_type
+msgid "Type"
+msgstr "Tipo"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_session__session_type__checkin
+msgid "Check-In"
+msgstr "Check-In"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_session__session_type__checkout
+msgid "Check-Out"
+msgstr "Check-Out"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__status
+msgid "Status"
+msgstr "Estado"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_session__status__started
+msgid "Started"
+msgstr "Iniciada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_session__status__id_scanned
+msgid "ID Scanned"
+msgstr "ID Escaneado"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_session__status__confirmed
+msgid "Confirmed"
+msgstr "Confirmado"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_session__status__completed
+msgid "Completed"
+msgstr "Completado"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_session__status__failed
+msgid "Failed"
+msgstr "Fallido"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_session__status__abandoned
+msgid "Abandoned"
+msgstr "Abandonado"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__id_scan_data
+msgid "ID Scan Data"
+msgstr "Datos de Escaneo de ID"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__id_document_type
+msgid "ID Document Type"
+msgstr "Tipo de Documento de ID"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__id_document_number
+msgid "ID Document Number"
+msgstr "Numero de Documento de ID"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__guest_signature
+msgid "Guest Signature"
+msgstr "Firma del Huesped"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__start_time
+msgid "Start Time"
+msgstr "Hora de Inicio"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__end_time
+msgid "End Time"
+msgstr "Hora de Fin"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__room_assigned
+msgid "Room Assigned"
+msgstr "Habitacion Asignada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__key_issued
+msgid "Key Issued"
+msgstr "Llave Entregada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_session__error_message
+msgid "Error Message"
+msgstr "Mensaje de Error"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_lookup__lookup_type
+msgid "Lookup Type"
+msgstr "Tipo de Busqueda"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_lookup__lookup_type__confirmation_number
+msgid "Confirmation Number"
+msgstr "Numero de Confirmacion"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_lookup__lookup_type__id_document
+msgid "ID Document"
+msgstr "Documento de Identidad"
+
+#. module: goliatt_pms
+#: model:ir.model.fields.selection,name:goliatt_pms.field_pms_kiosk_lookup__lookup_type__qr_code
+msgid "QR Code"
+msgstr "Codigo QR"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_lookup__lookup_value
+msgid "Search Value"
+msgstr "Valor de Busqueda"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_lookup__result_reservation_id
+msgid "Found Reservation"
+msgstr "Reserva Encontrada"
+
+#. module: goliatt_pms
+#: model:ir.model.fields,field_description:goliatt_pms.field_pms_kiosk_lookup__message
+msgid "Message"
+msgstr "Mensaje"
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/models/pms_reservation.py:0
+msgid "Only confirmed reservations can use kiosk check-in."
+msgstr "Solo las reservas confirmadas pueden usar el check-in de kiosco."
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/models/pms_reservation.py:0
+msgid "Kiosk Check-In"
+msgstr "Check-In de Kiosco"
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/models/pms_kiosk_session.py:0
+msgid "No reservation linked"
+msgstr "No hay reserva vinculada"
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/models/pms_kiosk_session.py:0
+msgid "No clean rooms available"
+msgstr "No hay habitaciones limpias disponibles"
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/wizard/pms_kiosk_lookup.py:0
+msgid "Please enter a search value."
+msgstr "Por favor ingrese un valor de busqueda."
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/wizard/pms_kiosk_lookup.py:0
+msgid "Reservation found: %s - %s"
+msgstr "Reserva encontrada: %s - %s"
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/wizard/pms_kiosk_lookup.py:0
+msgid "No matching reservation found."
+msgstr "No se encontro reserva coincidente."
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/wizard/pms_kiosk_lookup.py:0
+msgid "No reservation found. Please search first."
+msgstr "No se encontro reserva. Por favor busque primero."
+
+#. module: goliatt_pms
+#: code:addons/goliatt_pms/wizard/pms_kiosk_lookup.py:0
+msgid "Self Check-In"
+msgstr "Auto Check-In"

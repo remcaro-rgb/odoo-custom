@@ -127,11 +127,47 @@
         action="action_pms_availability"
         sequence="20"/>
 
+    <menuitem id="menu_pms_revenue_rules"
+        name="Revenue Rules"
+        parent="menu_pms_revenue"
+        action="action_pms_revenue_rule"
+        sequence="25"/>
+
+    <menuitem id="menu_pms_revenue_recommendations"
+        name="AI Recommendations"
+        parent="menu_pms_revenue"
+        action="action_pms_revenue_recommendation"
+        sequence="26"/>
+
+    <menuitem id="menu_pms_revenue_log"
+        name="Revenue Log"
+        parent="menu_pms_revenue"
+        action="action_pms_revenue_log"
+        sequence="27"/>
+
     <menuitem id="menu_pms_channels_revenue"
         name="Channels"
         parent="menu_pms_revenue"
         action="action_pms_channel"
         sequence="30"/>
+
+    <!-- ── Kiosk ─────────────────────────────────────────────────── -->
+    <menuitem id="menu_pms_kiosk"
+        name="Kiosk"
+        parent="menu_pms_root"
+        sequence="55"/>
+
+    <menuitem id="menu_pms_kiosk_checkin"
+        name="Self Check-In"
+        parent="menu_pms_kiosk"
+        action="action_pms_kiosk_lookup"
+        sequence="10"/>
+
+    <menuitem id="menu_pms_kiosk_sessions"
+        name="Kiosk Sessions"
+        parent="menu_pms_kiosk"
+        action="action_pms_kiosk_session"
+        sequence="20"/>
 
     <!-- ── Reports (placeholder) ──────────────────────────────────── -->
     <menuitem id="menu_pms_reports"

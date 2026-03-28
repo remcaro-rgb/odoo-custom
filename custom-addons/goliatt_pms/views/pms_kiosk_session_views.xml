@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Admin list view -->
+    <record id="view_pms_kiosk_session_list" model="ir.ui.view">
+        <field name="name">pms.kiosk.session.list</field>
+        <field name="model">pms.kiosk.session</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="property_id"/>
+                <field name="reservation_id"/>
+                <field name="guest_id"/>
+                <field name="session_type" widget="badge"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'completed'"
+                    decoration-info="status in ('started', 'id_scanned', 'confirmed')"
+                    decoration-danger="status == 'failed'"
+                    decoration-muted="status == 'abandoned'"/>
+                <field name="room_assigned"/>
+                <field name="key_issued"/>
+                <field name="start_time"/>
+                <field name="end_time"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Admin form view -->
+    <record id="view_pms_kiosk_session_form" model="ir.ui.view">
+        <field name="name">pms.kiosk.session.form</field>
+        <field name="model">pms.kiosk.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar"
+                        statusbar_visible="started,id_scanned,confirmed,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="property_id"/>
+                            <field name="reservation_id"/>
+                            <field name="guest_id"/>
+                            <field name="session_type"/>
+                        </group>
+                        <group>
+                            <field name="start_time"/>
+                            <field name="end_time"/>
+                            <field name="room_assigned"/>
+                            <field name="key_issued"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="ID Document">
+                            <field name="id_document_type"/>
+                            <field name="id_document_number"/>
+                            <field name="id_scan_data"/>
+                        </group>
+                        <group string="Signature">
+                            <field name="guest_signature" widget="signature"/>
+                        </group>
+                    </group>
+                    <group invisible="not error_message">
+                        <field name="error_message"
+                            class="text-danger fw-bold"/>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kiosk-mode form view (designed for touch screens, opened as dialog) -->
+    <record id="view_pms_kiosk_session_form_kiosk" model="ir.ui.view">
+        <field name="name">pms.kiosk.session.form.kiosk</field>
+        <field name="model">pms.kiosk.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <!-- Step 1: Welcome / Scan ID -->
+                    <div invisible="status != 'started'" class="text-center p-4">
+                        <h1>Welcome!</h1>
+                        <h3 class="text-muted mb-4">
+                            Please scan your ID document to begin check-in.
+                        </h3>
+                        <field name="reservation_id" invisible="1"/>
+                        <field name="guest_id" invisible="1"/>
+                        <field name="property_id" invisible="1"/>
+                        <field name="session_type" invisible="1"/>
+                        <div class="mb-3">
+                            <strong>Reservation: </strong>
+                            <field name="reservation_id" readonly="1" class="d-inline"/>
+                        </div>
+                        <div class="mb-4">
+                            <strong>Guest: </strong>
+                            <field name="guest_id" readonly="1" class="d-inline"/>
+                        </div>
+                        <button name="action_scan_id" type="object"
+                            string="Scan ID Document"
+                            class="btn btn-primary btn-lg"/>
+                    </div>
+
+                    <!-- Step 2: Confirm Details -->
+                    <div invisible="status != 'id_scanned'" class="text-center p-4">
+                        <h1>Verify Your Information</h1>
+                        <h3 class="text-muted mb-4">
+                            Please confirm the details below are correct.
+                        </h3>
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <group>
+                                    <field name="id_document_type" readonly="1"/>
+                                    <field name="id_document_number" readonly="1"/>
+                                    <field name="id_scan_data" readonly="1"/>
+                                </group>
+                            </div>
+                        </div>
+                        <button name="action_confirm_checkin" type="object"
+                            string="Confirm Details"
+                            class="btn btn-primary btn-lg"/>
+                    </div>
+
+                    <!-- Step 3: Signature -->
+                    <div invisible="status != 'confirmed'" class="text-center p-4">
+                        <h1>Sign to Complete</h1>
+                        <h3 class="text-muted mb-4">
+                            Please sign below to accept the terms and complete your check-in.
+                        </h3>
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <field name="guest_signature" widget="signature"/>
+                            </div>
+                        </div>
+                        <button name="action_complete_checkin" type="object"
+                            string="Complete Check-In"
+                            class="btn btn-success btn-lg"/>
+                    </div>
+
+                    <!-- Step 4: Completed -->
+                    <div invisible="status != 'completed'" class="text-center p-4">
+                        <h1 class="text-success">Check-In Complete!</h1>
+                        <h2 class="mb-4">
+                            Your room: <strong><field name="room_assigned" readonly="1" class="d-inline"/></strong>
+                        </h2>
+                        <p class="fs-4 text-muted">
+                            Your key card has been issued. Enjoy your stay!
+                        </p>
+                    </div>
+
+                    <!-- Step: Failed -->
+                    <div invisible="status != 'failed'" class="text-center p-4">
+                        <h1 class="text-danger">Check-In Failed</h1>
+                        <p class="fs-4">
+                            <field name="error_message" readonly="1"/>
+                        </p>
+                        <p class="text-muted">
+                            Please contact the front desk for assistance.
+                        </p>
+                    </div>
+
+                    <field name="status" invisible="1"/>
+                    <field name="name" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_pms_kiosk_session_search" model="ir.ui.view">
+        <field name="name">pms.kiosk.session.search</field>
+        <field name="model">pms.kiosk.session</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="reservation_id"/>
+                <field name="guest_id"/>
+                <field name="property_id"/>
+                <filter name="completed" string="Completed"
+                    domain="[('status', '=', 'completed')]"/>
+                <filter name="failed" string="Failed"
+                    domain="[('status', '=', 'failed')]"/>
+                <filter name="abandoned" string="Abandoned"
+                    domain="[('status', '=', 'abandoned')]"/>
+                <filter name="today" string="Today"
+                    domain="[('start_time', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0, 0, 0))),
+                             ('start_time', '&lt;', datetime.datetime.combine(context_today() + datetime.timedelta(days=1), datetime.time(0, 0, 0)))]"/>
+                <separator/>
+                <group>
+                    <filter name="group_status" string="Status"
+                        context="{'group_by': 'status'}"/>
+                    <filter name="group_property" string="Property"
+                        context="{'group_by': 'property_id'}"/>
+                    <filter name="group_type" string="Session Type"
+                        context="{'group_by': 'session_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_pms_kiosk_session" model="ir.actions.act_window">
+        <field name="name">Kiosk Sessions</field>
+        <field name="res_model">pms.kiosk.session</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_pms_kiosk_session_search"/>
+        <field name="path">pms-kiosk-sessions</field>
+    </record>
+
+</odoo>
