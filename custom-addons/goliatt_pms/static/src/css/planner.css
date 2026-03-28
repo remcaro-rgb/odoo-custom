@@ -144,8 +144,6 @@
 /* Reservation bars */
 .pms-reservation-bar {
     position: absolute;
-    top: 2px;
-    height: 28px;
     border-radius: 4px;
     padding: 2px 8px;
     font-size: 11px;

@@ -97,16 +97,53 @@ class PmsPlanner extends Component {
     }
 
     _computeBars() {
+        // Defer to next frame so the DOM cells are rendered
+        requestAnimationFrame(() => this._computeBarsFromDOM());
+    }
+
+    _computeBarsFromDOM() {
         const bars = [];
         const startDate = this.state.startDate;
         const roomIndexMap = {};
         this.state.rooms.forEach((r, idx) => { roomIndexMap[r.id] = idx; });
 
+        // Build a lookup of cell positions from actual DOM elements
+        const container = document.querySelector(".pms-planner");
+        if (!container) return;
+        const containerRect = container.getBoundingClientRect();
+        const scrollLeft = container.scrollLeft;
+        const scrollTop = container.scrollTop;
+
+        // Map: roomId -> { top, height } from DOM cells
+        const roomPositions = {};
+        // Map: dateIdx -> { left, width } from DOM cells
+        const datePositions = {};
+
+        const cells = container.querySelectorAll(".pms-planner-cell");
+        for (const cell of cells) {
+            const roomId = parseInt(cell.dataset.roomId);
+            const dateStr = cell.dataset.date;
+            if (!roomId || !dateStr) continue;
+
+            const rect = cell.getBoundingClientRect();
+            const relTop = rect.top - containerRect.top + scrollTop;
+            const relLeft = rect.left - containerRect.left + scrollLeft;
+
+            if (!roomPositions[roomId]) {
+                roomPositions[roomId] = { top: relTop, height: rect.height };
+            }
+
+            const dateIdx = this.state.dates.findIndex(d => d.iso === dateStr);
+            if (dateIdx >= 0 && !datePositions[dateIdx]) {
+                datePositions[dateIdx] = { left: relLeft, width: rect.width };
+            }
+        }
+
         for (const res of this.state.reservations) {
             if (!res.room_id) continue;
             const roomId = res.room_id[0];
-            const roomIdx = roomIndexMap[roomId];
-            if (roomIdx === undefined) continue;
+            const rp = roomPositions[roomId];
+            if (!rp) continue;
 
             const checkin = new Date(res.checkin_date + "T00:00:00");
             const checkout = new Date(res.checkout_date + "T00:00:00");
@@ -114,11 +151,18 @@ class PmsPlanner extends Component {
             const endOffset = Math.min(DAYS_TO_SHOW, this._diffDays(startDate, checkout));
             if (endOffset <= 0 || startOffset >= DAYS_TO_SHOW) continue;
 
+            const dp0 = datePositions[startOffset];
+            const dp1 = datePositions[Math.min(endOffset - 1, DAYS_TO_SHOW - 1)];
+            if (!dp0 || !dp1) continue;
+
+            const left = dp0.left;
+            const width = (dp1.left + dp1.width) - dp0.left - 2;
+            const top = rp.top + 2;
+            const barHeight = rp.height - 4;
+
             bars.push({
                 id: res.id,
-                left: LABEL_WIDTH + startOffset * CELL_WIDTH,
-                top: HEADER_HEIGHT + roomIdx * ROW_HEIGHT,
-                width: Math.max((endOffset - startOffset) * CELL_WIDTH - 2, 20),
+                left, top, width: Math.max(width, 20), barHeight,
                 guestName: res.guest_id ? res.guest_id[1] : res.name,
                 state: res.state, nights: res.nights,
                 checkinDate: res.checkin_date, checkoutDate: res.checkout_date,
@@ -269,12 +313,37 @@ class PmsPlanner extends Component {
             const { resId } = this._dragging;
             const bar = this.state.bars.find(b => b.id === resId);
             if (bar) {
-                const newDateIdx = Math.round((bar.left - LABEL_WIDTH) / CELL_WIDTH);
-                const newRoomIdx = Math.round((bar.top - HEADER_HEIGHT) / ROW_HEIGHT);
-                const clampedDateIdx = Math.max(0, Math.min(DAYS_TO_SHOW - 1, newDateIdx));
-                const clampedRoomIdx = Math.max(0, Math.min(this.state.rooms.length - 1, newRoomIdx));
-                const newCheckin = this.state.dates[clampedDateIdx]?.iso;
-                const newRoom = this.state.rooms[clampedRoomIdx];
+                // Find which cell the bar center lands on
+                const centerX = ev.clientX;
+                const centerY = ev.clientY;
+                const cell = document.elementFromPoint(centerX, centerY);
+                let newCheckin = null;
+                let newRoom = null;
+                if (cell && cell.classList.contains("pms-planner-cell")) {
+                    newCheckin = cell.dataset.date;
+                    const roomId = parseInt(cell.dataset.roomId);
+                    newRoom = this.state.rooms.find(r => r.id === roomId);
+                }
+                if (!newCheckin || !newRoom) {
+                    // Fallback: use pixel math
+                    const container = document.querySelector(".pms-planner");
+                    const containerRect = container ? container.getBoundingClientRect() : { left: 0, top: 0 };
+                    const cells = container ? container.querySelectorAll(".pms-planner-cell") : [];
+                    // Find nearest cell
+                    let minDist = Infinity;
+                    for (const c of cells) {
+                        const r = c.getBoundingClientRect();
+                        const cx = r.left + r.width / 2;
+                        const cy = r.top + r.height / 2;
+                        const dist = Math.abs(cx - centerX) + Math.abs(cy - centerY);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            newCheckin = c.dataset.date;
+                            const rid = parseInt(c.dataset.roomId);
+                            newRoom = this.state.rooms.find(rm => rm.id === rid);
+                        }
+                    }
+                }
 
                 if (newCheckin && newRoom) {
                     const res = this.state.reservations.find(r => r.id === resId);

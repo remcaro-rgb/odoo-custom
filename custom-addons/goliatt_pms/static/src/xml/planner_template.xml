@@ -59,7 +59,7 @@
             <div class="pms-reservation-bars" t-ref="barsContainer">
                 <t t-foreach="state.bars" t-as="bar" t-key="bar.id">
                     <div t-attf-class="pms-reservation-bar state-{{ bar.state }}"
-                         t-attf-style="left: {{ bar.left }}px; top: {{ bar.top }}px; width: {{ bar.width }}px;"
+                         t-attf-style="left: {{ bar.left }}px; top: {{ bar.top }}px; width: {{ bar.width }}px; height: {{ bar.barHeight || 28 }}px;"
                          t-att-data-res-id="bar.id"
                          t-on-mousedown="onBarMouseDown"
                          t-on-dblclick.stop="onBarDblClick"
