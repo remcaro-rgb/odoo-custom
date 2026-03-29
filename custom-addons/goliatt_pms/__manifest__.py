@@ -52,6 +52,7 @@
     ],
     'assets': {
         'web.assets_backend': [
+            'goliatt_pms/static/src/css/dark_theme.css',
             'goliatt_pms/static/src/css/planner.css',
             'goliatt_pms/static/src/xml/planner_template.xml',
             'goliatt_pms/static/src/js/planner.js',

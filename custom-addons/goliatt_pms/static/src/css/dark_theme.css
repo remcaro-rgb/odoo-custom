@@ -1,0 +1,335 @@
+/* Goliatt Dark Theme — activated by data-bs-theme="dark" on <html> */
+
+html[data-bs-theme="dark"] {
+    --bs-body-bg: #1a1d23;
+    --bs-body-color: #dee2e6;
+    --bs-emphasis-color: #f8f9fa;
+    --bs-border-color: #373b44;
+    --bs-tertiary-bg: #22262e;
+}
+
+html[data-bs-theme="dark"] body {
+    background-color: #1a1d23 !important;
+    color: #dee2e6 !important;
+}
+
+/* Navbar */
+html[data-bs-theme="dark"] .o_main_navbar {
+    background-color: #111318 !important;
+    border-color: #2a2e37 !important;
+}
+
+html[data-bs-theme="dark"] .o_main_navbar .o_menu_brand,
+html[data-bs-theme="dark"] .o_main_navbar .o_menu_entry,
+html[data-bs-theme="dark"] .o_main_navbar .o_menu_sections a,
+html[data-bs-theme="dark"] .o_main_navbar .o_nav_entry,
+html[data-bs-theme="dark"] .o_main_navbar .dropdown-item {
+    color: #c9cdd4 !important;
+}
+
+html[data-bs-theme="dark"] .o_main_navbar .o_menu_sections a:hover,
+html[data-bs-theme="dark"] .o_main_navbar .dropdown-item:hover {
+    background-color: #2a2e37 !important;
+    color: #fff !important;
+}
+
+/* Action manager / content area */
+html[data-bs-theme="dark"] .o_action_manager,
+html[data-bs-theme="dark"] .o_content {
+    background-color: #1a1d23 !important;
+}
+
+/* Control panel */
+html[data-bs-theme="dark"] .o_control_panel,
+html[data-bs-theme="dark"] .o_cp_breadcrumbs {
+    background-color: #1e2128 !important;
+    color: #dee2e6 !important;
+}
+
+html[data-bs-theme="dark"] .breadcrumb-item a,
+html[data-bs-theme="dark"] .breadcrumb-item.active {
+    color: #adb5bd !important;
+}
+
+/* Lists */
+html[data-bs-theme="dark"] .o_list_view .o_data_row:hover td {
+    background-color: #262a33 !important;
+}
+
+html[data-bs-theme="dark"] table.o_list_table {
+    --bs-table-bg: #1e2128;
+    --bs-table-striped-bg: #22262e;
+    --bs-table-hover-bg: #262a33;
+    color: #dee2e6;
+}
+
+html[data-bs-theme="dark"] table.o_list_table th {
+    background-color: #22262e !important;
+    color: #adb5bd !important;
+    border-color: #373b44 !important;
+}
+
+html[data-bs-theme="dark"] table.o_list_table td {
+    border-color: #2a2e37 !important;
+}
+
+/* Form views */
+html[data-bs-theme="dark"] .o_form_view .o_form_sheet_bg {
+    background-color: #1a1d23 !important;
+}
+
+html[data-bs-theme="dark"] .o_form_view .o_form_sheet {
+    background-color: #1e2128 !important;
+    border-color: #373b44 !important;
+    color: #dee2e6 !important;
+}
+
+html[data-bs-theme="dark"] .o_form_view .o_group .o_inner_group .o_td_label .o_form_label {
+    color: #adb5bd !important;
+}
+
+html[data-bs-theme="dark"] .o_form_view .o_statusbar_status button {
+    color: #c9cdd4 !important;
+}
+
+/* Kanban */
+html[data-bs-theme="dark"] .o_kanban_view {
+    background-color: #1a1d23 !important;
+}
+
+html[data-bs-theme="dark"] .o_kanban_group {
+    background-color: #1e2128 !important;
+}
+
+html[data-bs-theme="dark"] .o_kanban_record {
+    background-color: #22262e !important;
+    border-color: #373b44 !important;
+    color: #dee2e6 !important;
+}
+
+html[data-bs-theme="dark"] .o_kanban_record:hover {
+    background-color: #262a33 !important;
+}
+
+html[data-bs-theme="dark"] .o_kanban_header {
+    color: #c9cdd4 !important;
+}
+
+/* Cards and sheets */
+html[data-bs-theme="dark"] .card,
+html[data-bs-theme="dark"] .o_card {
+    background-color: #22262e !important;
+    border-color: #373b44 !important;
+    color: #dee2e6 !important;
+}
+
+/* Inputs */
+html[data-bs-theme="dark"] .o_field_widget input,
+html[data-bs-theme="dark"] .o_field_widget textarea,
+html[data-bs-theme="dark"] .o_field_widget select,
+html[data-bs-theme="dark"] .form-control,
+html[data-bs-theme="dark"] .form-select {
+    background-color: #262a33 !important;
+    color: #dee2e6 !important;
+    border-color: #373b44 !important;
+}
+
+html[data-bs-theme="dark"] .form-control:focus,
+html[data-bs-theme="dark"] .form-select:focus {
+    background-color: #2a2e37 !important;
+    border-color: #714B67 !important;
+    color: #f8f9fa !important;
+}
+
+/* Dropdowns */
+html[data-bs-theme="dark"] .dropdown-menu {
+    background-color: #22262e !important;
+    border-color: #373b44 !important;
+}
+
+html[data-bs-theme="dark"] .dropdown-item {
+    color: #dee2e6 !important;
+}
+
+html[data-bs-theme="dark"] .dropdown-item:hover,
+html[data-bs-theme="dark"] .dropdown-item:focus {
+    background-color: #2a2e37 !important;
+    color: #fff !important;
+}
+
+/* Sidebar / Search */
+html[data-bs-theme="dark"] .o_search_panel {
+    background-color: #1e2128 !important;
+    border-color: #373b44 !important;
+}
+
+html[data-bs-theme="dark"] .o_searchview {
+    background-color: #22262e !important;
+    border-color: #373b44 !important;
+}
+
+html[data-bs-theme="dark"] .o_searchview input {
+    color: #dee2e6 !important;
+}
+
+/* Chatter */
+html[data-bs-theme="dark"] .o-mail-Chatter,
+html[data-bs-theme="dark"] .o-mail-Thread {
+    background-color: #1e2128 !important;
+}
+
+html[data-bs-theme="dark"] .o-mail-Message {
+    border-color: #2a2e37 !important;
+}
+
+/* Modals/Dialogs */
+html[data-bs-theme="dark"] .modal-content {
+    background-color: #1e2128 !important;
+    border-color: #373b44 !important;
+    color: #dee2e6 !important;
+}
+
+html[data-bs-theme="dark"] .modal-header {
+    border-color: #373b44 !important;
+}
+
+html[data-bs-theme="dark"] .modal-footer {
+    border-color: #373b44 !important;
+}
+
+/* Notebooks/Tabs */
+html[data-bs-theme="dark"] .nav-tabs .nav-link {
+    color: #adb5bd !important;
+}
+
+html[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+    background-color: #1e2128 !important;
+    color: #fff !important;
+    border-color: #373b44 #373b44 #1e2128 !important;
+}
+
+html[data-bs-theme="dark"] .tab-content {
+    background-color: #1e2128 !important;
+}
+
+/* Buttons */
+html[data-bs-theme="dark"] .btn-secondary {
+    background-color: #373b44 !important;
+    border-color: #4a4f5a !important;
+    color: #dee2e6 !important;
+}
+
+html[data-bs-theme="dark"] .btn-light {
+    background-color: #2a2e37 !important;
+    border-color: #373b44 !important;
+    color: #dee2e6 !important;
+}
+
+/* Calendar */
+html[data-bs-theme="dark"] .o_calendar_container {
+    background-color: #1a1d23 !important;
+}
+
+html[data-bs-theme="dark"] .fc-theme-standard td,
+html[data-bs-theme="dark"] .fc-theme-standard th {
+    border-color: #2a2e37 !important;
+}
+
+/* Apps page */
+html[data-bs-theme="dark"] .o_apps .o_app {
+    color: #dee2e6 !important;
+}
+
+/* Stat buttons */
+html[data-bs-theme="dark"] .oe_stat_button {
+    border-color: #373b44 !important;
+    color: #adb5bd !important;
+}
+
+/* Settings */
+html[data-bs-theme="dark"] .o_base_settings {
+    background-color: #1a1d23 !important;
+}
+
+html[data-bs-theme="dark"] .o_base_settings .o_setting_box {
+    background-color: #1e2128 !important;
+}
+
+/* Scrollbar */
+html[data-bs-theme="dark"] ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+html[data-bs-theme="dark"] ::-webkit-scrollbar-track {
+    background: #1a1d23;
+}
+
+html[data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #373b44;
+    border-radius: 4px;
+}
+
+html[data-bs-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #4a4f5a;
+}
+
+/* PMS Planner dark overrides */
+html[data-bs-theme="dark"] .pms-planner {
+    background: #1a1d23;
+}
+
+html[data-bs-theme="dark"] .pms-planner-toolbar {
+    background: #1e2128;
+    border-color: #373b44;
+    color: #dee2e6;
+}
+
+html[data-bs-theme="dark"] .pms-planner-header-cell {
+    background: #22262e;
+    border-color: #2a2e37;
+    color: #adb5bd;
+}
+
+html[data-bs-theme="dark"] .pms-planner-header-cell.today {
+    background: #714B67;
+    color: #fff;
+}
+
+html[data-bs-theme="dark"] .pms-planner-header-corner {
+    background: #22262e;
+    border-color: #373b44;
+    color: #adb5bd;
+}
+
+html[data-bs-theme="dark"] .pms-planner-room-label {
+    background: #1e2128;
+    border-color: #2a2e37;
+    color: #dee2e6;
+}
+
+html[data-bs-theme="dark"] .pms-planner-cell {
+    border-color: #22262e;
+}
+
+html[data-bs-theme="dark"] .pms-planner-cell:hover {
+    background: #262a33;
+}
+
+html[data-bs-theme="dark"] .pms-planner-cell.weekend {
+    background: #1e2128;
+}
+
+html[data-bs-theme="dark"] .pms-planner-legend {
+    background: #1e2128;
+    border-color: #373b44;
+    color: #dee2e6;
+}
+
+html[data-bs-theme="dark"] .pms-planner-legend .legend-item:hover {
+    background: #262a33;
+}
+
+html[data-bs-theme="dark"] .pms-planner-legend .legend-item.legend-active {
+    background: #2a2e37;
+}
