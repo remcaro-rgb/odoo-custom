@@ -15,9 +15,8 @@ class DarkModeToggle extends Component {
 
     toggleTheme() {
         const newScheme = this.state.isDark ? "light" : "dark";
-        cookie.set("color_scheme", newScheme, { path: "/" });
+        cookie.set("color_scheme", newScheme);
         this.state.isDark = !this.state.isDark;
-        // Reload to apply the full dark/light CSS bundle
         window.location.reload();
     }
 }
