@@ -14,3 +14,4 @@ from . import pms_revenue_rule
 from . import pms_revenue_recommendation
 from . import pms_revenue_log
 from . import pms_kiosk_session
+from . import ir_http
