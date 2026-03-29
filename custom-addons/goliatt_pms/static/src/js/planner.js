@@ -225,7 +225,7 @@ class PmsPlanner extends Component {
     // ── Cell click → create reservation ───────────────────
 
     async onCellClick(ev) {
-        if (this._moved) return; // was a drag, not a click
+        if (this._moved) return;
         const roomId = parseInt(ev.currentTarget.dataset.roomId);
         const dateStr = ev.currentTarget.dataset.date;
         if (!roomId || !dateStr) return;
@@ -247,6 +247,8 @@ class PmsPlanner extends Component {
                 default_checkin_date: dateStr,
                 default_checkout_date: this._toISO(this._addDays(new Date(dateStr + "T00:00:00"), 1)),
             },
+        }, {
+            onClose: () => this._loadData(),
         });
     }
 
@@ -266,6 +268,8 @@ class PmsPlanner extends Component {
             view_mode: "form",
             views: [[false, "form"]],
             target: "new",
+        }, {
+            onClose: () => this._loadData(),
         });
     }
 
