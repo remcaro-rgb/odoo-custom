@@ -24,3 +24,9 @@ class StockWarehouse(models.Model):
     warehouse_notes = fields.Text(
         string='Warehouse Notes',
     )
+    purchase_split_mode = fields.Selection([
+        ('auto', 'Automatic Split'),
+        ('manual', 'User Decides'),
+        ('company_default', 'Use Company Setting'),
+    ], string='Stock Availability Split Mode', default='company_default',
+        help='Override company setting for this warehouse.')

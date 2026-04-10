@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_purchase_workflow" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.purchase.workflow</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="purchase.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='purchase']" position="inside">
+                <block title="Purchase Workflow" name="purchase_workflow_setting">
+                    <setting string="Stock Availability Split Mode"
+                             help="How to handle partially available stock on product requests.">
+                        <field name="purchase_split_mode" widget="radio"/>
+                    </setting>
+                    <setting string="Default Supplier Count for RFQs"
+                             help="Number of top-ranked suppliers to request quotations from by default.">
+                        <field name="default_supplier_count"/>
+                    </setting>
+                    <setting string="Receipt Journal Mode"
+                             help="How to create accounting entries upon goods receipt.">
+                        <field name="purchase_journal_mode" widget="radio"/>
+                    </setting>
+                    <setting string="Supplier Scoring Weights"
+                             help="Weights for multi-criteria supplier evaluation (should total 100).">
+                        <div class="row mt8">
+                            <label for="supplier_weight_price" class="col-3 col-lg-3 o_light_label"/>
+                            <field name="supplier_weight_price" class="col-2"/>
+                            <label for="supplier_weight_delivery" class="col-3 col-lg-3 o_light_label"/>
+                            <field name="supplier_weight_delivery" class="col-2"/>
+                        </div>
+                        <div class="row mt8">
+                            <label for="supplier_weight_quality" class="col-3 col-lg-3 o_light_label"/>
+                            <field name="supplier_weight_quality" class="col-2"/>
+                            <label for="supplier_weight_compliance" class="col-3 col-lg-3 o_light_label"/>
+                            <field name="supplier_weight_compliance" class="col-2"/>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
