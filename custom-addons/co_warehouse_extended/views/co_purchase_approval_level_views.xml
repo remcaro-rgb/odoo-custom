@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="co_purchase_approval_level_view_form" model="ir.ui.view">
+        <field name="name">co.purchase.approval.level.form</field>
+        <field name="model">co.purchase.approval.level</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="department_id"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="min_amount"/>
+                            <field name="max_amount"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <group string="Authorized Approvers">
+                        <field name="approver_ids" widget="many2many_tags"
+                               nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="co_purchase_approval_level_view_list" model="ir.ui.view">
+        <field name="name">co.purchase.approval.level.list</field>
+        <field name="model">co.purchase.approval.level</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="min_amount"/>
+                <field name="max_amount"/>
+                <field name="currency_id"/>
+                <field name="approver_ids" widget="many2many_tags"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_co_purchase_approval_level" model="ir.actions.act_window">
+        <field name="name">Approval Levels</field>
+        <field name="res_model">co.purchase.approval.level</field>
+        <field name="view_mode">list,form</field>
+        <field name="path">purchase-approval-levels</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Configure purchase approval levels
+            </p>
+            <p>Define amount-based approval tiers per department or company.
+               If no levels match a request's amount, it will be auto-approved.</p>
+        </field>
+    </record>
+</odoo>

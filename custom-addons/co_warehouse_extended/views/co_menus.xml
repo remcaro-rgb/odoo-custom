@@ -71,4 +71,19 @@
               action="action_co_inventory_formula"
               sequence="90"/>
 
+    <!-- ============================================================ -->
+    <!--              Purchase Configuration Menus                   -->
+    <!-- ============================================================ -->
+
+    <menuitem id="menu_purchase_workflow_config"
+              name="Purchase Workflow"
+              parent="purchase.menu_purchase_config"
+              sequence="50"/>
+    <menuitem id="menu_purchase_approval_levels"
+              name="Approval Levels"
+              parent="menu_purchase_workflow_config"
+              action="action_co_purchase_approval_level"
+              groups="co_warehouse_extended.group_purchase_request_manager"
+              sequence="10"/>
+
 </odoo>
