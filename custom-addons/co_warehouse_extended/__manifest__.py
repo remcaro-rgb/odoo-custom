@@ -35,6 +35,7 @@
         'views/stock_picking_views.xml',
         'views/purchase_order_views.xml',
         'views/res_config_settings_views.xml',
+        'views/co_supplier_score_views.xml',
         'views/co_menus.xml',
         # wizard
         'wizard/co_warehouse_transfer_wizard_views.xml',

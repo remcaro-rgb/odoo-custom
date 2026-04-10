@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="co_supplier_score_view_form" model="ir.ui.view">
+        <field name="name">co.supplier.score.form</field>
+        <field name="model">co.supplier.score</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_recalculate"
+                            string="Recalculate Scores"
+                            type="object"
+                            class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="product_category_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="total_score" widget="progressbar"/>
+                            <field name="last_updated"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Scores" name="scores">
+                            <group>
+                                <group string="Scores (0-100)">
+                                    <field name="score_price"/>
+                                    <field name="score_delivery"/>
+                                    <field name="score_quality"/>
+                                    <field name="score_compliance"/>
+                                </group>
+                                <group string="Weights">
+                                    <field name="weight_price"/>
+                                    <field name="weight_delivery"/>
+                                    <field name="weight_quality"/>
+                                    <field name="weight_compliance"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="co_supplier_score_view_list" model="ir.ui.view">
+        <field name="name">co.supplier.score.list</field>
+        <field name="model">co.supplier.score</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="partner_id"/>
+                <field name="product_category_id"/>
+                <field name="score_price"/>
+                <field name="score_delivery"/>
+                <field name="score_quality"/>
+                <field name="score_compliance"/>
+                <field name="total_score" widget="progressbar"/>
+                <field name="last_updated"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_co_supplier_score" model="ir.actions.act_window">
+        <field name="name">Supplier Scores</field>
+        <field name="res_model">co.supplier.score</field>
+        <field name="view_mode">list,form</field>
+        <field name="path">supplier-scores</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No supplier scores yet
+            </p>
+            <p>Supplier scores are created when evaluating suppliers
+               for purchase requests. You can also create them manually.</p>
+        </field>
+    </record>
+</odoo>
