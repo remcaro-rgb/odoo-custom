@@ -30,6 +30,12 @@
               groups="co_warehouse_extended.group_purchase_request_manager"
               sequence="20"/>
 
+    <menuitem id="menu_quotation_comparison"
+              name="Quotation Comparisons"
+              parent="purchase.menu_purchase_root"
+              action="action_co_quotation_comparison"
+              sequence="20"/>
+
     <menuitem id="menu_supplier_scores"
               name="Supplier Scores"
               parent="purchase.menu_purchase_root"

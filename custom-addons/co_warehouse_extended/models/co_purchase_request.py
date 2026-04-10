@@ -304,6 +304,86 @@ class CoPurchaseRequest(models.Model):
             'target': 'current',
         }
 
+    def action_request_quotations(self):
+        """Score suppliers and create RFQs for top N suppliers."""
+        self.ensure_one()
+        if self.state != 'approved':
+            raise UserError(_('Purchase request must be approved first.'))
+
+        supplier_count = self.supplier_count or self.company_id.default_supplier_count or 3
+
+        products = self.line_ids.mapped('product_id')
+        supplier_ids = set()
+        for product in products:
+            for seller in product.seller_ids:
+                supplier_ids.add(seller.partner_id.id)
+        for line in self.line_ids:
+            if line.supplier_id:
+                supplier_ids.add(line.supplier_id.id)
+
+        if not supplier_ids:
+            raise UserError(_(
+                'No suppliers found for the requested products. '
+                'Please configure supplier info on the products.'))
+
+        scored_suppliers = []
+        SupplierScore = self.env['co.supplier.score']
+        for partner_id in supplier_ids:
+            score_rec = SupplierScore.search([
+                ('partner_id', '=', partner_id),
+                ('company_id', '=', self.company_id.id),
+            ], limit=1)
+            if not score_rec:
+                score_rec = SupplierScore.create({
+                    'partner_id': partner_id,
+                    'company_id': self.company_id.id,
+                })
+                score_rec.action_recalculate()
+            scored_suppliers.append((score_rec.total_score, partner_id))
+
+        scored_suppliers.sort(key=lambda x: x[0], reverse=True)
+        top_suppliers = scored_suppliers[:supplier_count]
+
+        comparison = self.env['co.quotation.comparison'].create({
+            'purchase_request_id': self.id,
+        })
+        self.comparison_id = comparison.id
+
+        for _score, partner_id in top_suppliers:
+            po_vals = {
+                'partner_id': partner_id,
+                'company_id': self.company_id.id,
+                'origin': self.name,
+                'co_purchase_request_id': self.id,
+                'co_comparison_id': comparison.id,
+                'order_line': [(0, 0, {
+                    'product_id': line.product_id.id,
+                    'product_qty': line.quantity,
+                    'price_unit': line.estimated_price,
+                    'name': line.product_id.display_name,
+                    'product_uom': line.product_uom_id.id,
+                    'date_planned': fields.Datetime.now(),
+                }) for line in self.line_ids],
+            }
+            self.env['purchase.order'].create(po_vals)
+
+        self.state = 'rfq_sent'
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'co.quotation.comparison',
+            'view_mode': 'form',
+            'res_id': comparison.id,
+        }
+
+    def action_view_comparison(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'co.quotation.comparison',
+            'view_mode': 'form',
+            'res_id': self.comparison_id.id,
+        }
+
     def action_done(self):
         for rec in self:
             rec.write({'state': 'done'})

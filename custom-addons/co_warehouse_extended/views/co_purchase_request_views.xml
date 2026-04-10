@@ -21,6 +21,9 @@
                             string="Reject" class="btn-danger"
                             invisible="state != 'submitted' or approval_state != 'pending'"
                             groups="co_warehouse_extended.group_purchase_request_manager"/>
+                    <button name="action_request_quotations" type="object"
+                            string="Request Quotations" class="oe_highlight"
+                            invisible="state != 'approved'"/>
                     <button name="action_create_purchase_order" type="object"
                             string="Create Purchase Order" class="oe_highlight"
                             invisible="state != 'approved'"/>
@@ -43,6 +46,11 @@
                                 invisible="purchase_order_count == 0">
                             <field name="purchase_order_count" widget="statbutton"
                                    string="Purchase Orders"/>
+                        </button>
+                        <button name="action_view_comparison" type="object"
+                                class="oe_stat_button" icon="fa-balance-scale"
+                                invisible="not comparison_id">
+                            <span class="o_stat_text">Comparisons</span>
                         </button>
                     </div>
                     <div class="oe_title">

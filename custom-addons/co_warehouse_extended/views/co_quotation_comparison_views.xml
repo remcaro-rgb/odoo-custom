@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="co_quotation_comparison_view_form" model="ir.ui.view">
+        <field name="name">co.quotation.comparison.form</field>
+        <field name="model">co.quotation.comparison</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_accept_recommendation"
+                            string="Accept Recommendation"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="purchase_request_id"/>
+                            <field name="recommended_rfq_id"/>
+                        </group>
+                        <group>
+                            <field name="selected_rfq_id"
+                                   invisible="state != 'selected'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Quotations" name="quotations">
+                            <field name="rfq_ids" readonly="1">
+                                <list>
+                                    <field name="partner_id"/>
+                                    <field name="amount_total" sum="Total"/>
+                                    <field name="date_order"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="co_quotation_comparison_view_list" model="ir.ui.view">
+        <field name="name">co.quotation.comparison.list</field>
+        <field name="model">co.quotation.comparison</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="purchase_request_id"/>
+                <field name="recommended_rfq_id"/>
+                <field name="selected_rfq_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_co_quotation_comparison" model="ir.actions.act_window">
+        <field name="name">Quotation Comparisons</field>
+        <field name="res_model">co.quotation.comparison</field>
+        <field name="view_mode">list,form</field>
+        <field name="path">quotation-comparisons</field>
+    </record>
+</odoo>

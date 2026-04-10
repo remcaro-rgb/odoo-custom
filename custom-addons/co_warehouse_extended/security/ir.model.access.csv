@@ -17,3 +17,5 @@ access_co_warehouse_transfer_wizard_user,co.warehouse.transfer.wizard user,model
 access_co_warehouse_transfer_wizard_line_user,co.warehouse.transfer.wizard.line user,model_co_warehouse_transfer_wizard_line,stock.group_stock_user,1,1,1,1
 access_co_supplier_score_user,co.supplier.score user,model_co_supplier_score,purchase.group_purchase_user,1,1,1,0
 access_co_supplier_score_manager,co.supplier.score manager,model_co_supplier_score,purchase.group_purchase_manager,1,1,1,1
+access_co_quotation_comparison_user,co.quotation.comparison user,model_co_quotation_comparison,co_warehouse_extended.group_purchase_request_user,1,0,0,0
+access_co_quotation_comparison_manager,co.quotation.comparison manager,model_co_quotation_comparison,co_warehouse_extended.group_purchase_request_manager,1,1,1,1
