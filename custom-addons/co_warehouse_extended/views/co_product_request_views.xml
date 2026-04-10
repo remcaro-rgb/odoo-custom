@@ -130,10 +130,11 @@
         <field name="name">co.product.request.search</field>
         <field name="model">co.product.request</field>
         <field name="arch" type="xml">
-            <search>
+            <search string="Product Requests">
                 <field name="name"/>
                 <field name="requester_id"/>
                 <field name="department_id"/>
+                <separator/>
                 <filter name="filter_my" string="My Requests"
                         domain="[('requester_id', '=', uid)]"/>
                 <filter name="filter_draft" string="Draft"
@@ -141,7 +142,7 @@
                 <filter name="filter_processed" string="Processed"
                         domain="[('state', '=', 'processed')]"/>
                 <separator/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_state" string="Status"
                             context="{'group_by': 'state'}"/>
                     <filter name="group_requester" string="Requester"
