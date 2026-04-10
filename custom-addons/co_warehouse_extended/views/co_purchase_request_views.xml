@@ -15,7 +15,11 @@
                             invisible="state != 'draft'"/>
                     <button name="action_approve" type="object"
                             string="Approve" class="oe_highlight"
-                            invisible="state != 'submitted'"
+                            invisible="state != 'submitted' or approval_state != 'pending'"
+                            groups="co_warehouse_extended.group_purchase_request_manager"/>
+                    <button name="action_reject" type="object"
+                            string="Reject" class="btn-danger"
+                            invisible="state != 'submitted' or approval_state != 'pending'"
                             groups="co_warehouse_extended.group_purchase_request_manager"/>
                     <button name="action_create_purchase_order" type="object"
                             string="Create Purchase Order" class="oe_highlight"
@@ -30,7 +34,7 @@
                             string="Reset to Draft"
                             invisible="state not in ('cancel', 'submitted')"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,submitted,approved,purchase,done"/>
+                           statusbar_visible="draft,submitted,approved,rfq_sent,quotation_compared,purchase,done"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -59,8 +63,19 @@
                                    widget="priority"/>
                         </group>
                         <group>
+                            <field name="estimated_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="approval_state"
+                                   invisible="approval_state == 'no_approval'"
+                                   widget="badge"
+                                   decoration-info="approval_state == 'pending'"
+                                   decoration-success="approval_state == 'approved'"
+                                   decoration-danger="approval_state == 'rejected'"/>
                             <field name="date_approved"/>
                             <field name="approver_id"/>
+                            <field name="supplier_count"/>
+                            <field name="product_request_id"
+                                   invisible="not product_request_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                     </group>
@@ -77,6 +92,22 @@
                                     <field name="subtotal"/>
                                     <field name="supplier_id"/>
                                     <field name="reason"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Approval" name="approval"
+                              invisible="not approval_line_ids">
+                            <field name="approval_line_ids" readonly="1">
+                                <list>
+                                    <field name="sequence"/>
+                                    <field name="approval_level_id"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'pending'"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'rejected'"/>
+                                    <field name="approver_id"/>
+                                    <field name="date"/>
+                                    <field name="notes"/>
                                 </list>
                             </field>
                         </page>
