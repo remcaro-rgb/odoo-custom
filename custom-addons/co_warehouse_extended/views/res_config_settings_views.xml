@@ -13,7 +13,7 @@
                     </setting>
                     <setting string="Default Supplier Count for RFQs"
                              help="Number of top-ranked suppliers to request quotations from by default.">
-                        <field name="default_supplier_count"/>
+                        <field name="purchase_supplier_count"/>
                     </setting>
                     <setting string="Receipt Journal Mode"
                              help="How to create accounting entries upon goods receipt.">
