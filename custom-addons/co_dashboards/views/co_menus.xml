@@ -29,4 +29,10 @@
               parent="goliatt_pms.menu_pms_root"
               action="action_pms_board"
               sequence="0"/>
+
+    <menuitem id="menu_restaurant_dashboard"
+              name="Tablero de Restaurante"
+              parent="co_restaurant.menu_co_restaurant_root"
+              action="action_restaurant_board"
+              sequence="0"/>
 </odoo>

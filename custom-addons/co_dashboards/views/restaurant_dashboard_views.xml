@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- 1. ANÁLISIS DE COSTOS POR RECETA                              -->
+    <!-- ============================================================ -->
+    <record id="dashboard_recipe_cost_search" model="ir.ui.view">
+        <field name="name">dashboard.recipe.cost.search</field>
+        <field name="model">co.restaurant.cost.analysis</field>
+        <field name="arch" type="xml">
+            <search string="Análisis de Costos por Receta">
+                <field name="recipe_id"/>
+                <separator/>
+                <filter name="this_month" string="Este Mes"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="this_quarter" string="Este Trimestre"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=((context_today().month - 1) // 3) * 3 + 1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="this_year" string="Este Año"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="dashboard_recipe_cost_graph" model="ir.ui.view">
+        <field name="name">dashboard.recipe.cost.graph</field>
+        <field name="model">co.restaurant.cost.analysis</field>
+        <field name="arch" type="xml">
+            <graph string="Análisis de Costos por Receta" type="bar">
+                <field name="recipe_id" type="row"/>
+                <field name="theoretical_cost" type="measure"/>
+                <field name="actual_cost" type="measure"/>
+                <field name="waste_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_dashboard_recipe_cost" model="ir.actions.act_window">
+        <field name="name">Análisis de Costos por Receta</field>
+        <field name="res_model">co.restaurant.cost.analysis</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="dashboard_recipe_cost_graph"/>
+        <field name="search_view_id" ref="dashboard_recipe_cost_search"/>
+        <field name="context">{'search_default_this_month': 1}</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 2. FOOD COST % POR CATEGORÍA                                  -->
+    <!-- ============================================================ -->
+    <record id="dashboard_food_cost_pct_search" model="ir.ui.view">
+        <field name="name">dashboard.food.cost.pct.search</field>
+        <field name="model">co.restaurant.cost.analysis</field>
+        <field name="arch" type="xml">
+            <search string="Food Cost % por Categoría">
+                <field name="recipe_category_id"/>
+                <separator/>
+                <filter name="this_month" string="Este Mes"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="this_quarter" string="Este Trimestre"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=((context_today().month - 1) // 3) * 3 + 1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="this_year" string="Este Año"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="dashboard_food_cost_pct_graph" model="ir.ui.view">
+        <field name="name">dashboard.food.cost.pct.graph</field>
+        <field name="model">co.restaurant.cost.analysis</field>
+        <field name="arch" type="xml">
+            <graph string="Food Cost % por Categoría" type="bar">
+                <field name="recipe_category_id" type="row"/>
+                <field name="theoretical_food_cost_pct" type="measure"/>
+                <field name="actual_food_cost_pct" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_dashboard_food_cost_pct" model="ir.actions.act_window">
+        <field name="name">Food Cost % por Categoría</field>
+        <field name="res_model">co.restaurant.cost.analysis</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="dashboard_food_cost_pct_graph"/>
+        <field name="search_view_id" ref="dashboard_food_cost_pct_search"/>
+        <field name="context">{'search_default_this_month': 1}</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 3. PRODUCCIÓN POR ESTADO                                      -->
+    <!-- ============================================================ -->
+    <record id="dashboard_production_state_search" model="ir.ui.view">
+        <field name="name">dashboard.production.state.search</field>
+        <field name="model">co.restaurant.production</field>
+        <field name="arch" type="xml">
+            <search string="Producción por Estado">
+                <field name="state"/>
+                <separator/>
+                <filter name="this_month" string="Este Mes"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="this_quarter" string="Este Trimestre"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=((context_today().month - 1) // 3) * 3 + 1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="this_year" string="Este Año"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="dashboard_production_state_graph" model="ir.ui.view">
+        <field name="name">dashboard.production.state.graph</field>
+        <field name="model">co.restaurant.production</field>
+        <field name="arch" type="xml">
+            <graph string="Producción por Estado" type="pie">
+                <field name="state" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_dashboard_production_state" model="ir.actions.act_window">
+        <field name="name">Producción por Estado</field>
+        <field name="res_model">co.restaurant.production</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="dashboard_production_state_graph"/>
+        <field name="search_view_id" ref="dashboard_production_state_search"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 4. DESPERDICIOS POR TIPO                                      -->
+    <!-- ============================================================ -->
+    <record id="dashboard_waste_search" model="ir.ui.view">
+        <field name="name">dashboard.waste.search</field>
+        <field name="model">co.restaurant.waste</field>
+        <field name="arch" type="xml">
+            <search string="Desperdicios por Tipo">
+                <field name="waste_type"/>
+                <separator/>
+                <filter name="this_month" string="Este Mes"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="this_quarter" string="Este Trimestre"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=((context_today().month - 1) // 3) * 3 + 1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="this_year" string="Este Año"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="confirmed" string="Confirmados"
+                        domain="[('state', '=', 'confirmed')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="dashboard_waste_graph" model="ir.ui.view">
+        <field name="name">dashboard.waste.graph</field>
+        <field name="model">co.restaurant.waste</field>
+        <field name="arch" type="xml">
+            <graph string="Desperdicios por Tipo" type="bar">
+                <field name="waste_type" type="row"/>
+                <field name="total_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_dashboard_waste" model="ir.actions.act_window">
+        <field name="name">Desperdicios por Tipo</field>
+        <field name="res_model">co.restaurant.waste</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="dashboard_waste_graph"/>
+        <field name="search_view_id" ref="dashboard_waste_search"/>
+        <field name="context">{'search_default_this_month': 1, 'search_default_confirmed': 1}</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 5. VARIANZA DE PRODUCCIÓN                                     -->
+    <!-- ============================================================ -->
+    <record id="dashboard_production_variance_search" model="ir.ui.view">
+        <field name="name">dashboard.production.variance.search</field>
+        <field name="model">co.restaurant.production</field>
+        <field name="arch" type="xml">
+            <search string="Varianza de Producción">
+                <field name="recipe_id"/>
+                <separator/>
+                <filter name="this_month" string="Este Mes"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="this_quarter" string="Este Trimestre"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=((context_today().month - 1) // 3) * 3 + 1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="this_year" string="Este Año"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="done" string="Realizados"
+                        domain="[('state', '=', 'done')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="dashboard_production_variance_graph" model="ir.ui.view">
+        <field name="name">dashboard.production.variance.graph</field>
+        <field name="model">co.restaurant.production</field>
+        <field name="arch" type="xml">
+            <graph string="Varianza de Producción" type="bar">
+                <field name="recipe_id" type="row"/>
+                <field name="total_cost" type="measure"/>
+                <field name="variance_pct" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_dashboard_production_variance" model="ir.actions.act_window">
+        <field name="name">Varianza de Producción</field>
+        <field name="res_model">co.restaurant.production</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="dashboard_production_variance_graph"/>
+        <field name="search_view_id" ref="dashboard_production_variance_search"/>
+        <field name="context">{'search_default_this_month': 1, 'search_default_done': 1}</field>
+    </record>
+
+</odoo>

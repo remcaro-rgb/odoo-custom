@@ -24,6 +24,7 @@
         'club_guests',
         'club_affiliate_billing',
         'goliatt_pms',
+        'co_restaurant',
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -37,6 +38,8 @@
         'views/club_board_view.xml',
         'views/pms_dashboard_views.xml',
         'views/pms_board_view.xml',
+        'views/restaurant_dashboard_views.xml',
+        'views/restaurant_board_view.xml',
         'views/co_menus.xml',
     ],
     'installable': True,
