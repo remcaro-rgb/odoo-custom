@@ -983,3 +983,575 @@ msgstr "Asistente"
 #: code:addons/co_warehouse_extended/models/co_purchase_request.py:0
 msgid "You cannot submit a request without lines."
 msgstr "No puede enviar una solicitud sin líneas."
+
+#. module: co_warehouse_extended
+#. New purchase workflow translations - Product Request
+#: model:ir.model,name:co_warehouse_extended.model_co_product_request
+msgid "Product Request"
+msgstr "Solicitud de Producto"
+
+#. module: co_warehouse_extended
+#: model:ir.model,name:co_warehouse_extended.model_co_product_request_line
+msgid "Product Request Line"
+msgstr "Línea de Solicitud de Producto"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request__name
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request__requester_id
+msgid "Requested By"
+msgstr "Solicitado por"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request__warehouse_id
+msgid "Source Warehouse"
+msgstr "Almacén de Origen"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request__date_request
+msgid "Request Date"
+msgstr "Fecha de Solicitud"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request__line_ids
+msgid "Requested Products"
+msgstr "Productos Solicitados"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request__picking_ids
+msgid "Internal Transfers"
+msgstr "Transferencias Internas"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request__purchase_request_id
+msgid "Purchase Request"
+msgstr "Solicitud de Compra"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_product_request__state__stock_check
+msgid "Stock Checked"
+msgstr "Stock Verificado"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_product_request__state__splitting
+msgid "Awaiting Split Decision"
+msgstr "Esperando Decisión de División"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_product_request__state__processed
+msgid "Processed"
+msgstr "Procesado"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_form
+msgid "Check Availability"
+msgstr "Verificar Disponibilidad"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_form
+msgid "Confirm Split"
+msgstr "Confirmar División"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_form
+msgid "Mark Done"
+msgstr "Marcar como Hecho"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_form
+msgid "Reset to Draft"
+msgstr "Restablecer a Borrador"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_form
+msgid "Transfers"
+msgstr "Transferencias"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_form
+msgid "Products"
+msgstr "Productos"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_form
+msgid "Notes"
+msgstr "Notas"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_form
+msgid "Additional notes..."
+msgstr "Notas adicionales..."
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_search
+msgid "My Requests"
+msgstr "Mis Solicitudes"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_search
+msgid "Requester"
+msgstr "Solicitante"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_product_request_view_search
+msgid "Warehouse"
+msgstr "Almacén"
+
+#. module: co_warehouse_extended
+#: model:ir.actions.act_window,name:co_warehouse_extended.action_co_product_request
+msgid "Product Requests"
+msgstr "Solicitudes de Producto"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.action_co_product_request
+msgid "Create a product request"
+msgstr "Crear una solicitud de producto"
+
+#. module: co_warehouse_extended
+#. odoo-python
+#: code:addons/co_warehouse_extended/models/co_product_request.py:0
+msgid "Please add at least one product line."
+msgstr "Por favor agregue al menos una línea de producto."
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request_line__qty_requested
+msgid "Quantity Requested"
+msgstr "Cantidad Solicitada"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request_line__qty_available
+msgid "Available Stock"
+msgstr "Stock Disponible"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request_line__qty_to_transfer
+msgid "Qty to Transfer"
+msgstr "Cant. a Transferir"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request_line__qty_to_purchase
+msgid "Qty to Purchase"
+msgstr "Cant. a Comprar"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_product_request_line__line_state
+msgid "Availability"
+msgstr "Disponibilidad"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_product_request_line__line_state__available
+msgid "Available"
+msgstr "Disponible"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_product_request_line__line_state__partial
+msgid "Partially Available"
+msgstr "Parcialmente Disponible"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_product_request_line__line_state__unavailable
+msgid "Unavailable"
+msgstr "No Disponible"
+
+#. module: co_warehouse_extended
+#. Approval Level translations
+#: model:ir.model,name:co_warehouse_extended.model_co_purchase_approval_level
+msgid "Purchase Approval Level"
+msgstr "Nivel de Aprobación de Compra"
+
+#. module: co_warehouse_extended
+#: model:ir.model,name:co_warehouse_extended.model_co_purchase_approval_line
+msgid "Purchase Approval Line"
+msgstr "Línea de Aprobación de Compra"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_approval_level__name
+msgid "Level Name"
+msgstr "Nombre del Nivel"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_approval_level__sequence
+msgid "Approval Order"
+msgstr "Orden de Aprobación"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_approval_level__min_amount
+msgid "Minimum Amount"
+msgstr "Monto Mínimo"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_approval_level__max_amount
+msgid "Maximum Amount"
+msgstr "Monto Máximo"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_approval_level__approver_ids
+msgid "Authorized Approvers"
+msgstr "Aprobadores Autorizados"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_approval_line__approval_level_id
+msgid "Approval Level"
+msgstr "Nivel de Aprobación"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_approval_line__approver_id
+msgid "Approved By"
+msgstr "Aprobado por"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_purchase_approval_line__state__rejected
+msgid "Rejected"
+msgstr "Rechazado"
+
+#. module: co_warehouse_extended
+#: model:ir.actions.act_window,name:co_warehouse_extended.action_co_purchase_approval_level
+msgid "Approval Levels"
+msgstr "Niveles de Aprobación"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_purchase_approval_level_views
+msgid "Configure purchase approval levels"
+msgstr "Configurar niveles de aprobación de compra"
+
+#. module: co_warehouse_extended
+#. Supplier Score translations
+#: model:ir.model,name:co_warehouse_extended.model_co_supplier_score
+msgid "Supplier Score"
+msgstr "Puntuación de Proveedor"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__score_price
+msgid "Price Score (0-100)"
+msgstr "Puntuación de Precio (0-100)"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__score_delivery
+msgid "Delivery Score (0-100)"
+msgstr "Puntuación de Entrega (0-100)"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__score_quality
+msgid "Quality Score (0-100)"
+msgstr "Puntuación de Calidad (0-100)"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__score_compliance
+msgid "Compliance Score (0-100)"
+msgstr "Puntuación de Cumplimiento (0-100)"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__weight_price
+msgid "Price Weight"
+msgstr "Peso de Precio"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__weight_delivery
+msgid "Delivery Weight"
+msgstr "Peso de Entrega"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__weight_quality
+msgid "Quality Weight"
+msgstr "Peso de Calidad"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__weight_compliance
+msgid "Compliance Weight"
+msgstr "Peso de Cumplimiento"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__total_score
+msgid "Total Score"
+msgstr "Puntuación Total"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_supplier_score__last_updated
+msgid "Last Recalculated"
+msgstr "Último Recálculo"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_supplier_score_view_form
+msgid "Recalculate Scores"
+msgstr "Recalcular Puntuaciones"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_supplier_score_view_form
+msgid "Scores (0-100)"
+msgstr "Puntuaciones (0-100)"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_supplier_score_view_form
+msgid "Weights"
+msgstr "Pesos"
+
+#. module: co_warehouse_extended
+#: model:ir.actions.act_window,name:co_warehouse_extended.action_co_supplier_score
+msgid "Supplier Scores"
+msgstr "Puntuaciones de Proveedores"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.action_co_supplier_score
+msgid "No supplier scores yet"
+msgstr "Aún no hay puntuaciones de proveedores"
+
+#. module: co_warehouse_extended
+#. Quotation Comparison translations
+#: model:ir.model,name:co_warehouse_extended.model_co_quotation_comparison
+msgid "Quotation Comparison"
+msgstr "Comparación de Cotizaciones"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_quotation_comparison__rfq_ids
+msgid "RFQs"
+msgstr "Solicitudes de Cotización"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_quotation_comparison__recommended_rfq_id
+msgid "Recommended"
+msgstr "Recomendado"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_quotation_comparison__selected_rfq_id
+msgid "Selected RFQ"
+msgstr "Cotización Seleccionada"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_quotation_comparison__state__compared
+msgid "Compared"
+msgstr "Comparado"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_quotation_comparison__state__selected
+msgid "Selected"
+msgstr "Seleccionado"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_quotation_comparison_view_form
+msgid "Accept Recommendation"
+msgstr "Aceptar Recomendación"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_quotation_comparison_view_form
+msgid "Quotations"
+msgstr "Cotizaciones"
+
+#. module: co_warehouse_extended
+#: model:ir.actions.act_window,name:co_warehouse_extended.action_co_quotation_comparison
+msgid "Quotation Comparisons"
+msgstr "Comparaciones de Cotizaciones"
+
+#. module: co_warehouse_extended
+#. odoo-python
+#: code:addons/co_warehouse_extended/models/co_quotation_comparison.py:0
+msgid "No recommendation available."
+msgstr "No hay recomendación disponible."
+
+#. module: co_warehouse_extended
+#. Company settings translations
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__res_company__purchase_split_mode__auto
+msgid "Automatic Split"
+msgstr "División Automática"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__res_company__purchase_split_mode__manual
+msgid "User Decides"
+msgstr "El Usuario Decide"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_res_company__purchase_split_mode
+msgid "Stock Availability Split Mode"
+msgstr "Modo de División por Disponibilidad de Stock"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_res_company__default_supplier_count
+msgid "Default Supplier Count for RFQs"
+msgstr "Cantidad de Proveedores por Defecto para Cotizaciones"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__res_company__purchase_journal_mode__auto_entry
+msgid "Automatic Journal Entry"
+msgstr "Asiento Contable Automático"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__res_company__purchase_journal_mode__vendor_bill
+msgid "Vendor Bill"
+msgstr "Factura de Proveedor"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_res_company__purchase_journal_mode
+msgid "Receipt Journal Mode"
+msgstr "Modo de Diario en Recepción"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__stock_warehouse__purchase_split_mode__company_default
+msgid "Use Company Setting"
+msgstr "Usar Configuración de la Empresa"
+
+#. module: co_warehouse_extended
+#. Purchase Workflow settings
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.res_config_settings_view_form_purchase_workflow
+msgid "Purchase Workflow"
+msgstr "Flujo de Compras"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.res_config_settings_view_form_purchase_workflow
+msgid "Supplier Scoring Weights"
+msgstr "Pesos de Puntuación de Proveedores"
+
+#. module: co_warehouse_extended
+#. PO fulfillment translations
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_purchase_order__co_fulfillment_pct
+msgid "Fulfillment %"
+msgstr "% de Cumplimiento"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_purchase_order__co_fulfillment_state
+msgid "Fulfillment Status"
+msgstr "Estado de Cumplimiento"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__purchase_order__co_fulfillment_state__partial
+msgid "Partial"
+msgstr "Parcial"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__purchase_order__co_fulfillment_state__complete
+msgid "Complete"
+msgstr "Completo"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_purchase_order__co_comparison_id
+msgid "Quotation Comparison"
+msgstr "Comparación de Cotizaciones"
+
+#. module: co_warehouse_extended
+#. Purchase request new fields
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_request__estimated_amount
+msgid "Estimated Amount"
+msgstr "Monto Estimado"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_request__approval_state
+msgid "Approval Status"
+msgstr "Estado de Aprobación"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_purchase_request__approval_state__no_approval
+msgid "No Approval Needed"
+msgstr "No Requiere Aprobación"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_purchase_request__approval_state__pending
+msgid "Pending Approval"
+msgstr "Aprobación Pendiente"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_request__supplier_count
+msgid "Number of Suppliers for RFQ"
+msgstr "Número de Proveedores para Cotización"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_request__comparison_id
+msgid "Quotation Comparison"
+msgstr "Comparación de Cotizaciones"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields,field_description:co_warehouse_extended.field_co_purchase_request__product_request_id
+msgid "Source Product Request"
+msgstr "Solicitud de Producto de Origen"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_purchase_request__state__rfq_sent
+msgid "RFQs Sent"
+msgstr "Cotizaciones Enviadas"
+
+#. module: co_warehouse_extended
+#: model:ir.model.fields.selection,name:co_warehouse_extended.selection__co_purchase_request__state__quotation_compared
+msgid "Quotations Compared"
+msgstr "Cotizaciones Comparadas"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_purchase_request_view_form
+msgid "Request Quotations"
+msgstr "Solicitar Cotizaciones"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_purchase_request_view_form
+msgid "Reject"
+msgstr "Rechazar"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_purchase_request_view_form
+msgid "Comparisons"
+msgstr "Comparaciones"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.co_purchase_request_view_form
+msgid "Approval"
+msgstr "Aprobación"
+
+#. module: co_warehouse_extended
+#: model_terms:ir.ui.view,arch_db:co_warehouse_extended.purchase_order_form_inherit
+msgid "Supplier Payment Tracking"
+msgstr "Seguimiento de Pago a Proveedor"
+
+#. module: co_warehouse_extended
+#. Menu translations
+#: model:ir.ui.menu,name:co_warehouse_extended.menu_product_request
+msgid "Product Requests"
+msgstr "Solicitudes de Producto"
+
+#. module: co_warehouse_extended
+#: model:ir.ui.menu,name:co_warehouse_extended.menu_quotation_comparison
+msgid "Quotation Comparisons"
+msgstr "Comparaciones de Cotizaciones"
+
+#. module: co_warehouse_extended
+#: model:ir.ui.menu,name:co_warehouse_extended.menu_supplier_scores
+msgid "Supplier Scores"
+msgstr "Puntuaciones de Proveedores"
+
+#. module: co_warehouse_extended
+#: model:ir.ui.menu,name:co_warehouse_extended.menu_purchase_workflow_config
+msgid "Purchase Workflow"
+msgstr "Flujo de Compras"
+
+#. module: co_warehouse_extended
+#: model:ir.ui.menu,name:co_warehouse_extended.menu_purchase_approval_levels
+msgid "Approval Levels"
+msgstr "Niveles de Aprobación"
+
+#. module: co_warehouse_extended
+#. Python error messages
+#. odoo-python
+#: code:addons/co_warehouse_extended/models/co_purchase_request.py:0
+msgid "No suppliers found for the requested products. Please configure supplier info on the products."
+msgstr "No se encontraron proveedores para los productos solicitados. Por favor configure la información de proveedores en los productos."
+
+#. module: co_warehouse_extended
+#. odoo-python
+#: code:addons/co_warehouse_extended/models/co_purchase_request.py:0
+msgid "No pending approval steps."
+msgstr "No hay pasos de aprobación pendientes."
+
+#. module: co_warehouse_extended
+#. odoo-python
+#: code:addons/co_warehouse_extended/models/co_purchase_request.py:0
+msgid "Purchase request must be approved first."
+msgstr "La solicitud de compra debe ser aprobada primero."
+
+#. module: co_warehouse_extended
+#. Sequence
+#: model:ir.sequence,name:co_warehouse_extended.seq_co_product_request
+msgid "Product Request"
+msgstr "Solicitud de Producto"
+
+#. module: co_warehouse_extended
+#. Security groups
+#: model:res.groups,name:co_warehouse_extended.group_purchase_approver
+msgid "Purchase Approver"
+msgstr "Aprobador de Compras"
