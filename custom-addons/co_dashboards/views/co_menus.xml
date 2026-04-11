@@ -17,4 +17,10 @@
               parent="purchase.menu_purchase_root"
               action="action_purchase_board"
               sequence="0"/>
+
+    <menuitem id="menu_club_dashboard"
+              name="Tablero del Club"
+              parent="club_core.menu_club_root"
+              action="action_club_board"
+              sequence="0"/>
 </odoo>
