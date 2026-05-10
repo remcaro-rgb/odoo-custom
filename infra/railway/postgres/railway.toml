@@ -1,0 +1,29 @@
+# Railway service descriptor for the self-managed Postgres service.
+#
+# Point Railway at this file via the per-service `RAILWAY_CONFIG_FILE` env var
+# (or by selecting it as the config file in the service settings UI):
+#   RAILWAY_CONFIG_FILE=infra/railway/postgres/railway.toml
+#
+# The build context is the repo root; the Dockerfile path is repo-relative.
+#
+# Required Railway service env (set in the Railway dashboard, not committed):
+#   POSTGRES_PASSWORD              — superuser password
+#   PGBACKREST_REPO1_S3_BUCKET     — backup bucket (HOT tier)
+#   PGBACKREST_REPO1_S3_REGION     — AWS region
+#   PGBACKREST_REPO1_S3_KEY        — IAM access key (prefer IAM role on AWS)
+#   PGBACKREST_REPO1_S3_KEY_SECRET — IAM secret
+#   PGBACKREST_REPO1_CIPHER_PASS   — repo encryption passphrase
+#
+# Volume mount (configured in Railway service UI, not in this file):
+#   /var/lib/postgresql/data ← Railway Volume (start at 20 GB, grow as needed)
+
+[build]
+dockerfilePath = "infra/postgres/Dockerfile"
+
+[deploy]
+# Postgres listens on 5432. Railway internal networking exposes this to peer
+# services in the same project under `<service-name>.railway.internal:5432`.
+# No public TCP — the Odoo pool reaches us via private network only.
+healthcheckPath = ""
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5

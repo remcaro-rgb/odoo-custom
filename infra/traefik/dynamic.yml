@@ -1,0 +1,66 @@
+# Traefik v3 dynamic configuration — fallback / baseline.
+#
+# Production source of truth for per-tenant routes is the Redis KV provider
+# (see traefik.yml). This file ships the static baseline that is *always*
+# present regardless of whether Redis is reachable:
+#
+#   - Middlewares used by every tenant route.
+#   - IP-allowlist for /web/database/* (the Odoo master-password surface).
+#   - Health endpoints exposed for platform liveness checks.
+
+http:
+  middlewares:
+
+    # Compress responses (Odoo's HTML/JSON is highly compressible).
+    saas-compress:
+      compress: {}
+
+    # Security headers applied to every tenant response.
+    saas-security-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        frameDeny: false  # Odoo studio + iframes need this off
+
+    # IP-allowlist for the Odoo master-password surface. Only the SaaS control
+    # plane (Vercel egress) and the operator bastion may hit these endpoints.
+    # IPs are placeholders — fill from the control-plane Vercel egress range
+    # and the bastion's static IP before pilot.
+    saas-database-allowlist:
+      ipAllowList:
+        sourceRange:
+          - "127.0.0.1/32"            # local dev
+          # - "76.76.21.21/32"        # Vercel egress (example)
+          # - "<bastion-ip>/32"
+
+    # Rate limit per source IP — protects shared Odoo pool from a single
+    # tenant misbehaving (e.g., scripted polling).
+    saas-rate-limit:
+      rateLimit:
+        average: 100
+        burst: 200
+        period: 1s
+
+  routers:
+
+    # Hard-coded fallback router: blocks the master-password endpoints unless
+    # the source IP is in the allowlist above. Tenant-specific routers come
+    # from Redis and stack ON TOP of this rule when both match.
+    saas-database-guard:
+      rule: "PathPrefix(`/web/database`)"
+      priority: 1000
+      service: noop@internal
+      middlewares:
+        - saas-database-allowlist
+
+    # Platform liveness probe — answers 200 OK regardless of tenant state.
+    saas-liveness:
+      rule: "Path(`/saas/edge/health`)"
+      service: noop@internal
+
+tcp: {}
+udp: {}

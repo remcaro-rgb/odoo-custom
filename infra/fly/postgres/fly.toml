@@ -1,0 +1,57 @@
+# Fly.io app descriptor for the self-managed Postgres service.
+#
+# Deploy with:
+#   fly deploy --config infra/fly/postgres/fly.toml --dockerfile infra/postgres/Dockerfile
+#
+# This is NOT Fly Postgres (the legacy managed add-on). It's a normal Fly app
+# running our own Postgres image, mounted on a Fly Volume.
+#
+# Secrets (set with `fly secrets set --app odoo-saas-postgres KEY=VALUE`):
+#   POSTGRES_PASSWORD
+#   PGBACKREST_REPO1_S3_BUCKET
+#   PGBACKREST_REPO1_S3_REGION
+#   PGBACKREST_REPO1_S3_KEY
+#   PGBACKREST_REPO1_S3_KEY_SECRET
+#   PGBACKREST_REPO1_CIPHER_PASS
+
+app            = "odoo-saas-postgres"
+primary_region = "iad"           # Phase 1 single-region. Phase 5 adds GRU/SCL.
+kill_signal    = "SIGINT"
+kill_timeout   = "30s"
+
+[build]
+  dockerfile = "../../postgres/Dockerfile"
+
+[env]
+  PGDATA = "/var/lib/postgresql/data/pgdata"
+
+# Postgres listens on 5432 over 6PN (Fly's IPv6 internal mesh). No public TCP —
+# Odoo and Traefik reach Postgres via `odoo-saas-postgres.internal:5432`.
+[[services]]
+  internal_port = 5432
+  protocol      = "tcp"
+  auto_start_machines = false
+  auto_stop_machines  = false
+  min_machines_running = 1
+
+  [[services.tcp_checks]]
+    interval     = "10s"
+    timeout      = "2s"
+    grace_period = "30s"
+
+[[mounts]]
+  source      = "pgdata"
+  destination = "/var/lib/postgresql/data"
+  # Fly Volumes are zone-pinned within a region. HA = streaming replica in a
+  # second region (Phase 2+), not volume forking.
+
+# Process group: a single Postgres process per machine. Replicas (Phase 2) get
+# their own Fly app via a separate fly.toml (replica-specific archive_command
+# left empty + recovery.conf as needed).
+[processes]
+  primary = "postgres -c config_file=/etc/postgresql/postgresql.conf"
+
+[[vm]]
+  size      = "shared-cpu-2x"
+  memory    = "4gb"
+  processes = ["primary"]

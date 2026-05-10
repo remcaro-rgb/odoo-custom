@@ -1,0 +1,60 @@
+# Fly.io app descriptor for Traefik v3.
+#
+# Deploy with:
+#   fly deploy --config infra/fly/traefik/fly.toml --dockerfile infra/traefik/Dockerfile
+#
+# Secrets (set with `fly secrets set --app odoo-saas-traefik KEY=VALUE`):
+#   CLOUDFLARE_DNS_API_TOKEN
+#   REDIS_USERNAME
+#   REDIS_PASSWORD
+
+app            = "odoo-saas-traefik"
+primary_region = "iad"
+kill_signal    = "SIGINT"
+kill_timeout   = "10s"
+
+[build]
+  dockerfile = "../../traefik/Dockerfile"
+
+[env]
+  TRAEFIK_LOG_LEVEL = "INFO"
+
+[http_service]
+  internal_port       = 443
+  force_https         = true
+  auto_start_machines = true
+  auto_stop_machines  = false
+  min_machines_running = 2
+
+  [[http_service.checks]]
+    interval     = "10s"
+    timeout      = "2s"
+    grace_period = "30s"
+    method       = "GET"
+    path         = "/saas/edge/health"
+
+# Plain HTTP on 80 → redirect to 443 (handled inside Traefik via the
+# entryPoints.web.http.redirections config).
+[[services]]
+  internal_port = 80
+  protocol      = "tcp"
+  auto_start_machines = true
+  auto_stop_machines  = false
+  min_machines_running = 2
+
+  [[services.ports]]
+    port     = 80
+    handlers = ["http"]
+
+  [[services.tcp_checks]]
+    interval     = "10s"
+    timeout      = "2s"
+    grace_period = "30s"
+
+[[mounts]]
+  source      = "traefik_letsencrypt"
+  destination = "/letsencrypt"
+
+[[vm]]
+  size   = "shared-cpu-1x"
+  memory = "512mb"

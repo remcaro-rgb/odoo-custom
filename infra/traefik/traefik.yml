@@ -1,0 +1,83 @@
+# Traefik v3 static configuration — Odoo SaaS edge router.
+#
+# Same file deploys to Railway and Fly. Tenant routing logic is identical on
+# both platforms; we chose Traefik over Fly Proxy / Railway edge specifically
+# to keep this surface platform-agnostic.
+#
+# Dynamic source of truth in production: Redis KV. The WDK provisionTenant
+# workflow's `registerRoute` step writes `<slug>.app.example.com →
+# odoo-pool:8069` entries with `X-Odoo-Database: <slug>` header injection.
+# The fallback dynamic.yml file ships baseline middlewares + the IP-allowlist
+# rule for /web/database/*.
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+log:
+  level: INFO
+  format: json
+
+accessLog:
+  format: json
+  fields:
+    headers:
+      defaultMode: keep
+      names:
+        Authorization: drop
+        Cookie: drop
+        X-Odoo-Database: keep
+
+api:
+  dashboard: true
+  insecure: false
+  # Dashboard is exposed only on the internal entrypoint; never reachable
+  # from public HTTPS.
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: cloudflare
+  internal:
+    address: ":8080"
+    # Traefik dashboard + metrics. Bound to platform-internal network only;
+    # neither Railway nor Fly should expose 8080 publicly.
+
+providers:
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+  redis:
+    endpoints:
+      - "redis:6379"
+    rootKey: "traefik"
+    # Set REDIS_USERNAME / REDIS_PASSWORD via env at runtime. The WDK control
+    # plane writes routes here; this provider reads them.
+
+certificatesResolvers:
+  cloudflare:
+    acme:
+      email: ops@example.com
+      storage: /letsencrypt/acme.json
+      dnsChallenge:
+        provider: cloudflare
+        delayBeforeCheck: 0
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+
+metrics:
+  prometheus:
+    entryPoint: internal
+    addEntryPointsLabels: true
+    addServicesLabels: true

@@ -1,0 +1,27 @@
+# Railway service descriptor for Traefik v3.
+#
+# Configure this file as the per-service RAILWAY_CONFIG_FILE for the Traefik
+# service in the Railway dashboard:
+#   RAILWAY_CONFIG_FILE=infra/railway/traefik/railway.toml
+#
+# Required service env (set in Railway dashboard, not committed):
+#   CLOUDFLARE_DNS_API_TOKEN  — for DNS-01 ACME challenge against *.app.example.com
+#   REDIS_USERNAME            — Redis KV provider (dynamic routes)
+#   REDIS_PASSWORD            — Redis KV provider
+#
+# Volume mount (configured in Railway service UI):
+#   /letsencrypt ← Railway Volume (1 GB is plenty; holds acme.json)
+
+[build]
+dockerfilePath = "infra/traefik/Dockerfile"
+
+[deploy]
+# Traefik's own health endpoint is /ping when enabled; we route /saas/edge/health
+# through it via dynamic.yml.
+healthcheckPath = "/saas/edge/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+# Traefik exposes 80 + 443 publicly. The internal dashboard / metrics port
+# (8080) stays on Railway's internal network only.
