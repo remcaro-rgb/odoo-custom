@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Defaults for the saas.* config parameter namespace. The SaaS
+             control plane (provisioning workflow + plan-change workflow)
+             overwrites these per tenant. 'unset' sentinels are deliberate:
+             the telemetry endpoint refuses to answer when the secret is
+             unset, which prevents a freshly-installed tenant from leaking
+             data before the control plane has finished provisioning it. -->
+
+        <record id="saas_seat_cap" model="ir.config_parameter">
+            <field name="key">saas.seat_cap</field>
+            <field name="value">0</field>
+        </record>
+
+        <record id="saas_tenant_id" model="ir.config_parameter">
+            <field name="key">saas.tenant_id</field>
+            <field name="value">unset</field>
+        </record>
+
+        <record id="saas_plan_code" model="ir.config_parameter">
+            <field name="key">saas.plan_code</field>
+            <field name="value">unset</field>
+        </record>
+
+        <record id="saas_telemetry_secret" model="ir.config_parameter">
+            <field name="key">saas.telemetry_secret</field>
+            <field name="value">unset</field>
+        </record>
+    </data>
+</odoo>
