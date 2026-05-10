@@ -20,6 +20,15 @@ services:
       db:
         condition: service_healthy
     env_file: .env
+    environment:
+      # Multi-tenant entrypoint (infra/odoo-entrypoint.sh) reads PG* + ADMIN_PASSWORD.
+      # Mapped from the POSTGRES_* / ADMIN_PASSWORD values in .env.
+      - PGHOST=db
+      - PGPORT=5432
+      - PGUSER=${POSTGRES_USER}
+      - PGPASSWORD=${POSTGRES_PASSWORD}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - PLATFORM=compose
     volumes:
       - ./odoo:/odoo
       - ./jorels-addons:/mnt/jorels-addons

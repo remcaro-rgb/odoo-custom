@@ -1,10 +1,13 @@
 FROM python:3.12-slim
 
 LABEL maintainer="Manuel Caro"
+LABEL org.opencontainers.image.title="odoo-saas"
+LABEL org.opencontainers.image.description="Odoo 19 + Colombia localization (Jorels) + custom addons, platform-agnostic image. Multi-tenant via dbfilter=^%d$."
 
-# System dependencies — all in one RUN layer to avoid stale cache
+# System dependencies — all in one RUN layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    git \
     libpq-dev \
     libxml2-dev \
     libxslt1-dev \
@@ -29,10 +32,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xfonts-base \
     nodejs \
     npm \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# wkhtmltopdf — patched-Qt build from wkhtmltopdf/packaging (NOT distro package)
-# apt-get update required again here because lists were cleared in the prior layer
+# wkhtmltopdf — patched-Qt build from wkhtmltopdf/packaging
 ARG WKHTMLTOPDF_VERSION=0.12.6.1-3
 RUN ARCH=$(dpkg --print-architecture) \
     && apt-get update \
@@ -42,26 +45,42 @@ RUN ARCH=$(dpkg --print-architecture) \
     && rm /tmp/wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/*
 
-# less CSS compiler (node-less apt package not available on Bookworm)
+# less CSS compiler
 RUN npm install -g less
 
-# Python dependencies from Odoo source
-COPY odoo/requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+# Clone Odoo 19.0 from GitHub (pinned to exact commit)
+ARG ODOO_COMMIT=36251c03d81188c04faca77f9d14abe782486b49
+RUN git clone --depth 1 --branch 19.0 https://github.com/odoo/odoo.git /odoo \
+    && cd /odoo && git fetch --depth 1 origin $ODOO_COMMIT && git checkout $ODOO_COMMIT \
+    && rm -rf /odoo/.git
 
-# Install Odoo itself (makes odoo-bin available as a Python package)
-COPY odoo /odoo
+# Python dependencies from Odoo source
+RUN pip install --no-cache-dir -r /odoo/requirements.txt
 RUN pip install --no-cache-dir -e /odoo
+
+# Jorels Colombian localization addons (copied from build context)
+COPY jorels-addons /mnt/jorels-addons
+
+# Copy custom addons (small, from build context)
+COPY custom-addons /mnt/custom-addons
+
+# Config (currently named odoo-railway.conf for historical reasons; the contents
+# are platform-agnostic. Workers / log level can be overridden via env at runtime.)
+COPY config/odoo-railway.conf /etc/odoo/odoo.conf
+
+# Platform-agnostic entrypoint
+COPY infra/odoo-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Odoo filestore directory
 RUN mkdir -p /var/lib/odoo
 
 EXPOSE 8069
 
-# Run as non-root user for security
-# --no-create-home because /odoo already exists (populated by COPY above)
+# Run as non-root user
 RUN useradd --no-create-home -u 1000 odoo \
-    && chown -R odoo:odoo /var/lib/odoo
+    && chown -R odoo:odoo /var/lib/odoo /mnt/custom-addons /mnt/jorels-addons
+
 USER odoo
 
-CMD ["/odoo/odoo-bin", "--config=/etc/odoo/odoo.conf"]
+ENTRYPOINT ["/entrypoint.sh"]
