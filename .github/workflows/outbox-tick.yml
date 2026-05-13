@@ -1,0 +1,49 @@
+# Outbox-tick consumer — runs every 5 minutes and POSTs to the admin app's
+# /api/cron/outbox-tick endpoint, which pulls up to 100 pending rows from
+# the `outbox` table and dispatches each through the per-event handlers.
+#
+# Lives in GH Actions (not Vercel cron) because Vercel Hobby only allows
+# daily cron schedules; 5-min cadence is what we want for billing webhook
+# consumers. Promote to Vercel cron if/when you upgrade to Pro.
+#
+# Required GH secrets:
+#   VERCEL_ADMIN_CRON_URL   full https://… URL of /api/cron/outbox-tick
+#                           e.g. https://odoo-saas-admin.vercel.app/api/cron/outbox-tick
+#   VERCEL_ADMIN_CRON_SECRET  same value as CRON_SECRET on the admin Vercel project
+
+name: outbox tick
+
+on:
+  schedule:
+    # Every 5 minutes. GH Actions enforces a 5-min minimum and has ~15 min
+    # skew in practice — fine for billing events.
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST /api/cron/outbox-tick
+        env:
+          URL: ${{ secrets.VERCEL_ADMIN_CRON_URL }}
+          SECRET: ${{ secrets.VERCEL_ADMIN_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${URL:-}" ] || [ -z "${SECRET:-}" ]; then
+            echo "::error::VERCEL_ADMIN_CRON_URL and VERCEL_ADMIN_CRON_SECRET must be set"
+            exit 1
+          fi
+          # The route is a GET (mirrors the Vercel-cron contract) — Vercel cron
+          # always GETs the endpoint; we do the same for symmetry.
+          http_status=$(curl -sS -o /tmp/resp.json -w "%{http_code}" \
+            -H "authorization: Bearer $SECRET" \
+            "$URL")
+          echo "HTTP $http_status"
+          cat /tmp/resp.json
+          echo
+          if [ "$http_status" != "200" ]; then
+            echo "::error::outbox-tick failed with HTTP $http_status" >&2
+            exit 1
+          fi
