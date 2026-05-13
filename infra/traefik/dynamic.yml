@@ -45,6 +45,21 @@ http:
         burst: 200
         period: 1s
 
+  services:
+
+    # The shared-tier Odoo pool, reachable on each platform's internal
+    # network. On Fly: `odoo-saas-odoo.internal:8069` over 6PN. On Railway:
+    # `odoo.railway.internal:8069` — but Railway isn't running Traefik (it's
+    # using Railway's edge directly), so the Fly form is what actually gets
+    # used. If/when this dynamic.yml ships to a Railway Traefik in the
+    # future, override via Redis with the Railway-internal host.
+    saas-odoo-shared:
+      loadBalancer:
+        servers:
+          - url: "http://odoo-saas-odoo.internal:8069"
+        passHostHeader: true   # Odoo's dbfilter resolves the tenant DB from
+                               # the original Host header, NOT a rewritten one.
+
   routers:
 
     # Hard-coded fallback router: blocks the master-password endpoints unless
@@ -57,10 +72,33 @@ http:
       middlewares:
         - saas-database-allowlist
 
+    # Wildcard tenant router — matches `<slug>.app.goliatt.co` and forwards to
+    # the shared Odoo pool. With `tls.certResolver: cloudflare` + an explicit
+    # `tls.domains` entry, Traefik PRE-ACQUIRES the *.app.goliatt.co cert on
+    # startup (rather than lazily on first request) so the first tenant hit
+    # doesn't pay the ACME round-trip latency.
+    #
+    # `<slug>` is whatever Odoo's tenant DB is named (control plane enforces
+    # the same regex). Priority below the database-guard so /web/database
+    # still gates on IP first.
+    saas-tenants-wildcard:
+      rule: "HostRegexp(`^[a-z0-9][a-z0-9-]*\\.app\\.goliatt\\.co$`)"
+      priority: 100
+      service: saas-odoo-shared
+      middlewares:
+        - saas-compress
+        - saas-security-headers
+        - saas-rate-limit
+      tls:
+        certResolver: cloudflare
+        domains:
+          - main: "*.app.goliatt.co"
+
     # Platform liveness probe — answers 200 OK regardless of tenant state.
     saas-liveness:
       rule: "Path(`/saas/edge/health`)"
       service: noop@internal
 
-tcp: {}
-udp: {}
+# Empty `tcp: {}` / `udp: {}` blocks rejected by Traefik 3.2.5+ as
+# "standalone element (type *dynamic.TCPConfiguration)". Omit them entirely
+# until/unless real TCP/UDP routers land.
