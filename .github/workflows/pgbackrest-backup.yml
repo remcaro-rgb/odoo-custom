@@ -96,6 +96,12 @@ jobs:
             echo "::error::RAILWAY_TOKEN is unset; configure repo secret." >&2
             exit 1
           fi
+          # Debug: surface what the runner sees so we can diagnose
+          # auth failures. railway whoami exits non-zero on bad tokens
+          # (with `set -e` would abort) — wrap in `|| true`.
+          echo "railway --version: $(railway --version 2>&1)"
+          echo "railway whoami: $(railway whoami 2>&1 || true)"
+          echo "token-byte-count (should be 36 for a UUID-shaped project token): ${#RAILWAY_TOKEN}"
           # railway ssh needs an Account / Personal API Token from
           # https://railway.com/account/tokens — NOT a project-scoped token
           # from Project Settings. If the next step errors with
