@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+        Daily filestore backup. 03:30 COT == 08:30 UTC — staggered an hour
+        after pgBackRest's diff cron (03:00 UTC) so the two don't compete
+        for S3 / postgres I/O at the same moment.
+
+        active=False on first install: the cron registers but doesn't fire
+        until the control plane writes saas.filestore_backup_endpoint into
+        ir.config_parameter (which is also when the backing endpoint
+        actually exists on the control plane). Tenants without the wiring
+        won't see noise in the cron log.
+        -->
+        <record id="ir_cron_saas_filestore_backup" model="ir.cron">
+            <field name="name">SaaS: daily filestore backup</field>
+            <field name="model_id" ref="model_saas_filestore_backup" />
+            <field name="state">code</field>
+            <field name="code">model.run_backup()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+            <field name="active" eval="False" />
+            <field name="priority">50</field>
+        </record>
+    </data>
+</odoo>

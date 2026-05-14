@@ -1,0 +1,34 @@
+# Fly.io app descriptor for PgBouncer in front of the Fly Postgres.
+#
+# Deploy:
+#   flyctl deploy --config infra/fly/pgbouncer/fly.toml --remote-only
+#
+# Required secrets (set with `flyctl secrets set --app odoo-saas-pgbouncer …`):
+#   PG_HOST           odoo-saas-postgres.internal
+#   PG_PORT           5432
+#   PGUSER            odoo
+#   PGPASSWORD        same value as on the odoo Fly app
+#
+# Switching Fly Odoo to PgBouncer (NOT done in this commit): on the
+# odoo-saas-odoo app, set PGHOST=odoo-saas-pgbouncer.internal + PGPORT=6432
+# via `flyctl secrets set`. Deploy. Revert on connection errors.
+
+app            = "odoo-saas-pgbouncer"
+primary_region = "iad"
+kill_signal    = "SIGINT"
+kill_timeout   = "10s"
+
+[build]
+  dockerfile = "../../postgres/pgbouncer/Dockerfile"
+
+[checks]
+  [checks.pgbouncer_tcp]
+    type         = "tcp"
+    port         = 6432
+    interval     = "15s"
+    timeout      = "2s"
+    grace_period = "30s"
+
+[[vm]]
+  size   = "shared-cpu-1x"
+  memory = "256mb"

@@ -1,0 +1,24 @@
+# Railway service descriptor for PgBouncer.
+#
+# Required env (set in dashboard):
+#   PG_HOST           postgres.railway.internal
+#   PG_PORT           5432
+#   PGUSER            odoo  (or postgres for direct-admin pooling)
+#   PGPASSWORD        same value as on the odoo service
+#
+# Switching Odoo to talk through PgBouncer (Phase 1 cutover, NOT done in
+# this commit): edit the odoo service env on Railway and set
+#   PGHOST=pgbouncer.railway.internal
+#   PGPORT=6432
+# then redeploy odoo. Health stays green if PgBouncer is reachable; revert
+# the two env vars if connection errors appear.
+
+[build]
+dockerfilePath = "infra/postgres/pgbouncer/Dockerfile"
+
+[deploy]
+# No HTTP healthcheck — PgBouncer is plain TCP. Railway falls back to
+# "process is alive" + the TCP socket on 6432.
+healthcheckPath = ""
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
