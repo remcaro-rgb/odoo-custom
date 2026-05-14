@@ -1,15 +1,26 @@
 # Quarterly pgBackRest restore drill — proves the backups are actually
 # restorable, not just sitting in S3. The plan commits to drilling at least
 # quarterly and marking any backup older than 12 months unverified as
-# tenant_backups.state = 'untrusted'.
+# tenant_backups.state = 'untrusted' (now cluster_backups.state).
 #
-# Strategy: SSH into each platform's postgres container, restore the most
-# recent base backup into a side path (NOT touching the running cluster),
-# verify the canonical files exist, then clean up. Fully non-destructive.
+# Strategy per platform:
+#   1. Run `pgbackrest info --output=json` to fetch the S3 catalog, pipe
+#      the JSON back to the GH runner.
+#   2. POST to /api/internal/cluster-backups with op=sync — upserts a row
+#      per backup label so the catalog mirrors S3 in Neon.
+#   3. Restore the latest base backup into /tmp on the postgres container
+#      (NOT touching the live cluster). Verify canonical files exist.
+#   4. POST op=drill_pass for the restored label — flips state to
+#      'verified' and stamps restore_tested_at = NOW().
 #
-# Required GH secrets (already set):
-#   RAILWAY_TOKEN, RAILWAY_PROJECT_ID, RAILWAY_ENVIRONMENT_ID
-#   FLY_API_TOKEN
+# After both per-platform drills, a final job hits op=sweep_untrusted which
+# flips any row > 12 months old without restore_tested_at to state='untrusted'.
+#
+# Required GH secrets:
+#   RAILWAY_API_TOKEN, RAILWAY_PROJECT_ID, RAILWAY_ENVIRONMENT_ID
+#   RAILWAY_SSH_PRIVATE_KEY
+#   FLY_SSH_TOKEN_POSTGRES
+#   VERCEL_ADMIN_CRON_SECRET    Bearer token for /api/internal/*
 
 name: pgBackRest restore drill
 
@@ -25,6 +36,9 @@ on:
         required: true
         default: "both"
         options: [both, railway, fly]
+
+env:
+  CONTROL_PLANE_URL: https://odoo-saas-admin.vercel.app
 
 jobs:
   drill-railway:
@@ -59,30 +73,39 @@ jobs:
           chmod 600 "$HOME/.ssh/config"
           touch "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/known_hosts"
-      - name: Restore drill (Railway)
+      - name: Sync Railway catalog → cluster_backups
         env:
-          # Account-level token (RAILWAY_API_TOKEN, not project-scoped
-          # RAILWAY_TOKEN). Same reason as the backup workflow.
           RAILWAY_API_TOKEN_RAW: ${{ secrets.RAILWAY_API_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
+          CRON_SECRET: ${{ secrets.VERCEL_ADMIN_CRON_SECRET }}
         run: |
           set -euo pipefail
           export RAILWAY_API_TOKEN="$(printf '%s' "$RAILWAY_API_TOKEN_RAW" | tr -d '\r\n')"
-          if [ -z "${RAILWAY_API_TOKEN:-}" ]; then
-            echo "::error::RAILWAY_API_TOKEN unset"; exit 1
-          fi
-          # The remote command runs as root in the postgres container; we
-          # gosu down to postgres for pgbackrest so it reads its own conf.
-          # Restore into /tmp/restore-drill-<ts> (not the live PGDATA), verify
-          # the canonical files exist, then rm -rf with a trap.
-          # See pgbackrest-backup.yml for why we link first and why
-          # names are used instead of UUIDs, and why we unset the
-          # UUID env vars before ssh.
-          railway link \
-            --project odoo-saas \
-            --environment production \
-            --service postgres
+          [ -z "$RAILWAY_API_TOKEN" ] && { echo "::error::RAILWAY_API_TOKEN unset"; exit 1; }
+          [ -z "$CRON_SECRET" ] && { echo "::error::VERCEL_ADMIN_CRON_SECRET unset"; exit 1; }
+          railway link --project odoo-saas --environment production --service postgres
+          unset RAILWAY_PROJECT_ID RAILWAY_ENVIRONMENT_ID
+          railway ssh --service postgres "gosu postgres pgbackrest --stanza=shared info --output=json" \
+            > /tmp/rw-info.json
+          # Validate JSON before sending
+          jq -e '. | length > 0 and .[0].backup | length > 0' /tmp/rw-info.json >/dev/null
+          # Capture the latest backup label for the drill-pass step below
+          LATEST=$(jq -r '.[0].backup | sort_by(.timestamp.start) | last | .label' /tmp/rw-info.json)
+          echo "latest-label=$LATEST" >> "$GITHUB_OUTPUT"
+          echo "RAILWAY_LATEST_LABEL=$LATEST" >> "$GITHUB_ENV"
+          # POST the catalog
+          curl -fsSL -X POST "$CONTROL_PLANE_URL/api/internal/cluster-backups" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --slurpfile info /tmp/rw-info.json \
+                '{op:"sync", platform:"railway", stanza:"shared", pgbackrestInfo:$info[0]}')" \
+            | jq '.'
+      - name: Restore drill (Railway)
+        env:
+          RAILWAY_API_TOKEN_RAW: ${{ secrets.RAILWAY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          export RAILWAY_API_TOKEN="$(printf '%s' "$RAILWAY_API_TOKEN_RAW" | tr -d '\r\n')"
+          railway link --project odoo-saas --environment production --service postgres > /dev/null 2>&1 || true
           unset RAILWAY_PROJECT_ID RAILWAY_ENVIRONMENT_ID
           railway ssh --service postgres "
             set -eu
@@ -90,8 +113,6 @@ jobs:
             trap 'rm -rf \$DRILL' EXIT
             mkdir -p \$DRILL
             chown postgres:postgres \$DRILL
-            echo '--- pgbackrest info (Railway / shared) ---'
-            gosu postgres pgbackrest --stanza=shared info
             echo '--- restore to '\$DRILL' ---'
             gosu postgres pgbackrest --stanza=shared --pg1-path=\$DRILL --log-level-console=info restore
             echo '--- verify restored files ---'
@@ -99,6 +120,18 @@ jobs:
             cat \$DRILL/PG_VERSION
             echo '--- drill OK (Railway / shared) ---'
           "
+      - name: Record drill_pass (Railway)
+        env:
+          CRON_SECRET: ${{ secrets.VERCEL_ADMIN_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          [ -z "$RAILWAY_LATEST_LABEL" ] && { echo "::error::RAILWAY_LATEST_LABEL not captured by sync step"; exit 1; }
+          curl -fsSL -X POST "$CONTROL_PLANE_URL/api/internal/cluster-backups" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg label "$RAILWAY_LATEST_LABEL" --arg run "$GITHUB_RUN_ID" \
+                '{op:"drill_pass", platform:"railway", label:$label, workflowRunId:$run}')" \
+            | jq '.'
 
   drill-fly:
     if: github.event.schedule != '' || inputs.target == 'both' || inputs.target == 'fly'
@@ -106,23 +139,43 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Sync Fly catalog → cluster_backups
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_SSH_TOKEN_POSTGRES }}
+          CRON_SECRET: ${{ secrets.VERCEL_ADMIN_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          [ -z "$FLY_API_TOKEN" ] && { echo "::error::FLY_API_TOKEN unset"; exit 1; }
+          [ -z "$CRON_SECRET" ] && { echo "::error::VERCEL_ADMIN_CRON_SECRET unset"; exit 1; }
+          flyctl ssh console --app odoo-saas-postgres -C "gosu postgres pgbackrest --stanza=shared info --output=json" \
+            > /tmp/fly-info.json
+          # flyctl wraps its output sometimes; strip the leading "Connecting to ..." preamble.
+          # Find first '[' and slice from there.
+          OFFSET=$(grep -bo '^\[' /tmp/fly-info.json | head -1 | cut -d: -f1)
+          if [ -n "$OFFSET" ] && [ "$OFFSET" -gt 0 ]; then
+            tail -c +$((OFFSET + 1)) /tmp/fly-info.json > /tmp/fly-info.clean.json
+            mv /tmp/fly-info.clean.json /tmp/fly-info.json
+          fi
+          jq -e '. | length > 0 and .[0].backup | length > 0' /tmp/fly-info.json >/dev/null
+          LATEST=$(jq -r '.[0].backup | sort_by(.timestamp.start) | last | .label' /tmp/fly-info.json)
+          echo "FLY_LATEST_LABEL=$LATEST" >> "$GITHUB_ENV"
+          curl -fsSL -X POST "$CONTROL_PLANE_URL/api/internal/cluster-backups" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --slurpfile info /tmp/fly-info.json \
+                '{op:"sync", platform:"fly", stanza:"shared", pgbackrestInfo:$info[0]}')" \
+            | jq '.'
       - name: Restore drill (Fly)
         env:
-          # Same reason as the backup workflow: ssh-scoped token, not deploy.
           FLY_API_TOKEN: ${{ secrets.FLY_SSH_TOKEN_POSTGRES }}
         run: |
           set -euo pipefail
-          if [ -z "${FLY_API_TOKEN:-}" ]; then
-            echo "::error::FLY_API_TOKEN unset"; exit 1
-          fi
           flyctl ssh console --app odoo-saas-postgres -C "
             set -eu
             DRILL=/tmp/restore-drill-\$(date +%s)
             trap 'rm -rf \$DRILL' EXIT
             mkdir -p \$DRILL
             chown postgres:postgres \$DRILL
-            echo '--- pgbackrest info (Fly / shared) ---'
-            gosu postgres pgbackrest --stanza=shared info
             echo '--- restore to '\$DRILL' ---'
             gosu postgres pgbackrest --stanza=shared --pg1-path=\$DRILL --log-level-console=info restore
             echo '--- verify restored files ---'
@@ -130,25 +183,46 @@ jobs:
             cat \$DRILL/PG_VERSION
             echo '--- drill OK (Fly / shared) ---'
           "
+      - name: Record drill_pass (Fly)
+        env:
+          CRON_SECRET: ${{ secrets.VERCEL_ADMIN_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          [ -z "$FLY_LATEST_LABEL" ] && { echo "::error::FLY_LATEST_LABEL not captured by sync step"; exit 1; }
+          curl -fsSL -X POST "$CONTROL_PLANE_URL/api/internal/cluster-backups" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg label "$FLY_LATEST_LABEL" --arg run "$GITHUB_RUN_ID" \
+                '{op:"drill_pass", platform:"fly", label:$label, workflowRunId:$run}')" \
+            | jq '.'
 
-  flag-untrusted:
-    # After both per-platform drills run, flag tenant_backups rows older than
-    # 12 months that haven't been touched by a successful drill as
-    # state='untrusted' (per the plan's commitment). Phase-1 stub: no rows
-    # exist with restore_tested_at populated yet because the drill doesn't
-    # write to tenant_backups — a follow-up adds catalog writes per drill run.
+  sweep-untrusted:
+    # Final pass: flag any cluster_backups row > 12 months old without
+    # restore_tested_at as state='untrusted'. Runs even if one platform's
+    # drill failed — sweeping still moves forward on whatever did succeed.
     needs: [drill-railway, drill-fly]
-    if: always() && needs.drill-railway.result != 'failure' && needs.drill-fly.result != 'failure'
+    if: always() && (needs.drill-railway.result == 'success' || needs.drill-fly.result == 'success')
     runs-on: ubuntu-latest
     steps:
-      - name: Note — untrusted-flagging
+      - name: Sweep untrusted rows
+        env:
+          CRON_SECRET: ${{ secrets.VERCEL_ADMIN_CRON_SECRET }}
         run: |
-          echo "## Restore drill summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Platform | Result |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Railway | ${{ needs.drill-railway.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Fly | ${{ needs.drill-fly.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "TODO Phase 2: write a row into tenant_backups.restore_tested_at" >> "$GITHUB_STEP_SUMMARY"
-          echo "for each successful drill, and a separate workflow that flags" >> "$GITHUB_STEP_SUMMARY"
-          echo "any backup row > 12 months since last drill as state='untrusted'." >> "$GITHUB_STEP_SUMMARY"
+          set -euo pipefail
+          [ -z "$CRON_SECRET" ] && { echo "::error::VERCEL_ADMIN_CRON_SECRET unset"; exit 1; }
+          RESP=$(curl -fsSL -X POST "$CONTROL_PLANE_URL/api/internal/cluster-backups" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d '{"op":"sweep_untrusted"}')
+          echo "$RESP" | jq '.'
+          FLAGGED=$(echo "$RESP" | jq -r '.flagged')
+          {
+            echo "## Restore drill summary"
+            echo
+            echo "| Platform | Result |"
+            echo "|---|---|"
+            echo "| Railway | ${{ needs.drill-railway.result }} |"
+            echo "| Fly | ${{ needs.drill-fly.result }} |"
+            echo
+            echo "**Untrusted sweep:** flagged $FLAGGED row(s) older than 12 months without a recent drill."
+          } >> "$GITHUB_STEP_SUMMARY"
