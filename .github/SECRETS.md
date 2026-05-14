@@ -6,7 +6,7 @@ Actions → Repository secrets**.
 
 | Secret | Used by | Where to get it |
 |---|---|---|
-| `RAILWAY_TOKEN` | `ci.yml` deploy-railway, `pgbackrest-backup.yml` backup-railway | Railway dashboard → Project → Tokens → "Create token". Use a **team/project token**. Same token works for `railway ssh` (used by the pgBackRest workflow). |
+| `RAILWAY_TOKEN` | `ci.yml` deploy-railway, `pgbackrest-backup.yml` backup-railway, `restore-drill.yml` drill-railway | **Account / Personal API Token** from https://railway.com/account/tokens — **NOT** a project token from Project Settings → Tokens. Project tokens are limited to deploy operations and **cannot run `railway ssh`** (observed: "Unauthorized. Please check that your RAILWAY_TOKEN is valid"). Account tokens cover the broader scope `railway ssh` needs. Set via `gh secret set RAILWAY_TOKEN -R remcaro-rgb/odoo-custom --body "<token>"` (the `--body` form avoids the trailing newline that interactive paste keeps, but the workflows defensively `tr -d '\r\n'` either way). |
 | `RAILWAY_ODOO_SERVICE_ID` | `ci.yml` deploy-railway | Railway dashboard → odoo service → Settings → service ID at the top of the page (`919deb8a-3ca5-4c48-8577-ea89f6c9cf90` for current pilot). |
 | `RAILWAY_PROJECT_ID` | `pgbackrest-backup.yml` backup-railway | `465dcc94-8004-4b4c-ad19-039d1b9b90c8` for the `odoo-saas` project. `railway status` shows it. |
 | `RAILWAY_ENVIRONMENT_ID` | `pgbackrest-backup.yml` backup-railway | `41fa1df4-6faa-4dae-beed-644fa6354180` for the `production` env. `railway variables --service postgres --kv` shows it. |

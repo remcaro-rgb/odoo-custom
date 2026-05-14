@@ -96,6 +96,11 @@ jobs:
             echo "::error::RAILWAY_TOKEN is unset; configure repo secret." >&2
             exit 1
           fi
+          # railway ssh needs an Account / Personal API Token from
+          # https://railway.com/account/tokens — NOT a project-scoped token
+          # from Project Settings. If the next step errors with
+          # "Unauthorized. Please check that your RAILWAY_TOKEN is valid",
+          # swap the secret value for an account token. See .github/SECRETS.md.
           # railway ssh joins args + runs remote `sh -c`, so the SQL/CLI string
           # has to survive the remote shell's parse — see the Railway TXT-prefix
           # memory note. Plain alphanumerics + slashes are fine.
