@@ -1,0 +1,66 @@
+# Fly.io app descriptor for the dedicated Operator Odoo (the SaaS's own
+# books — chart of accounts for our subscribers, DIAN e-invoicing via
+# Jorels, etc.). Same image as the tenant Odoo pool, but runs in SINGLE_DB
+# mode so it serves exactly one database (`operator`) regardless of the
+# request Host header.
+#
+# Deploy:
+#   flyctl deploy --config infra/fly/operator/fly.toml --remote-only
+#
+# Required secrets (set with `flyctl secrets set --app odoo-saas-operator …`):
+#   ADMIN_PASSWORD     master password
+#   PGHOST             odoo-saas-postgres.internal  (or its own DB host)
+#   PGPORT             5432
+#   PGUSER             odoo (CREATEDB role)
+#   PGPASSWORD         the odoo role password
+#   SINGLE_DB          operator  (← routes ALL requests to this DB)
+#
+# Operator data migration (NOT done automatically — explicit cutover):
+#   1. pg_dump --format=custom -d operator from the Railway postgres
+#   2. pg_restore into a fresh DB on the Fly postgres (or its own dedicated
+#      Postgres app if you want true isolation — strongly preferred for
+#      operator data)
+#   3. Update OPERATOR_ODOO_URL on Vercel admin from
+#      https://operator.app.goliatt.co → https://operator.fly.goliatt.co
+#      (or whichever subdomain you wire up)
+#   4. Add a Fly custom domain on this app for operator.fly.goliatt.co
+#      via `flyctl certs add`
+#   5. Delete the `operator` DB from the Railway shared Postgres so the
+#      shared Odoo pool no longer serves it
+
+app            = "odoo-saas-operator"
+primary_region = "iad"
+kill_signal    = "SIGINT"
+kill_timeout   = "30s"
+
+[build]
+  dockerfile = "../../../Dockerfile"
+
+[env]
+  PLATFORM  = "fly"
+  PORT      = "8069"
+  # The single-DB switch — entrypoint pins dbfilter to ^operator$ and
+  # passes --database=operator.
+  SINGLE_DB = "operator"
+
+[http_service]
+  internal_port       = 8069
+  force_https         = true
+  auto_start_machines = true
+  auto_stop_machines  = false
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    interval     = "15s"
+    timeout      = "5s"
+    grace_period = "60s"
+    method       = "GET"
+    path         = "/web/health"
+
+[[mounts]]
+  source      = "operator_data"
+  destination = "/var/lib/odoo"
+
+[[vm]]
+  size   = "shared-cpu-2x"
+  memory = "2gb"

@@ -123,8 +123,26 @@ ARGS=(
     --db_password="$DB_PASSWORD"
     --http-port="$WEB_PORT"
     --proxy-mode
-    --db-filter='^%d$'
 )
+
+# Routing mode selection:
+#   SINGLE_DB=<name>   → single-DB serving mode for the operator Odoo or
+#                       any other single-tenant Odoo. dbfilter pinned to
+#                       ^<name>$ so the server only ever resolves to that
+#                       one DB regardless of the request Host header.
+#                       Use this when the app fronts ONE database with
+#                       a stable hostname.
+#   (otherwise)         → multi-tenant SaaS mode (default). dbfilter
+#                       ^%d$ resolves the DB name from the request
+#                       subdomain; the control plane provisions and
+#                       routes tenant subdomains.
+SINGLE_DB="${SINGLE_DB:-}"
+if [ -n "$SINGLE_DB" ]; then
+    ARGS+=(--database="$SINGLE_DB" --db-filter="^${SINGLE_DB}\$")
+    echo "odoo-entrypoint: SINGLE_DB mode — pinned to database '$SINGLE_DB'"
+else
+    ARGS+=(--db-filter='^%d$')
+fi
 
 if [ -n "${WORKERS:-}" ]; then
     ARGS+=(--workers="$WORKERS")
