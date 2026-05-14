@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Vercel function errors > 5/min",
+    "description": "Any control-plane function logging level=error at high rate. Catches downstream provider outages (Resend, Neon, Clerk) and code regressions.",
+    "query": "['odoo-saas'] | where level == 'error' | summarize count() by bin(_time, 1m) | where count_ > 5",
+    "interval": "1m",
+    "alert_on": "any-result",
+    "severity": "error",
+    "channels": ["email"]
+  },
+  {
+    "name": "Odoo CRITICAL log line",
+    "description": "Odoo emits CRITICAL only on registry-init failures, segfaults, missing translations — always operator action.",
+    "query": "['odoo-saas'] | where _source startswith 'odoo' | where message contains ' CRITICAL '",
+    "interval": "1m",
+    "alert_on": "any-result",
+    "severity": "error",
+    "channels": ["email"]
+  },
+  {
+    "name": "pgBackRest backup failed",
+    "description": "Daily pgBackRest base/diff failed on Railway or Fly. Symptom of WAL archiving regression or S3 outage.",
+    "query": "['odoo-saas'] | where workflow == 'pgBackRest base backup' | where conclusion == 'failure'",
+    "interval": "5m",
+    "alert_on": "any-result",
+    "severity": "error",
+    "channels": ["email"]
+  },
+  {
+    "name": "Restore drill failed",
+    "description": "Quarterly drill failed before reaching drill_pass. Backups may be unrestorable.",
+    "query": "['odoo-saas'] | where workflow == 'pgBackRest restore drill' | where conclusion == 'failure'",
+    "interval": "5m",
+    "alert_on": "any-result",
+    "severity": "error",
+    "channels": ["email"]
+  },
+  {
+    "name": "Provisioning workflow FatalError",
+    "description": "provisionTenant or any WDK step FatalError'd — a tenant is stuck pending. Operator must investigate.",
+    "query": "['odoo-saas'] | where errorName == 'FatalError' | where workflowRunId is not empty",
+    "interval": "1m",
+    "alert_on": "any-result",
+    "severity": "error",
+    "channels": ["email"]
+  },
+  {
+    "name": "cluster_backups untrusted flags fired",
+    "description": "The quarterly sweep flagged at least one backup row as untrusted (>12mo without drill). Investigate why drills weren't covering it.",
+    "query": "['odoo-saas'] | where route == '/api/internal/cluster-backups' | where msg == 'sweep_untrusted-ok' | where flagged > 0",
+    "interval": "1h",
+    "alert_on": "any-result",
+    "severity": "warn",
+    "channels": ["email"]
+  },
+  {
+    "name": "Outbox tick with failures",
+    "description": "Webhook event handlers failing at the outbox dispatcher. Risk: lost billing/subscription events.",
+    "query": "['odoo-saas'] | where route == '/api/cron/outbox-tick' | where failed > 0",
+    "interval": "5m",
+    "alert_on": "any-result",
+    "severity": "warn",
+    "channels": ["email"]
+  },
+  {
+    "name": "Welcome email delivery failed",
+    "description": "Resend rejected an admin-credentials email. Tenant DB is up but the user hasn't received the password.",
+    "query": "['odoo-saas'] | where errorStack contains 'Resend rejected welcome email'",
+    "interval": "1m",
+    "alert_on": "any-result",
+    "severity": "error",
+    "channels": ["email"]
+  }
+]
