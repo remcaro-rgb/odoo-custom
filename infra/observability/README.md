@@ -1,103 +1,61 @@
-# Observability — log drains + alerts
+# Observability — native logs only (current state)
 
-This implements HARDENING.md item 2.
+HARDENING.md item 2 calls for log aggregation across Vercel + Railway + Fly into a single vendor. Operator decision (2026-05-14): **skip the external vendor for this phase**. Rely on each platform's native log viewer + the structured-JSON output we now emit in critical paths.
 
-The control plane (Vercel admin + portal), data plane (Railway + Fly Odoo + Postgres), and the GitHub Actions backup/drill workflows all emit logs today, but they sit in each platform's native viewer with no retention, no aggregated search, no alerting. This dir holds the configuration + runbook for shipping all of those into one place.
+## What you have today
 
-## Vendor
-
-**Default pick: Axiom** (https://axiom.co). Rationale:
-
-| Vendor | Vercel native | Free tier | Setup time | Notes |
-|---|---|---|---|---|
-| **Axiom** | ✅ one-click Vercel integration | 500 GB/mo ingest, 30-day retention | ~5 min | APL query language; alert webhooks built-in |
-| Better Stack (Logtail) | drain config | 1 GB/mo (small) | ~10 min | nicer UI, smaller free tier |
-| Datadog | drain config | 14-day trial | ~20 min | full APM stack but pricey at scale |
-| SigNoz | self-hosted | unlimited (you run it) | ~hours | OSS; only if we already operate it |
-
-Going with Axiom. Switch by editing the URL/token in the Vercel/Railway drain step below — the JSON log shape we emit is vendor-agnostic.
-
-## What the code already emits
-
-The control plane uses structured one-line JSON via `console.log(JSON.stringify({level, route, msg, ...extra}))`. Drains pick up stdout/stderr as-is. Sites already wired:
-
-- `apps/admin/app/api/internal/cluster-backups/route.ts` — emits `level=info|warn|error`, `op`, `flagged`, `platform`, `label`, `workflowRunId` per cluster-backup operation
-- `apps/admin/app/api/cron/outbox-tick/route.ts` — already logs auth failures (will be augmented with per-row dispatch results when the outbox grows)
-- `packages/workflows/src/provision-tenant.ts` — `[loadTenant]`, `[emailWelcome]` instrumentation (the latter records `to_present`, `to_value` for delivery debugging)
-- WDK runtime — every workflow step boundary is one Vercel log line (`POST /.well-known/workflow/v1/{flow,step}`)
-
-Data plane (Odoo) writes its native log lines (`module/level/timestamp/message`) to stdout, which is what we'll drain.
-
-## Activation — what's left for the user
-
-Each drain endpoint needs an account + token. I can't sign up for you (Anthropic safety rule). Once you have an Axiom account:
-
-1. **Create a dataset** at https://axiom.co — name it `odoo-saas` (or any).
-2. **Create an API token** with `Ingest` permission scoped to that dataset. Copy it.
-3. **Paste back** to me with:
-   - `AXIOM_DATASET=odoo-saas`
-   - `AXIOM_INGEST_TOKEN=xaat-...`
-
-I will then, in one turn:
-
-```bash
-# 1) Vercel — both apps. Drain UI is at:
-#    https://vercel.com/<team>/<project>/settings/log-drains
-# CLI is faster:
-for app in admin portal; do
-  vercel integrations install axiom --project=odoo-saas-$app
-done
-# OR via the Vercel API directly (avoids the Marketplace install dance):
-# POST https://api.vercel.com/v2/integrations/log-drains
-#   { name, type: "json", url: "https://api.axiom.co/v1/datasets/odoo-saas/ingest?...",
-#     projectIds: [...], headers: { "Authorization": "Bearer <token>" } }
-
-# 2) Railway — Project → Settings → Log Drains → New Drain
-#    type: Datadog-compatible (Axiom impersonates), URL: https://api.axiom.co/v1/datasets/odoo-saas/ingest
-#    headers: Authorization=Bearer <token>
-# CLI:
-railway add log-drain --type generic-webhook \
-  --url https://api.axiom.co/v1/datasets/odoo-saas/ingest \
-  --header "Authorization=Bearer $AXIOM_INGEST_TOKEN"
-
-# 3) Fly — deploy the superfly/fly-log-shipper app on the same org
-#    Doc: https://github.com/superfly/fly-log-shipper
-flyctl launch --image flyio/log-shipper --name odoo-saas-log-shipper --org personal --copy-config --now
-flyctl secrets set --app odoo-saas-log-shipper \
-  ACCESS_TOKEN="$(flyctl tokens create org-read --org personal --expiry 8760h)" \
-  ORG=personal \
-  AXIOM_TOKEN="$AXIOM_INGEST_TOKEN" \
-  AXIOM_DATASET="$AXIOM_DATASET"
-```
-
-## Alerts to configure once logs are flowing
-
-Per HARDENING.md item 2, set Axiom monitors on these queries:
-
-| Alert | APL query | Trigger | Channel |
+| Source | Where to look | Retention | Search |
 |---|---|---|---|
-| Vercel function errors > N/min | `['odoo-saas'] \| where level == 'error' \| where _source startswith 'vercel-' \| summarize count() by bin(_time, 1m)` | > 5/min | email/slack |
-| Odoo CRITICAL | `['odoo-saas'] \| where _source =~ 'odoo' \| where message contains 'CRITICAL'` | any | email |
-| pgBackRest backup non-zero exit | `['odoo-saas'] \| where _source =~ 'github-actions' \| where conclusion == 'failure' and workflow contains 'pgbackrest'` | any | email |
-| Vercel cron.failed | `['odoo-saas'] \| where event == 'cron.failed'` | any | email |
-| Restore drill failure | `['odoo-saas'] \| where workflow == 'pgBackRest restore drill' and conclusion == 'failure'` | any | email |
+| Vercel admin functions | `vercel logs odoo-saas-admin.vercel.app --since 1h` or the Vercel dashboard | **1h on Hobby**, 30d on Pro/Enterprise | full-text + structured field filters in dashboard |
+| Vercel portal functions | `vercel logs odoo-saas-portal.vercel.app --since 1h` | same | same |
+| Railway Odoo + Postgres | Railway dashboard → service → Logs tab; or `railway logs --service <name>` | ~7 days on Hobby | per-service stream, no cross-service correlation |
+| Fly Odoo + Postgres | `flyctl logs --app <app>` | **streaming only, no retention** | grep on the live stream |
+| GitHub Actions (pgBackRest backups, restore drills, CI) | `gh run view <id> --log` or repo Actions tab | 90 days default | per-run search |
 
-Alert config lives in Axiom's UI — there's no IaC for monitors at the free tier. If we ever need that, switch to Grafana Alerting on a self-hosted SigNoz or Loki.
+## What we lose without a drain
 
-## Rotation
+- No cross-platform correlation (a tenant signup spans portal → admin → Odoo pool; tracing that today means three separate viewers).
+- No retention beyond the platform defaults; Fly's zero retention is the worst gap.
+- No automated alerting on the conditions HARDENING.md item 2 calls out:
+  - Vercel function errors > N/min
+  - Odoo CRITICAL lines
+  - pgBackRest backup-runner non-zero exits
+  - Cron failures
+  - Resend rejection in `emailWelcome`
 
-Axiom ingest tokens don't expire by default. Rotate annually:
+Operationally that means: failures get noticed by tenants before us, or by the next operator visit to the dashboards. Acceptable for a private pilot; not acceptable once paying tenants are on.
 
-```bash
-# Create a new token (Axiom UI → Settings → API Tokens → New)
-# Update Vercel:
-for app in admin portal; do
-  vercel integrations update axiom --project=odoo-saas-$app --token=<new>
-done
-# Update Railway drain (UI is easier than CLI here; the existing drain edit accepts new headers)
-# Update Fly log-shipper:
-flyctl secrets set --app odoo-saas-log-shipper AXIOM_TOKEN=<new>
-# Revoke the old token in Axiom UI.
-```
+## Structured-JSON log lines already in place
 
-See [[reference-railway-cli-v458-ssh-gotchas]] for the broader secrets-rotation pattern used in this repo.
+These flow through whichever platform runs the code; if you ever flip the vendor decision, every drain ingests them as-is — no rewrite needed.
+
+- `apps/admin/app/api/internal/cluster-backups/route.ts` — `{level, route, msg, op, ...}` per sync/drill_pass/sweep_untrusted call
+- `apps/admin/app/api/cron/outbox-tick/route.ts` — `{level, route, msg, pulled, handled, noopped, failed}` per tick + auth-failure warns
+- `packages/workflows/src/provision-tenant.ts` — `[loadTenant] row=`, `[emailWelcome] inputs=` instrumentation for the provisioning pipeline
+
+When new code lands, follow the same shape: `console.log(JSON.stringify({level, route, msg, ...extra}))`.
+
+## Future activation (when you're ready)
+
+If/when you upgrade to a vendor:
+
+1. Sign up at https://axiom.co (recommended — Vercel-native), create a dataset `odoo-saas`, generate an Ingest-scope API token.
+2. Paste the token back to me (or set it manually):
+   - Vercel: Project Settings → Logs → "Connect a Log Drain" → Axiom → paste token. Repeat for admin + portal.
+   - Railway: Project Settings → Log Drains → New Drain → Generic Webhook → URL `https://api.axiom.co/v1/datasets/odoo-saas/ingest`, header `Authorization=Bearer <token>`.
+   - Fly: deploy `superfly/fly-log-shipper` as a new Fly app on the same org, secrets `AXIOM_TOKEN`, `AXIOM_DATASET`, `ORG`, `ACCESS_TOKEN` (org-read scope from `flyctl tokens create org-read`).
+3. Configure the 8 monitors from `alerts.json` in the Axiom UI.
+
+## Operational practice while we have no aggregation
+
+- Check Vercel + Railway + Fly dashboards on a weekly cadence.
+- The pgBackRest workflows (`.github/workflows/pgbackrest-backup.yml` and `restore-drill.yml`) email-on-failure via the GitHub repo's notification settings — make sure repo notifications are on for the operator's GitHub account.
+- The cron-tick workflow on Vercel emits a structured summary every minute; in the absence of alerting, check `vercel logs` for `failed > 0` lines after any webhook-handler change.
+- `cluster_backups` table in Neon is the canonical record of which backups have been drill-tested — query it directly when in doubt:
+  ```sql
+  SELECT platform, state, count(*) FROM cluster_backups GROUP BY 1,2;
+  ```
+
+## Alert definitions (parked, not active)
+
+`alerts.json` in this dir holds the eight alert queries we'd want if we had a vendor. They're written in Axiom's APL but are simple enough to translate to any vendor's query language. Keep them up to date alongside the code changes they observe so they're ready to wire when you flip the decision.
