@@ -10,7 +10,8 @@ Actions → Repository secrets**.
 | `RAILWAY_ODOO_SERVICE_ID` | `ci.yml` deploy-railway | Railway dashboard → odoo service → Settings → service ID at the top of the page (`919deb8a-3ca5-4c48-8577-ea89f6c9cf90` for current pilot). |
 | `RAILWAY_PROJECT_ID` | `pgbackrest-backup.yml` backup-railway | `465dcc94-8004-4b4c-ad19-039d1b9b90c8` for the `odoo-saas` project. `railway status` shows it. |
 | `RAILWAY_ENVIRONMENT_ID` | `pgbackrest-backup.yml` backup-railway | `41fa1df4-6faa-4dae-beed-644fa6354180` for the `production` env. `railway variables --service postgres --kv` shows it. |
-| `FLY_API_TOKEN` | `ci.yml` deploy-fly, `pgbackrest-backup.yml` backup-fly | `flyctl tokens create deploy --name "ci"` (or org-scoped). Must allow `flyctl ssh console` against `odoo-saas-postgres`. |
+| `FLY_API_TOKEN` | `ci.yml` deploy-fly | `flyctl tokens create deploy --app odoo-saas-odoo --name "gh-deploy"` (deploy-only scope is fine; CI just runs `flyctl deploy`). |
+| `FLY_SSH_TOKEN_POSTGRES` | `pgbackrest-backup.yml` backup-fly, `restore-drill.yml` drill-fly | `flyctl tokens create ssh --app odoo-saas-postgres --name "gh-actions-pgbackrest-ssh"`. **Must be ssh-scoped, NOT deploy** — deploy tokens can't run the GraphQL `appcompact` query that `flyctl ssh console` needs (observed: 401 "You must be authenticated to view this."). SSH tokens additionally include the org-wireguard scope. |
 
 ## Environments
 
