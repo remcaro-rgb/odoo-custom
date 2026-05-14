@@ -41,15 +41,16 @@ jobs:
           ssh-keygen -t ed25519 -N "" -f "$HOME/.ssh/id_ed25519" -q
       - name: Restore drill (Railway)
         env:
-          RAILWAY_TOKEN_RAW: ${{ secrets.RAILWAY_TOKEN }}
+          # Account-level token (RAILWAY_API_TOKEN, not project-scoped
+          # RAILWAY_TOKEN). Same reason as the backup workflow.
+          RAILWAY_API_TOKEN_RAW: ${{ secrets.RAILWAY_API_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
         run: |
           set -euo pipefail
-          # Trim trailing newline that `gh secret set` interactive mode keeps.
-          export RAILWAY_TOKEN="$(printf '%s' "$RAILWAY_TOKEN_RAW" | tr -d '\r\n')"
-          if [ -z "${RAILWAY_TOKEN:-}" ]; then
-            echo "::error::RAILWAY_TOKEN unset"; exit 1
+          export RAILWAY_API_TOKEN="$(printf '%s' "$RAILWAY_API_TOKEN_RAW" | tr -d '\r\n')"
+          if [ -z "${RAILWAY_API_TOKEN:-}" ]; then
+            echo "::error::RAILWAY_API_TOKEN unset"; exit 1
           fi
           # The remote command runs as root in the postgres container; we
           # gosu down to postgres for pgbackrest so it reads its own conf.

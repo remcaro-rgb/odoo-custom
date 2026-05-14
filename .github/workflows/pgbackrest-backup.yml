@@ -82,31 +82,23 @@ jobs:
           ssh-keygen -t ed25519 -N "" -f "$HOME/.ssh/id_ed25519" -q
       - name: pgbackrest backup (Railway)
         env:
-          # Defensive trim: `gh secret set` interactive mode keeps the
-          # paste's trailing newline in the secret value, which Railway
-          # rejects as Unauthorized. Strip any \r\n before passing.
-          RAILWAY_TOKEN_RAW: ${{ secrets.RAILWAY_TOKEN }}
+          # Railway CLI v4.58+ no longer accepts project tokens for
+          # `railway ssh` / `railway whoami` — needs an ACCOUNT-level
+          # token via the RAILWAY_API_TOKEN env. The legacy project-token
+          # flow via RAILWAY_TOKEN still works for `railway up` deploys
+          # but fails everything else. SECRETS.md documents the split.
+          RAILWAY_API_TOKEN_RAW: ${{ secrets.RAILWAY_API_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
           BACKUP_TYPE: ${{ needs.determine-type.outputs.type }}
         run: |
           set -euo pipefail
-          export RAILWAY_TOKEN="$(printf '%s' "$RAILWAY_TOKEN_RAW" | tr -d '\r\n')"
-          if [ -z "${RAILWAY_TOKEN:-}" ]; then
-            echo "::error::RAILWAY_TOKEN is unset; configure repo secret." >&2
+          # Trim trailing \r\n (gh-secret-set interactive paste artifact).
+          export RAILWAY_API_TOKEN="$(printf '%s' "$RAILWAY_API_TOKEN_RAW" | tr -d '\r\n')"
+          if [ -z "${RAILWAY_API_TOKEN:-}" ]; then
+            echo "::error::RAILWAY_API_TOKEN is unset; configure repo secret (see .github/SECRETS.md)." >&2
             exit 1
           fi
-          # Debug: surface what the runner sees so we can diagnose
-          # auth failures. railway whoami exits non-zero on bad tokens
-          # (with `set -e` would abort) — wrap in `|| true`.
-          echo "railway --version: $(railway --version 2>&1)"
-          echo "railway whoami: $(railway whoami 2>&1 || true)"
-          echo "token-byte-count (should be 36 for a UUID-shaped project token): ${#RAILWAY_TOKEN}"
-          # railway ssh needs an Account / Personal API Token from
-          # https://railway.com/account/tokens — NOT a project-scoped token
-          # from Project Settings. If the next step errors with
-          # "Unauthorized. Please check that your RAILWAY_TOKEN is valid",
-          # swap the secret value for an account token. See .github/SECRETS.md.
           # railway ssh joins args + runs remote `sh -c`, so the SQL/CLI string
           # has to survive the remote shell's parse — see the Railway TXT-prefix
           # memory note. Plain alphanumerics + slashes are fine.
