@@ -126,17 +126,16 @@ jobs:
           # for symmetry with the rest of the toolchain but aren't used
           # by the CLI here. If the project gets renamed, update these
           # two values in lockstep with the Railway dashboard.
-          echo "DEBUG cwd=$(pwd)"
           railway link \
             --project odoo-saas \
             --environment production \
             --service postgres
-          echo "DEBUG after-link config.json contents:"
-          if [ -f "$HOME/.railway/config.json" ]; then
-            jq '.projects | keys' "$HOME/.railway/config.json" || cat "$HOME/.railway/config.json"
-          else
-            echo "(no $HOME/.railway/config.json file)"
-          fi
+          # CRITICAL: unset RAILWAY_PROJECT_ID / RAILWAY_ENVIRONMENT_ID before
+          # ssh runs. The CLI prefers env-var UUIDs over the linked-state in
+          # config.json; with the UUID-form env vars set, ssh queries with
+          # UUIDs and fails ("Project not found") even though the link
+          # succeeded. Linked-state uses names internally.
+          unset RAILWAY_PROJECT_ID RAILWAY_ENVIRONMENT_ID
           # railway ssh joins args + runs remote `sh -c`, so the SQL/CLI string
           # has to survive the remote shell's parse — see the Railway TXT-prefix
           # memory note. Plain alphanumerics + slashes are fine.

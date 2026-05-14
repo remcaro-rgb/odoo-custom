@@ -77,11 +77,13 @@ jobs:
           # Restore into /tmp/restore-drill-<ts> (not the live PGDATA), verify
           # the canonical files exist, then rm -rf with a trap.
           # See pgbackrest-backup.yml for why we link first and why
-          # names are used instead of UUIDs.
+          # names are used instead of UUIDs, and why we unset the
+          # UUID env vars before ssh.
           railway link \
             --project odoo-saas \
             --environment production \
             --service postgres
+          unset RAILWAY_PROJECT_ID RAILWAY_ENVIRONMENT_ID
           railway ssh --service postgres "
             set -eu
             DRILL=/tmp/restore-drill-\$(date +%s)
