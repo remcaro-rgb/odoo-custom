@@ -16,11 +16,13 @@
 #   - /web/database/list          unused
 #   - /web/database/change_password unused
 #
-# Override each with a 404 NotFound. Odoo's @http.route decoration is
-# applied per-class-per-method; the runtime registers them in source-order,
-# and the LAST controller registered wins for a duplicate route. Because
-# saas_provisioning_gateway is loaded server-wide via --load AFTER the web
-# addon's Database controller (which is in `base` deps), our route wins.
+# Override each with a 404 NotFound. We SUBCLASS the stock Database
+# controller and override its methods so Python's MRO determines the
+# winner regardless of route-registration order. A sibling http.Controller
+# (the original approach) only wins for db-context requests; nodb
+# requests go through a different resolution path that picks the
+# earliest-registered route — which is the stock one because the web
+# addon loads before saas_provisioning_gateway.
 #
 # Phase-2 HARDENING.md item 1 — at-the-Odoo equivalent for Railway tenants
 # (which don't pass through our Traefik). Fly tenants get the same defense
@@ -28,37 +30,68 @@
 
 from odoo import http
 from odoo.exceptions import AccessDenied
+from odoo.addons.web.controllers.database import Database
 
 
-class SaasDatabaseLockdown(http.Controller):
+class SaasDatabaseLockdown(Database):
 
-    # GET endpoints (browser-friendly probes)
+    # GET surfaces — the most common fingerprinting probe. 404 hides the
+    # endpoint shape entirely.
     @http.route(
-        ['/web/database/manager', '/web/database/selector'],
+        '/web/database/manager',
         type='http', auth='none', methods=['GET'], csrf=False,
     )
-    def hidden_get(self, **kw):
+    def manager(self, **kw):
         return http.request.not_found()
 
-    # POST endpoints — keep the verb constraints Odoo's stock controller had,
+    @http.route(
+        '/web/database/selector',
+        type='http', auth='none', methods=['GET'], csrf=False,
+    )
+    def selector(self, **kw):
+        return http.request.not_found()
+
+    # POST verbs that mutate state — keep the verb constraints stock had,
     # so a GET still falls through to method-not-allowed rather than 404
-    # disclosure-equivalent. The action ones (create/duplicate/...) are
+    # disclosure-equivalent. The action ones are
     # @check_db_management_enabled-protected at the service layer; this is
     # defense in depth that prevents an attacker from even probing the
-    # endpoint shape.
+    # endpoint shape. AccessDenied → Odoo converts to a generic auth-error
+    # response (better than 404 here because legitimate internal callers
+    # see a clear "you can't do this" instead of "doesn't exist").
     @http.route(
-        ['/web/database/duplicate',
-         '/web/database/drop',
-         '/web/database/backup',
-         '/web/database/restore',
-         '/web/database/change_password'],
+        '/web/database/duplicate',
         type='http', auth='none', methods=['POST'], csrf=False,
     )
-    def hidden_post(self, **kw):
-        # AccessDenied → Odoo converts to a generic auth-error response.
-        # Better than 404 here because some legitimate-ish internal callers
-        # might still hit these by mistake and a 404 would mask the real
-        # reason. AccessDenied also shows up in audit logs cleanly.
+    def duplicate(self, master_pwd=None, name=None, new_name=None, **kw):
+        raise AccessDenied()
+
+    @http.route(
+        '/web/database/drop',
+        type='http', auth='none', methods=['POST'], csrf=False,
+    )
+    def drop(self, master_pwd=None, name=None, **kw):
+        raise AccessDenied()
+
+    @http.route(
+        '/web/database/backup',
+        type='http', auth='none', methods=['POST'], csrf=False,
+    )
+    def backup(self, master_pwd=None, name=None, backup_format='zip', **kw):
+        raise AccessDenied()
+
+    @http.route(
+        '/web/database/restore',
+        type='http', auth='none', methods=['POST'], csrf=False,
+    )
+    def restore(self, master_pwd=None, backup_file=None, name=None, copy=False, **kw):
+        raise AccessDenied()
+
+    @http.route(
+        '/web/database/change_password',
+        type='http', auth='none', methods=['POST'], csrf=False,
+    )
+    def change_password(self, master_pwd=None, master_pwd_new=None, **kw):
         raise AccessDenied()
 
     # /web/database/list is type='json'; mirror that. Returns an empty
@@ -67,5 +100,11 @@ class SaasDatabaseLockdown(http.Controller):
         '/web/database/list',
         type='json', auth='none', methods=['POST'], csrf=False,
     )
-    def hidden_list_json(self, **kw):
+    def list(self, **kw):
         return []
+
+    # NOTE: /web/database/create is intentionally NOT overridden here.
+    # The stock implementation is already gated by list_db=False at the
+    # service layer (@check_db_management_enabled), and we expose a
+    # replacement at /saas/provision (controllers/provision.py) that the
+    # control plane calls with an HMAC signature.
