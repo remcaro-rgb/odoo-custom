@@ -39,5 +39,13 @@ fi
 chmod 600 /etc/pgbouncer/userlist.txt
 chown pgbouncer:pgbouncer /etc/pgbouncer/userlist.txt
 
-# pgbouncer reads PG_HOST/PG_PORT via %(NAME)s substitution in pgbouncer.ini.
-exec su-exec pgbouncer pgbouncer /etc/pgbouncer/pgbouncer.ini
+# pgbouncer's %(VAR)s substitution doesn't reach the [databases] section
+# (parsed literally before env interpolation). Generate a finalized
+# pgbouncer.ini at startup with the real hostname inlined.
+INI_SRC=/etc/pgbouncer/pgbouncer.ini
+INI_OUT=/tmp/pgbouncer.runtime.ini
+sed -e "s|%(PG_HOST)s|$PG_HOST|g" -e "s|%(PG_PORT)s|$PG_PORT|g" "$INI_SRC" > "$INI_OUT"
+chown pgbouncer:pgbouncer "$INI_OUT"
+echo "pgbouncer-entrypoint: launching with PG_HOST=$PG_HOST PG_PORT=$PG_PORT" >&2
+
+exec su-exec pgbouncer pgbouncer "$INI_OUT"
