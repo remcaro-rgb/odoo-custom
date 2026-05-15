@@ -62,7 +62,10 @@ jobs:
             context: .
           - name: odoo-saas-backup-runner
             dockerfile: ./infra/backup-runner/Dockerfile
-            context: ./infra/backup-runner
+            # Repo root — the Dockerfile uses `COPY infra/backup-runner/...`
+            # paths, not local-context paths. Same convention as the odoo
+            # and postgres images.
+            context: .
 
     steps:
       - uses: actions/checkout@v4
