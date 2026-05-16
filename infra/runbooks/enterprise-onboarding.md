@@ -127,16 +127,44 @@ The response includes the `id` field — this UUID is the customer's license_id.
 
 ### Step 5 — Generate customer-specific HMAC secret
 
-Each enterprise customer gets a **distinct** `SAAS_PROVISIONING_SECRET`. (The shared SaaS pool uses one global secret; enterprise self-host uses per-customer secrets so revoking access for one customer doesn't break others.)
+Each enterprise customer gets a **distinct** HMAC secret. The shared SaaS pool uses the pool-wide `SAAS_PROVISIONING_SECRET`; enterprise self-host customers each get their own entry in `SAAS_PROVISIONING_SECRETS_EXTRA` (comma-separated). Revoking one customer's secret means editing the env var to remove their entry, not rotating the pool secret.
 
 ```bash
 CUSTOMER_HMAC=$(openssl rand -base64 36 | tr -d '/+=' | cut -c1-48)
 echo "customer HMAC: ${CUSTOMER_HMAC}"
 ```
 
-Add this secret to Vercel **as a list entry**, not as a new env var. We use a comma-separated `SAAS_PROVISIONING_SECRETS_EXTRA` env var that the HMAC verifier in `_lib.ts` checks alongside the main secret.
+Append to Vercel (admin app, production env):
 
-**TODO (operator):** extend `_lib.ts` to accept multiple secrets. Today's verifier only accepts the single global `SAAS_PROVISIONING_SECRET` — that means every enterprise customer would currently share the same HMAC secret with each other AND with the shared pool, which weakens the trust boundary. This is acceptable for the FIRST customer but must be hardened before the second. Track in `project_phase41_licensing` memory.
+```bash
+cd ~/Odoo-control-plane/apps/admin
+# Pull current value
+CURRENT=$(vercel env pull /tmp/admin.env --environment=production --yes >/dev/null && \
+          grep '^SAAS_PROVISIONING_SECRETS_EXTRA=' /tmp/admin.env | cut -d= -f2- | tr -d '"')
+rm /tmp/admin.env
+
+# Append (preserve existing entries, comma-separated)
+if [ -n "$CURRENT" ]; then
+    NEW_VALUE="${CURRENT},${CUSTOMER_HMAC}"
+else
+    NEW_VALUE="${CUSTOMER_HMAC}"
+fi
+
+# Vercel CLI: remove + re-add (no in-place edit verb)
+vercel env rm SAAS_PROVISIONING_SECRETS_EXTRA production --yes 2>/dev/null || true
+echo "${NEW_VALUE}" | vercel env add SAAS_PROVISIONING_SECRETS_EXTRA production
+```
+
+Trigger redeploy so the new env reaches the runtime:
+
+```bash
+vercel redeploy "$(vercel ls --json 2>/dev/null | head -1 | jq -r '.[0].url' || echo '<latest-url>')" --target=production
+```
+
+Operator follow-ups documented:
+- **Audit log**: every successful `/v1/check` writes a log line with `secret_ref` (`primary` for pool, `extra:<index>` for enterprise). Search Vercel logs by `secret_ref=extra:N` to confirm which customer is hitting the endpoint.
+- **Rotation**: to rotate a customer's secret, mint a new HMAC, append to `_EXTRA`, deliver to customer, customer updates their env var + restarts, then remove the old entry from `_EXTRA`.
+- **Revocation**: same env-var-edit + redeploy procedure as rotation, just skip the "deliver new" step.
 
 ### Step 6 — Deliver the install bundle
 
