@@ -65,6 +65,17 @@ COPY jorels-addons /mnt/jorels-addons
 # Copy custom addons (small, from build context)
 COPY custom-addons /mnt/custom-addons
 
+# Phase 4.1: license signing pubkey. saas_license_gate verifies the
+# Ed25519 signature on the /v1/check response against this key at
+# install time and on every hourly cron tick. The dev key is shipped
+# in the main image; production enterprise builds use `--build-arg
+# LICENSE_PUBKEY_FILE=infra/keys/license-signing-pubkey.pem` (the
+# rotated, non-leaked key — see infra/keys/README.md). When the gate
+# addon is not installed (i.e., shared SaaS pool images), this file
+# is unused but harmless.
+ARG LICENSE_PUBKEY_FILE=infra/keys/license-signing-pubkey.dev.pem
+COPY ${LICENSE_PUBKEY_FILE} /etc/saas-license-pubkey.pem
+
 # Config (currently named odoo-railway.conf for historical reasons; the contents
 # are platform-agnostic. Workers / log level can be overridden via env at runtime.)
 COPY config/odoo-railway.conf /etc/odoo/odoo.conf

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+        Hourly license check. The license authority caches well at the
+        edge, so hourly is fine. If the customer goes offline, we have
+        the cached verdict in ir.config_parameter (last_status) plus
+        last_checked_at; the gate stays in its last-known state until
+        either a successful refresh OR last_checked_at falls more than
+        grace_period_days (default 14) behind, at which point it locks
+        as if revoked.
+
+        Odoo 19 removed numbercall + doall — the cron loops on its
+        interval naturally.
+        -->
+        <record id="ir_cron_saas_license_check" model="ir.cron">
+            <field name="name">SaaS: hourly license check</field>
+            <field name="model_id" ref="model_saas_license_gate" />
+            <field name="state">code</field>
+            <field name="code">model.run_check()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True" />
+            <field name="priority">10</field>
+        </record>
+    </data>
+</odoo>
