@@ -231,7 +231,14 @@ If you don't see entries within ~70 minutes (cron drift), the customer's instanc
 
 ### Step 8 — Renewals
 
-90 days before `expires_at`, the operator gets an email (Phase 4.1.x — not yet shipped; for now, set a calendar reminder).
+The control plane sends three reminder emails per license (Phase 4.1.x) at 90, 30, and 7 days before `expires_at` to the address in the `LICENSE_EXPIRY_NOTIFY_TO` Vercel env var. Set this once during platform setup:
+
+```bash
+cd ~/Odoo-control-plane/apps/admin
+echo 'operator@example.com' | vercel env add LICENSE_EXPIRY_NOTIFY_TO production
+```
+
+Reminders are idempotent — audit_log rows guard against duplicate sends, so re-running the cron is harmless. The 09:00 COT daily cron at `/api/cron/license-expiry-reminders` does the scan.
 
 On renewal day:
 
