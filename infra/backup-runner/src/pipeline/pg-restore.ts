@@ -20,10 +20,12 @@ interface PgRestoreArgs {
  *   --if-exists      no error when dropping non-existent objects
  *   --no-owner       skip ALTER OWNER commands (target may have different roles)
  *   --no-privileges  skip GRANT/REVOKE
- *   --jobs=4         parallel restore
  *   --exit-on-error  abort on first failure (default is to keep going)
  *
- * The custom-format archive (`-Fc`) supports --jobs out of the box.
+ * Note: pg_restore CAN do --jobs on a custom-format archive (unlike
+ * pg_dump --jobs which is dir-format-only), but we leave it
+ * single-threaded for Phase 3.0 small-tenant scale. Re-add `--jobs=4`
+ * here when restore throughput becomes a bottleneck.
  */
 export async function pgRestore(args: PgRestoreArgs): Promise<void> {
   const proc = spawn(
@@ -34,7 +36,6 @@ export async function pgRestore(args: PgRestoreArgs): Promise<void> {
       '--if-exists',
       '--no-owner',
       '--no-privileges',
-      '--jobs=4',
       '--exit-on-error',
       args.dumpPath,
     ],

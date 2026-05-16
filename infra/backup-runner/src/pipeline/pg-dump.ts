@@ -20,14 +20,19 @@ export async function pgDump(args: {
   outputPath: string;
   env?: Record<string, string>;
 }): Promise<PgDumpResult> {
-  // -Fc  custom format
-  // -j 4 4 parallel jobs
+  // -Fc  custom format (single file, restorable with pg_restore)
   // -Z 6 zstd-ish gzip-equivalent compression level
   // -f   output file
+  // NOTE: NO `-j 4`. pg_dump's `--jobs` parallel mode requires the
+  // directory format (`-Fd`), not custom (`-Fc`). PostgreSQL rejects
+  // with: "parallel backup only supported by the directory format".
+  // For Phase 1+2 tenant sizes single-threaded -Fc is fast enough.
+  // If we hit big-tenant throughput limits, switch to -Fd and adapt
+  // the encrypt pipeline to walk a directory tree.
   // PG* env vars carry connection info; pg_dump reads them natively.
   const proc = spawn(
     'pg_dump',
-    ['-Fc', '-j', '4', '-Z', '6', '-f', args.outputPath, args.dbName],
+    ['-Fc', '-Z', '6', '-f', args.outputPath, args.dbName],
     {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, ...(args.env ?? {}) },
