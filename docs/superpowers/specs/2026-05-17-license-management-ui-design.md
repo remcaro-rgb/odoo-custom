@@ -29,14 +29,14 @@ Build the first real UI inside `apps/admin` so the Goliatt operator can manage e
 
 **Cross-tenant leak risk:** zero. The control plane has no row-level tenancy column on these tables; every row is operator-internal. The UI's filter inputs (`customer_ref`, `image_sha256`) operate on enterprise-self-host customers, who by definition have no shared-pool tenancy at all.
 
-**Audit-log viewer scope:** the page shows ALL rows in `audit_log`, including rows whose `target_kind = 'tenant'` reference shared-pool tenant operations. This is acceptable because (a) the operator role already has full read access via the control-plane DB, and (b) the audit_log table never carries tenant-customer PII beyond names/emails already in the operator's view from the existing `tenants` table.
+**Audit-log viewer scope:** the page shows ALL rows in `audit_log`, including rows whose `target_type = 'tenant'` reference shared-pool tenant operations. This is acceptable because (a) the operator role already has full read access via the control-plane DB, and (b) the audit_log table never carries tenant-customer PII beyond names/emails already in the operator's view from the existing `tenants` table.
 
 ## 4. Data model changes
 
 **None.** This is a pure UI slice over existing tables:
 
 - `enterprise_licenses` (shipped Phase 4.1 v0.2, migration `0007`). Columns: id, customer_ref, image_sha256, expires_at, grace_until, allowed_modules (jsonb), revoked_at, revoked_reason, notes, created_at.
-- `audit_log` (existing). Columns: id, timestamp, actor, action, target_kind, target_id, payload (jsonb), correlation_id.
+- `audit_log` (existing). Columns: id, ts (timestamp), actor_user_id, action, target_type, target_id, payload (jsonb). The Drizzle model is in `packages/db/src/schema.ts`; the UI does not add columns.
 
 No new tables, columns, indexes, or constraints. No migration.
 
@@ -65,7 +65,7 @@ No new tables, columns, indexes, or constraints. No migration.
 
 **New tRPC router — `packages/api/src/routers/audit.ts`:**
 
-- `audit.list({ actionPrefix?, targetKind?, targetId?, actor?, from?, to?, cursor?, limit? })` — read-only, operator-only. Generic query over the existing `audit_log` table. `actionPrefix` filter matches via `LIKE 'license.%'` etc. `cursor` / `limit` same shape as the licenses list.
+- `audit.list({ actionPrefix?, targetType?, targetId?, actor?, from?, to?, cursor?, limit? })` — read-only, operator-only. Generic query over the existing `audit_log` table. `actionPrefix` filter matches via `LIKE 'license.%'` etc. `cursor` / `limit` same shape as the licenses list.
 
 **Reused unchanged:** `POST /api/internal/license/check` — the signing-key probe page calls this internally with a sentinel HMAC envelope (same logic as `license-cli.sh verify-signing-key`).
 
@@ -86,7 +86,7 @@ No new tables, columns, indexes, or constraints. No migration.
 
 **Sensitive data exposure:** the audit-log payload field can contain JSON that includes the per-request HMAC signature from the incoming `/v1/check` envelope and the outgoing Ed25519 signature on the response payload. Neither is a long-lived secret — HMAC signatures are single-use with a ±300 s timestamp window, and Ed25519 signatures are verifiable proofs that anyone holding the pubkey can validate. The JSON payload modal renders these as `<pre>` text without redaction. Acceptable: only operators can see this page, and the payload is already what their browser would see via the Neon dashboard. No raw secrets (`SAAS_PROVISIONING_SECRET`, `LICENSE_SIGNING_PRIVATE_KEY_B64`) are ever written to `audit_log.payload`.
 
-**Tenancy-isolation argument:** this UI operates on control-plane-only tables (`enterprise_licenses`, `audit_log`). It never queries a tenant database, never references a `tenant_id` for read or write, and never crosses the per-tenant boundary. There is no row-level tenancy gating to evaluate because the data is intrinsically non-per-tenant. Even the audit-log viewer, which surfaces some `target_kind = 'tenant'` rows from other namespaces, only displays operator-visible metadata (tenant slug, action) that's already in the operator's view via the existing tenants router.
+**Tenancy-isolation argument:** this UI operates on control-plane-only tables (`enterprise_licenses`, `audit_log`). It never queries a tenant database, never references a `tenant_id` for read or write, and never crosses the per-tenant boundary. There is no row-level tenancy gating to evaluate because the data is intrinsically non-per-tenant. Even the audit-log viewer, which surfaces some `target_type = 'tenant'` rows from other namespaces, only displays operator-visible metadata (tenant slug, action) that's already in the operator's view via the existing tenants router.
 
 ## 7. Test plan
 
@@ -162,7 +162,7 @@ Each step is a separate PR. Each PR is independently revertible.
 
 1. **Pagination strategy: cursor or offset?** The tRPC `list` procedure currently returns up to 100 rows without a cursor. With <1000 total licenses anticipated for years, offset pagination is simpler and equally fast. Recommendation: page size 50, offset-based, `?page=N` URL param. **Decide at implementation.**
 
-2. **Should the audit-log viewer link to specific entity detail pages for non-license `target_kind` rows?** e.g., `target_kind='tenant'` → link to `/tenants/[id]` page. Those pages don't exist yet (deferred to future spec). For v1: rows whose `target_kind != 'license'` show the `target_id` as plain text, no link. Reconsider when tenant CRUD lands.
+2. **Should the audit-log viewer link to specific entity detail pages for non-license `target_type` rows?** e.g., `target_type='tenant'` → link to `/tenants/[id]` page. Those pages don't exist yet (deferred to future spec). For v1: rows whose `target_type != 'license'` show the `target_id` as plain text, no link. Reconsider when tenant CRUD lands.
 
 3. **What's the Clerk test-user / test-org setup for E2E?** The control plane has a real Clerk integration; we need separate test users in a test org for Playwright. Two paths: (a) Clerk's testing-token utility, (b) a dedicated Clerk dev project pointed at the preview env. **Decide before Playwright lands; not blocking earlier steps.**
 
