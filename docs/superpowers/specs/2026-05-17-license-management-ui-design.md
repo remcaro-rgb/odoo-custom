@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-17
 **Author:** Manuel Caro (with Claude)
-**Status:** Draft
+**Status:** Accepted (implemented 2026-05-17)
 **Spec type:** design spec (follows §2.4 of `docs/2026-05-15-spec-driven-dev-plan.md`)
 **Scope of work:** First operator-facing UI slice in `apps/admin` of the control plane. Replaces day-to-day use of `infra/scripts/license-cli.sh` with a web UI that has full CLI parity (mint, revoke, restore, list) plus a generic audit-log viewer and a `/v1/check` signing-key probe.
 
@@ -169,3 +169,9 @@ Each step is a separate PR. Each PR is independently revertible.
 4. **Tailwind v4 + shadcn/ui in a Next 16 monorepo with the existing pnpm workspace — any known integration gotchas?** Spot-check: `npx shadcn add` writes to `apps/admin/components/ui/` and registers a `components.json`; should work without monorepo-specific surgery, but worth a 30-min probe before committing to the stack across future operator-app slices.
 
 5. **Audit-log payload field can contain large JSON (e.g. full signed license-check responses, ~3 KB). Does the modal need lazy-load or pagination of the payload itself?** v1 renders the full JSON — assume <10 KB per row is fine. Reconsider if a single payload ever exceeds ~50 KB.
+
+6. **Integration-test layer against ephemeral Neon branches is deferred from v1 ship.** Unit tests cover the action contracts; Playwright E2E covers the user-visible behavior. The 4-test integration layer originally scoped in §7 needed a `NEON_API_KEY` + a `branch-create + branch-delete` GH Action, neither of which is provisioned. Reconsider after the first real customer onboarding to see if the unit-only gap caused any production issue. **Open until incident-driven justification.**
+
+7. **Clerk Core 3 `__clerk_db_jwt` localStorage shortcut used in Playwright `auth-helper.ts` works only against Clerk development instances** (publishable key `pk_test_*`). Production instances (`pk_live_*`) ignore the local override. Live e2e against the production preview requires Clerk's testing-token API + a dedicated dev Clerk project. Tracked alongside question 3.
+
+8. **Pagination duplication between `enterpriseLicenses.list` and `audit.list`** (~50 lines of identical cursor decode/encode + nextCursor calculation). YAGNI says wait — refactor to a shared `keysetPaginate()` helper when the third caller arrives.
