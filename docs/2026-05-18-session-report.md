@@ -243,5 +243,6 @@ All 5 active specs and all 3 active plans passed audit unchanged. The placeholde
 - `aaf34fa` fix(admin) Session.customerRef in admin route + trpc-server (on customer-portal)
 - `62c0fa1` merge main into customer-portal + customerRef fixes in 4 test sites
 - `fa0d65c` (PR #2 squash) customer portal
+- `b0e6caf` (PR #5 squash) no-auth Playwright smoke spec — 7 tests covering /not-authorized, /sign-in, and the 5 auth-gated admin routes; runs without Clerk tokens; green in CI's Playwright (chromium) check
 
 **Production deploys auto-triggered** for each merge to main (admin + portal Vercel projects). Live URLs above.
