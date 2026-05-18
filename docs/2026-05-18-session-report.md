@@ -67,7 +67,7 @@ Four operator surfaces inside `apps/admin`:
 
 Schema migration `0008_add_quarantined_at.sql` applied to prod Neon (column added to `tenant_backups`).
 
-### PR #2 — Customer portal (squash `pending`)
+### PR #2 — Customer portal (squash `fa0d65c`)
 
 Customer-facing license self-service inside `apps/portal`:
 
@@ -173,6 +173,6 @@ All 5 active specs and all 3 active plans passed audit unchanged. The placeholde
 - `8a883f3` fix(admin) tsconfig vitest.integration.config.ts (on customer-portal branch)
 - `aaf34fa` fix(admin) Session.customerRef in admin route + trpc-server (on customer-portal)
 - `62c0fa1` merge main into customer-portal + customerRef fixes in 4 test sites
-- PR #2 squash pending
+- `fa0d65c` (PR #2 squash) customer portal
 
 **Production deploys auto-triggered** for each merge to main (admin + portal Vercel projects). Live URLs above.
