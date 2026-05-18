@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Implementation Agent — Design Infographic</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --card: #171f3d;
+    --card-2: #1f2950;
+    --line: #2a356a;
+    --text: #e8ecff;
+    --muted: #9aa3c7;
+    --accent: #7c5cff;
+    --accent-2: #22d3ee;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad:  #f87171;
+    --impl: #60a5fa;
+    --spec: #fbbf24;
+    --human: #34d399;
+    --reporter: #c4b5fd;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(96,165,250,0.20), transparent 60%),
+                radial-gradient(900px 500px at 90% 10%, rgba(124,92,255,0.18), transparent 60%),
+                var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* HERO */
+  .hero {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; align-items: center;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(96,165,250,0.22), rgba(124,92,255,0.12));
+    border: 1px solid rgba(96,165,250,0.30);
+    border-radius: 24px;
+    margin-bottom: 36px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content:""; position:absolute; right:-120px; top:-120px;
+    width:360px; height:360px;
+    background: radial-gradient(circle, rgba(96,165,250,0.35), transparent 60%);
+  }
+  .eyebrow { text-transform:uppercase; letter-spacing:2px; font-size:12px; color: var(--impl); margin-bottom:12px; }
+  .v-pill {
+    display:inline-block; margin-left:10px; padding:2px 10px; border-radius:999px;
+    background: linear-gradient(120deg, var(--impl), var(--accent));
+    color:#0b1020; font-weight:700; font-size:12px; letter-spacing:1px;
+    vertical-align: middle;
+  }
+  h1 { font-size:42px; line-height:1.1; margin:0 0 14px; letter-spacing:-0.5px; }
+  h1 .grad { background: linear-gradient(120deg, #93c5fd, #c4b5fd 60%, #67e8f9); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { color: var(--muted); font-size:17px; max-width:640px; }
+  .stats { display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; }
+  .stat { background:rgba(255,255,255,0.04); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .stat .n { font-size:24px; font-weight:700; background:linear-gradient(120deg, #93c5fd, #c4b5fd); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .stat .l { color:var(--muted); font-size:13px; }
+
+  section { margin-top: 44px; }
+  h2 { font-size:26px; margin:0 0 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  h2 .badge { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:10px; background: linear-gradient(135deg, var(--impl), var(--accent)); color:#0b1020; font-weight:800; font-size:14px; }
+  h2 .vtag { font-size:12px; color:var(--muted); font-weight:400; }
+  h3 { margin:0 0 8px; font-size:18px; }
+  .lead { color: var(--muted); margin:0 0 18px; max-width:980px; }
+
+  /* THREE FLOWS */
+  .flows {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .flow {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px;
+    position: relative;
+  }
+  .flow.initial  { border-top: 3px solid var(--impl); }
+  .flow.reporter { border-top: 3px solid var(--reporter); }
+  .flow.human    { border-top: 3px solid var(--human); }
+
+  .flow .tag {
+    display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+  .flow.initial .tag { background: rgba(96,165,250,0.16); color: #93c5fd; }
+  .flow.reporter .tag { background: rgba(196,181,253,0.16); color: #c4b5fd; }
+  .flow.human .tag { background: rgba(52,211,153,0.16); color: #6ee7b7; }
+  .flow h3 { font-size: 15px; }
+  .flow .trigger {
+    font-size: 11px; color: var(--muted); padding: 6px 10px;
+    background: rgba(255,255,255,0.04); border-radius: 8px;
+    margin: 6px 0 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .flow ol {
+    margin: 0; padding-left: 18px;
+    font-size: 12.5px; color: var(--muted);
+  }
+  .flow ol li { margin: 6px 0; }
+  .flow .target {
+    margin-top: 14px; padding: 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    font-size: 11px; color: var(--muted);
+  }
+  .flow .target strong { color: var(--text); }
+
+  /* ARCHITECTURE */
+  .arch-frame {
+    background: linear-gradient(180deg, rgba(96,165,250,0.06), rgba(124,92,255,0.04));
+    border: 1px solid rgba(96,165,250,0.25);
+    border-radius: 18px;
+    padding: 22px;
+  }
+  .arch-layer {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  .arch-layer:first-child { margin-top: 0; }
+  .arch-layer .lbl {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .triggers {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+  }
+  .trig {
+    background: rgba(96,165,250,0.08);
+    border: 1px solid rgba(96,165,250,0.30);
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 11px;
+  }
+  .trig .tt { color: #93c5fd; font-weight: 600; }
+  .trig .tx { color: var(--muted); font-family: ui-monospace, Menlo, monospace; margin-top: 4px; font-size: 10px; }
+  .modules {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .mod {
+    background: rgba(124,92,255,0.10);
+    border: 1px solid rgba(124,92,255,0.30);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+  }
+  .mod .nm { color: #c4b5fd; font-weight: 600; font-family: ui-monospace, Menlo, monospace; }
+  .mod .ds { color: var(--muted); font-size: 11px; margin-top: 4px; }
+  .ports {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .port {
+    font-size: 11px; padding: 4px 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    font-family: ui-monospace, Menlo, monospace;
+  }
+  .arrow-down {
+    text-align: center; color: var(--accent-2); font-size: 18px;
+    margin: 4px 0;
+  }
+
+  /* STATE MACHINE */
+  .state-machine {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .state {
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px;
+    position: relative;
+    min-height: 70px;
+  }
+  .state .lbl {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .state .by {
+    font-size: 10px; color: var(--muted); margin-top: 4px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .state.s1 { border-left: 3px solid var(--spec); }
+  .state.s2 { border-left: 3px solid var(--impl); }
+  .state.s3 { border-left: 3px solid var(--reporter); }
+  .state.s4 { border-left: 3px solid var(--human); }
+  .state.terminal { border-left: 3px solid var(--good); background: rgba(52,211,153,0.08); }
+  .state.error { border-left: 3px solid var(--bad); background: rgba(248,113,113,0.06); }
+
+  .legend-row {
+    display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px;
+    font-size: 12px; color: var(--muted);
+  }
+  .legend-row span { display: flex; align-items: center; gap: 6px; }
+  .swatch { width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+  /* PREVIEW LIFECYCLE */
+  .lifecycle {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .life-step {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    position: relative;
+    text-align: center;
+  }
+  .life-step .ic { font-size: 24px; line-height: 1; }
+  .life-step h4 { margin: 8px 0 4px; font-size: 13px; }
+  .life-step p { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.45; }
+  .life-step + .life-step::before {
+    content: "▶"; position: absolute; left: -10px; top: 50%;
+    transform: translateY(-50%); color: var(--accent-2); font-size: 12px;
+  }
+
+  /* COST TABLE */
+  .cost-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 8px;
+  }
+  .cost-grid > div {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  .cost-grid .h {
+    background: rgba(96,165,250,0.10);
+    color: #93c5fd;
+    font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px;
+  }
+  .cost-grid .total {
+    background: rgba(52,211,153,0.10);
+    border-color: rgba(52,211,153,0.30);
+    color: #6ee7b7;
+    font-weight: 700;
+  }
+
+  /* GUARDRAILS */
+  .guards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .guard {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--bad);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .guard strong { color: var(--text); display: block; margin-bottom: 4px; font-size: 12px; }
+
+  /* FAILURES */
+  .failures {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .fail {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+  }
+  .fail h4 { margin: 0 0 4px; font-size: 13px; color: #fca5a5; }
+  .fail .det { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+  .fail .rec { color: #6ee7b7; font-size: 11px; }
+  .fail .rec::before { content: "↳ "; }
+
+  /* ROLLOUT TIMELINE */
+  .rollout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .sub {
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    position: relative;
+  }
+  .sub .week { font-size: 11px; color: var(--accent-2); text-transform: uppercase; letter-spacing: 2px; }
+  .sub .nm { font-weight: 700; font-size: 16px; margin: 6px 0; }
+  .sub ul { padding-left: 16px; margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+  .sub ul li { margin: 4px 0; }
+
+  /* INTERACTIONS */
+  .interactions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .interact {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .interact .who {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .interact .ico {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    background: rgba(124,92,255,0.18);
+  }
+  .interact h4 { margin: 0; font-size: 14px; }
+  .interact p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* PORTS BLOCK */
+  .ports-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .port-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 8px;
+    padding: 10px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    align-items: center;
+    font-size: 12px;
+  }
+  .port-row .pn {
+    font-family: ui-monospace, Menlo, monospace;
+    color: #c4b5fd;
+    font-weight: 600;
+  }
+  .port-row .pu { color: var(--muted); }
+
+  footer { margin-top:48px; color:var(--muted); font-size:12px; text-align:center; }
+
+  @media (max-width: 1100px) {
+    .hero { grid-template-columns:1fr; }
+    .flows, .state-machine, .triggers, .modules, .lifecycle, .guards, .failures, .rollout, .interactions, .ports-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cost-grid { grid-template-columns: 1fr; }
+    .life-step + .life-step::before { content: "▼"; left: 50%; top: -10px; transform: translateX(-50%); }
+  }
+  @media (max-width: 700px) {
+    .flows, .state-machine, .triggers, .modules, .lifecycle, .guards, .failures, .rollout, .interactions, .ports-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Design infographic · 2026-05-16 <span class="v-pill">Implementation Agent</span></div>
+      <h1>From <span class="grad">intent-confirmed</span> to merged PR — with the reporter and humans both in the loop</h1>
+      <p class="sub">The agent that picks up a reporter-confirmed spec, builds it on a per-spec preview env, iterates with the reporter until they're happy, then hands off to humans for review and DevOps for merge. Sits on the v7 portable runtime — no vendor lock-in.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">&lt; 30 min</div><div class="l">intent-confirmed → preview URL posted</div></div>
+      <div class="stat"><div class="n">5 / 3</div><div class="l">reporter / human iteration caps</div></div>
+      <div class="stat"><div class="n">~$4</div><div class="l">typical LLM cost / PR</div></div>
+      <div class="stat"><div class="n">10</div><div class="l">concurrent preview envs (org cap)</div></div>
+    </div>
+  </div>
+
+  <!-- THREE FLOWS -->
+  <section>
+    <h2><span class="badge">1</span>Three iteration flows <span class="vtag">— event-driven, all using the same agent core</span></h2>
+    <p class="lead">One agent, three triggers. Each flow uses the same code path inside <code>agents/agents/implementation/core.py</code>; the trigger only decides which entry point runs.</p>
+    <div class="flows">
+
+      <div class="flow initial">
+        <span class="tag">Flow 1 · Initial</span>
+        <h3>⚙️ First implementation</h3>
+        <div class="trigger">trigger · label <code>intent-confirmed</code> applied to PR on <code>agent/spec-*</code></div>
+        <ol>
+          <li>Read spec at branch HEAD</li>
+          <li>Draft plan → commit to <code>docs/superpowers/plans/</code></li>
+          <li>Implement code in steps; commit per step</li>
+          <li>Run abbreviated Gate 1 in agentlab (build · lint · security · tests)</li>
+          <li>Retry up to 3× on fail; escalate if still red</li>
+          <li>Spawn <code>preview-spec-&lt;N&gt;</code> Fly app + DB</li>
+          <li>Seed with masked snapshot, install fixture modules</li>
+          <li>Provision reviewer login (one-time password)</li>
+          <li>Post URL + creds + summary to GitHub issue</li>
+          <li>Label → <code>awaiting-reviewer</code>; Slack ping</li>
+        </ol>
+        <div class="target"><strong>Target:</strong> &lt; 30 min spec-merge → URL posted.</div>
+      </div>
+
+      <div class="flow reporter">
+        <span class="tag">Flow 2 · Reporter</span>
+        <h3>🔁 Reporter iteration</h3>
+        <div class="trigger">trigger · <code>issue_comment.created</code> on linked issue (PR label = <code>awaiting-reviewer</code>)</div>
+        <ol>
+          <li>Classify the comment:
+            <br/><span style="color: var(--good);">✓ approval</span> ·
+            <span style="color: var(--accent-2);">↻ iteration</span> ·
+            <span style="color: var(--warn);">⨯ out-of-scope</span> ·
+            <span style="color: var(--bad);">⚠ escalate</span></li>
+          <li>If <strong>approval</strong>: label → <code>awaiting-human-review</code>, ping CODEOWNERS</li>
+          <li>If <strong>iteration</strong>: in-scope check vs spec.goal + spec.non-goals (LLM judgement, confidence ≥ 0.7)</li>
+          <li>In-scope → coder applies change → re-run Gate 1 → redeploy preview at same URL</li>
+          <li>Bump iter counter (label <code>iter-N</code>)</li>
+          <li>If iter > 5 → escalate (<code>needs-human</code>)</li>
+          <li>If <strong>out-of-scope</strong>: polite refusal + offer <code>/file-followup</code></li>
+          <li>If <strong>escalate</strong>: label <code>needs-human</code>; page on-call</li>
+        </ol>
+        <div class="target"><strong>Cap:</strong> 5 iterations. Escalation guarantees a finite loop.</div>
+      </div>
+
+      <div class="flow human">
+        <span class="tag">Flow 3 · Human commit · v5 Q15</span>
+        <h3>🛡️ Human refinement + reporter ping</h3>
+        <div class="trigger">trigger · <code>push</code> to <code>agent/spec-*</code> by non-agent author</div>
+        <ol>
+          <li>Workflow filters bot identities (<code>implementation-bot@</code>, <code>spec-generator-bot@</code>)</li>
+          <li>Compute diff summary + flag user-visible files (views, qweb, controllers)</li>
+          <li>Redeploy preview env at same URL</li>
+          <li>Post (or edit) ping comment on issue with: SHA, author, message, diff, user-visible tag, URL</li>
+          <li>Debounce: 1-hour window batches commits into one comment</li>
+          <li>Label: <code>human-review-approved</code> → <code>awaiting-reporter-reconfirm</code></li>
+          <li>Start 24h auto-reconfirm timer (resets on each new human commit)</li>
+          <li>If reporter <code>/approves</code> → <code>awaiting-devops</code></li>
+          <li>If silent 24h → auto-clear to <code>awaiting-devops</code></li>
+        </ol>
+        <div class="target"><strong>Cap:</strong> 3 human iterations. Branch protection refuses force-push.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section>
+    <h2><span class="badge">2</span>Architecture <span class="vtag">— event entry points → core modules → v7 ports</span></h2>
+    <div class="arch-frame">
+
+      <div class="arch-layer">
+        <div class="lbl">Event entry points (portable via runtime EventBus)</div>
+        <div class="triggers">
+          <div class="trig"><div class="tt">implementation.yml</div><div class="tx">label intent-confirmed</div></div>
+          <div class="trig"><div class="tt">implementation-iterate.yml</div><div class="tx">issue_comment.created</div></div>
+          <div class="trig"><div class="tt">implementation-iterate.yml</div><div class="tx">issues.labeled</div></div>
+          <div class="trig"><div class="tt">notify-reporter-on-human-commit.yml</div><div class="tx">push (non-agent)</div></div>
+          <div class="trig"><div class="tt">implementation-sweep.yml</div><div class="tx">cron daily</div></div>
+        </div>
+      </div>
+
+      <div class="arrow-down">▼</div>
+
+      <div class="arch-layer">
+        <div class="lbl">Agent core modules · <code>agents/agents/implementation/</code></div>
+        <div class="modules">
+          <div class="mod"><div class="nm">core.py</div><div class="ds">Orchestration · routes each event to a flow handler</div></div>
+          <div class="mod"><div class="nm">planner.py</div><div class="ds">Spec → plan with checkbox steps</div></div>
+          <div class="mod"><div class="nm">coder.py</div><div class="ds">Plan → code commits, step by step</div></div>
+          <div class="mod"><div class="nm">gate1.py</div><div class="ds">Run build · lint · security · tests in agentlab</div></div>
+          <div class="mod"><div class="nm">preview.py</div><div class="ds">Spawn / deploy / redeploy / destroy</div></div>
+          <div class="mod"><div class="nm">classifier.py</div><div class="ds">Comment intent · approval / iter / OOS / escalate</div></div>
+          <div class="mod"><div class="nm">commenter.py</div><div class="ds">Bot voice · format issue comments + Slack pings</div></div>
+          <div class="mod"><div class="nm">state_machine.py</div><div class="ds">PR label transitions + dedupe + cap enforcement</div></div>
+        </div>
+      </div>
+
+      <div class="arrow-down">▼</div>
+
+      <div class="arch-layer">
+        <div class="lbl">Ports used (from v7 runtime · no vendor SDKs in agent core)</div>
+        <div class="ports">
+          <span class="port">LLMProvider</span>
+          <span class="port">Repo</span>
+          <span class="port">IssueTracker</span>
+          <span class="port">Notifier</span>
+          <span class="port">ComputeEnv</span>
+          <span class="port">ArtifactStore</span>
+          <span class="port">KnowledgeBase</span>
+          <span class="port">SecretStore</span>
+          <span class="port">EventBus</span>
+          <span class="port">Logger</span>
+        </div>
+      </div>
+
+      <div class="arrow-down">▼</div>
+
+      <div class="arch-layer" style="background: rgba(255,255,255,0.02);">
+        <div class="lbl">External effects (via configurable adapters)</div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; font-size: 11px; color: var(--muted);">
+          <div>📝 Commits + push</div>
+          <div>💬 Issue comments</div>
+          <div>🏷️ PR labels</div>
+          <div>🚀 Preview env</div>
+          <div>📨 Slack pings</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PR LABEL STATE MACHINE -->
+  <section>
+    <h2><span class="badge">3</span>PR label state machine <span class="vtag">— labels are the source of truth; DB rebuilds from them</span></h2>
+    <div class="state-machine">
+      <div class="state s1"><div class="lbl">spec-drafted</div><div class="by">Spec Generator</div></div>
+      <div class="state s1"><div class="lbl">awaiting-reporter-confirm</div><div class="by">Spec Generator</div></div>
+      <div class="state s1"><div class="lbl">intent-confirmed</div><div class="by">Reporter · /confirm or 24h silence</div></div>
+      <div class="state s2"><div class="lbl">implementing</div><div class="by">Impl Agent</div></div>
+      <div class="state s2"><div class="lbl">awaiting-preview</div><div class="by">Impl Agent</div></div>
+      <div class="state s3"><div class="lbl">awaiting-reviewer</div><div class="by">URL posted</div></div>
+      <div class="state s3"><div class="lbl">iterating</div><div class="by">Impl Agent · iter N</div></div>
+      <div class="state s3"><div class="lbl">reporter-approved</div><div class="by">Reporter · /approve</div></div>
+      <div class="state s4"><div class="lbl">awaiting-human-review</div><div class="by">CODEOWNERS pinged</div></div>
+      <div class="state s4"><div class="lbl">human-refining</div><div class="by">Reviewer</div></div>
+      <div class="state s4"><div class="lbl">human-review-approved</div><div class="by">Reviewer signed off</div></div>
+      <div class="state s4"><div class="lbl">awaiting-reporter-reconfirm</div><div class="by">v5 · human pushed → reporter pinged</div></div>
+      <div class="state s4"><div class="lbl">awaiting-devops</div><div class="by">Reporter re-OK or 24h silent</div></div>
+      <div class="state terminal"><div class="lbl">merged</div><div class="by">DevOps merge</div></div>
+      <div class="state terminal"><div class="lbl">rolling-out</div><div class="by">promote-to-prod waves</div></div>
+      <div class="state terminal"><div class="lbl">done</div><div class="by">Wave-2 complete</div></div>
+      <div class="state error"><div class="lbl">needs-human</div><div class="by">Off-path · escalation</div></div>
+      <div class="state error"><div class="lbl">abandoned</div><div class="by">Off-path · 14d silence or closed</div></div>
+    </div>
+
+    <div class="legend-row">
+      <span><span class="swatch" style="background: var(--spec)"></span>Spec Generator territory</span>
+      <span><span class="swatch" style="background: var(--impl)"></span>Implementation Agent — builds</span>
+      <span><span class="swatch" style="background: var(--reporter)"></span>Implementation Agent — reporter loop</span>
+      <span><span class="swatch" style="background: var(--human)"></span>Human gate + handoff</span>
+      <span><span class="swatch" style="background: var(--good)"></span>Terminal · in main / prod</span>
+      <span><span class="swatch" style="background: var(--bad)"></span>Off-path · escalation</span>
+    </div>
+  </section>
+
+  <!-- PREVIEW LIFECYCLE -->
+  <section>
+    <h2><span class="badge">4</span>Preview env lifecycle <span class="vtag">— one Fly app + one Postgres + one tenant DB per spec</span></h2>
+    <div class="lifecycle">
+      <div class="life-step">
+        <div class="ic">🌱</div>
+        <h4>Spawn</h4>
+        <p>Fly app <code>preview-spec-&lt;N&gt;</code> · shared-cpu-1x · Postgres 5 GB · region iad</p>
+      </div>
+      <div class="life-step">
+        <div class="ic">🌾</div>
+        <h4>Seed</h4>
+        <p>Masked agentlab snapshot · single tenant DB <code>preview_&lt;N&gt;</code> · fixture modules</p>
+      </div>
+      <div class="life-step">
+        <div class="ic">🔑</div>
+        <h4>Reviewer login</h4>
+        <p>One-time password · group_user only · posted in private issue comment</p>
+      </div>
+      <div class="life-step">
+        <div class="ic">♻️</div>
+        <h4>Redeploy</h4>
+        <p>Same URL through every iteration · rolling deploy · 1h debounce on human commits</p>
+      </div>
+      <div class="life-step">
+        <div class="ic">🪦</div>
+        <h4>Destroy</h4>
+        <p>Nightly sweep after PR merged / closed / 14d stale · manual override via CLI</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+      <div style="background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--impl); border-radius: 8px; padding: 12px; font-size: 12px;">
+        <strong style="color: var(--text); display: block; margin-bottom: 4px;">Network</strong>
+        <span style="color: var(--muted);">SMTP → MailHog · telemetry → mock · no real webhooks reachable</span>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--impl); border-radius: 8px; padding: 12px; font-size: 12px;">
+        <strong style="color: var(--text); display: block; margin-bottom: 4px;">DNS</strong>
+        <span style="color: var(--muted);">Wildcard cert on <code>preview-*.&lt;your-domain&gt;</code> via Traefik · no preview can claim a non-wildcard subdomain</span>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--impl); border-radius: 8px; padding: 12px; font-size: 12px;">
+        <strong style="color: var(--text); display: block; margin-bottom: 4px;">Concurrent cap</strong>
+        <span style="color: var(--muted);">10 active org-wide · overflow queues with ETA comment</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- COST MODEL -->
+  <section>
+    <h2><span class="badge">5</span>Cost model <span class="vtag">— per phase per PR · $20 hard cap</span></h2>
+    <div class="cost-grid">
+      <div class="h">Phase</div><div class="h">LLM cost</div><div class="h">Compute</div>
+      <div>Initial planning</div><div>$0.50</div><div>—</div>
+      <div>Initial coding (~3 steps)</div><div>$1.50</div><div>—</div>
+      <div>Gate 1 retries (avg 0.5)</div><div>$0.30</div><div>$0.02</div>
+      <div>Preview spawn</div><div>—</div><div>$0.10</div>
+      <div>Reporter iteration (avg 2)</div><div>$1.00</div><div>$0.05</div>
+      <div>Human refinement (avg 1)</div><div>$0.50</div><div>$0.02</div>
+      <div class="total">Typical PR total</div><div class="total">$3.80</div><div class="total">$0.20</div>
+    </div>
+
+    <div style="margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12px;">
+      <div style="background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--warn); border-radius: 8px; padding: 12px;">
+        <strong style="color: var(--text);">$20 per-PR cap</strong><br/>
+        <span style="color: var(--muted);">80% reached → Slack warn. 100% → pause + label <code>needs-human</code> reason <code>budget-exceeded</code>.</span>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--warn); border-radius: 8px; padding: 12px;">
+        <strong style="color: var(--text);">Outlier scenarios</strong><br/>
+        <span style="color: var(--muted);">5-iter PR with multiple Gate-1 retries ≈ $15 — still under cap, but rare.</span>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--good); border-radius: 8px; padding: 12px;">
+        <strong style="color: var(--text);">Total at scale</strong><br/>
+        <span style="color: var(--muted);">10 concurrent previews × $5 avg ≈ $50/mo compute · plus ~$4/PR × ~10 PR/week LLM ≈ $200/mo. Well within v5 caps.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUARDRAILS -->
+  <section>
+    <h2><span class="badge">6</span>Hard guardrails <span class="vtag">— enforced by <code>agent-guardrails</code> CI</span></h2>
+    <div class="guards">
+      <div class="guard"><strong>No infra/workflow edits</strong>Cannot touch <code>.github/workflows/**</code>, <code>infra/**</code>, <code>Dockerfile</code>, <code>agents/**/CHARTER.md</code>.</div>
+      <div class="guard"><strong>No tenancy-security edits</strong>Cannot touch <code>saas_tenant_gate/security/**</code> without security-agent co-sign label.</div>
+      <div class="guard"><strong>Cannot bypass gates</strong>lint-python, security-scan, test-changed-addons must all pass; cannot shrink test count.</div>
+      <div class="guard"><strong>≤ 400 LOC per PR</strong>Added + deleted lines each capped. Bigger work must split.</div>
+      <div class="guard"><strong>≤ 5 open PRs</strong>Per-agent concurrent cap. Newer specs queue.</div>
+      <div class="guard"><strong>≤ 5 reporter iterations</strong>Per PR. Cap hit → <code>needs-human</code>.</div>
+      <div class="guard"><strong>≤ 3 human iterations</strong>Per PR. Cap hit → sync review.</div>
+      <div class="guard"><strong>Cannot merge own PR</strong>Always requires DevOps merge.</div>
+      <div class="guard"><strong>No spec rewrites</strong>Only commits prefixed <code>[impl-agent] spec correction:</code> in <code>docs/superpowers/specs/**</code>.</div>
+      <div class="guard"><strong>Signed commits</strong>Bot identity <code>implementation-bot@</code>, GPG-signed via runtime SigningAdapter.</div>
+      <div class="guard"><strong>PR title prefix</strong>Auto-prefixed <code>[agent:implementation]</code>.</div>
+      <div class="guard"><strong>Spend cap</strong>$20 per PR · pause + Slack warn at 80% · hard stop at 100%.</div>
+    </div>
+  </section>
+
+  <!-- FAILURE MODES -->
+  <section>
+    <h2><span class="badge">7</span>Failure modes &amp; recovery <span class="vtag">— 13 designed-for failure paths</span></h2>
+    <div class="failures">
+      <div class="fail"><h4>Agent can't implement</h4><div class="det">Gate 1 fails 3× in a row.</div><div class="rec">Label <code>needs-human</code>; preview stays up; humans rewrite spec or implement.</div></div>
+      <div class="fail"><h4>Spec is internally contradictory</h4><div class="det">Planner self-detects mid-plan.</div><div class="rec">Label <code>spec-refinement-needed</code>; Spec Generator re-engages; loop paused.</div></div>
+      <div class="fail"><h4>Preview spawn fails</h4><div class="det">ComputeEnv adapter error after 3 retries.</div><div class="rec">Label <code>infra-issue</code>; on-call paged.</div></div>
+      <div class="fail"><h4>Out-of-scope request</h4><div class="det">Classifier ≥ 0.7 confidence.</div><div class="rec">Polite refusal + suggest <code>/file-followup</code>.</div></div>
+      <div class="fail"><h4>Reporter silent</h4><div class="det">7d / 14d timers.</div><div class="rec">Ping at 7d; abandon + destroy preview at 14d.</div></div>
+      <div class="fail"><h4>Reporter loop &gt; 5</h4><div class="det">Iteration counter.</div><div class="rec">Label <code>needs-human</code> reason <code>iter-cap</code>.</div></div>
+      <div class="fail"><h4>Human loop &gt; 3</h4><div class="det">Iteration counter.</div><div class="rec">Label <code>needs-human</code> reason <code>human-iter-cap</code> · sync review required.</div></div>
+      <div class="fail"><h4>Reviewer rubber-stamps</h4><div class="det">Hard to detect automatically.</div><div class="rec">CODEOWNERS checklist · pre-review reports from Security + Code agents · 10% sample audit.</div></div>
+      <div class="fail"><h4>Spend cap hit mid-PR</h4><div class="det">Cost tracker.</div><div class="rec">Pause · label <code>needs-human</code> reason <code>budget-exceeded</code>.</div></div>
+      <div class="fail"><h4>Adapter outage</h4><div class="det">e.g. Slack down.</div><div class="rec">Notifier falls back to email · LLM falls back via LiteLLM chain.</div></div>
+      <div class="fail"><h4>LLM hallucinates test results</h4><div class="det">Snapshot mismatch.</div><div class="rec">Gate 1 always re-runs in agentlab · agent's claim vs actual → escalation.</div></div>
+      <div class="fail"><h4>Prompt injection in reporter comment</h4><div class="det">Injection detector before classification.</div><div class="rec">Refuse · log to security audit queue · do not iterate.</div></div>
+      <div class="fail"><h4>Merge conflict with main</h4><div class="det">Repo adapter detect.</div><div class="rec">Auto-rebase 1×; on fail → label <code>needs-human</code> reason <code>rebase-conflict</code>.</div></div>
+    </div>
+  </section>
+
+  <!-- PORT USAGE -->
+  <section>
+    <h2><span class="badge">8</span>v7 port usage <span class="vtag">— vendor-agnostic; swap any one via config</span></h2>
+    <div class="ports-grid">
+      <div class="port-row"><span class="pn">LLMProvider</span><span class="pu">planner · coder · classifier · bot voice · out-of-scope judgement</span></div>
+      <div class="port-row"><span class="pn">Repo</span><span class="pu">checkout · read spec · write plan + code · commits · PR · CODEOWNERS lookup</span></div>
+      <div class="port-row"><span class="pn">IssueTracker</span><span class="pu">post + edit issue comments · add/remove labels · link issue↔PR</span></div>
+      <div class="port-row"><span class="pn">Notifier</span><span class="pu">Slack <code>#devops-implementations</code> · on-call paging</span></div>
+      <div class="port-row"><span class="pn">ComputeEnv</span><span class="pu">spawn / deploy / redeploy / destroy preview app + Postgres</span></div>
+      <div class="port-row"><span class="pn">ArtifactStore</span><span class="pu">fetch snapshots · store logs, screenshots, Playwright traces</span></div>
+      <div class="port-row"><span class="pn">KnowledgeBase</span><span class="pu">search past similar implementations (read-only)</span></div>
+      <div class="port-row"><span class="pn">SecretStore</span><span class="pu">Postgres creds · admin password · GitHub PAT · LLM key</span></div>
+      <div class="port-row"><span class="pn">EventBus</span><span class="pu">subscribe to triggers · webhook / push / cron</span></div>
+      <div class="port-row"><span class="pn">Logger</span><span class="pu">structured JSON · tagged <code>agent=implementation</code>, <code>run_id</code>, <code>pr</code>, <code>issue</code></span></div>
+    </div>
+  </section>
+
+  <!-- ROLLOUT -->
+  <section>
+    <h2><span class="badge">9</span>Phase 8 rollout · weeks 13–15 <span class="vtag">— sub-phased with 4-stage canary</span></h2>
+    <div class="rollout">
+      <div class="sub">
+        <div class="week">Week 13</div>
+        <div class="nm">8a · Happy path</div>
+        <ul>
+          <li><code>core.implement()</code> end-to-end</li>
+          <li>Preview spawn/seed scripts</li>
+          <li>Bot identity provisioned</li>
+          <li>Manual <code>intent-confirmed</code> labels on fixtures</li>
+        </ul>
+      </div>
+      <div class="sub">
+        <div class="week">Week 14</div>
+        <div class="nm">8b · Reporter loop</div>
+        <ul>
+          <li><code>implementation-iterate.yml</code></li>
+          <li>Classifier 90%+ on labelled set</li>
+          <li>Out-of-scope path</li>
+          <li>Iteration cap enforcement</li>
+        </ul>
+      </div>
+      <div class="sub">
+        <div class="week">Week 14–15</div>
+        <div class="nm">8c · Human refinement</div>
+        <ul>
+          <li><code>notify-reporter-on-human-commit.yml</code></li>
+          <li>1h debounce logic</li>
+          <li>24h auto-reconfirm timer</li>
+          <li>Human-loop cap (3)</li>
+        </ul>
+      </div>
+      <div class="sub">
+        <div class="week">Week 15</div>
+        <div class="nm">8d · Escalation</div>
+        <ul>
+          <li>Gate-1 3-retry → <code>needs-human</code></li>
+          <li>Spec contradiction handling</li>
+          <li>Spend cap exhausted path</li>
+          <li>Stale PR sweep cron</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; padding: 14px; background: linear-gradient(135deg, rgba(124,92,255,0.08), rgba(96,165,250,0.06)); border: 1px solid rgba(124,92,255,0.25); border-radius: 12px;">
+      <strong style="color: var(--text);">4-stage canary inside Phase 8:</strong>
+      <span style="color: var(--muted); font-size: 13px; margin-left: 8px;">
+        ① shadow mode (5 PRs, no push/post) → ② live on test fixtures (5 PRs) → ③ opt-in real specs → ④ default-on after 2 weeks clean.
+      </span>
+    </div>
+  </section>
+
+  <!-- AGENT INTERACTIONS -->
+  <section>
+    <h2><span class="badge">10</span>Interactions with the other 5 agents</h2>
+    <div class="interactions">
+      <div class="interact">
+        <div class="who"><div class="ico" style="background: rgba(251,191,36,0.18); color: #fde68a;">📝</div><h4>Spec Generator</h4></div>
+        <p>Produces the input. Implementation Agent reads <code>agent/spec-&lt;N&gt;</code> HEAD; never wholesale-rewrites the spec. Spec Generator stays available for <code>spec-refinement-needed</code> requests.</p>
+      </div>
+      <div class="interact">
+        <div class="who"><div class="ico" style="background: rgba(124,92,255,0.18); color: #c4b5fd;">🛠️</div><h4>Code Agent</h4></div>
+        <p>Posts an automated code-quality report on the PR before <code>awaiting-human-review</code>. Impl Agent surfaces top findings in the handoff comment to humans.</p>
+      </div>
+      <div class="interact">
+        <div class="who"><div class="ico" style="background: rgba(251,113,133,0.18); color: #fda4af;">🛡️</div><h4>Security Agent</h4></div>
+        <p>Posts an automated security pre-review. Same surfacing rule. Tenancy-boundary issues block the human-handoff comment until acknowledged.</p>
+      </div>
+      <div class="interact">
+        <div class="who"><div class="ico" style="background: rgba(52,211,153,0.18); color: #6ee7b7;">⚡</div><h4>Optimization Agent</h4></div>
+        <p>Doesn't directly interact. Its perf suggestions land as separate autonomous PRs through its own loop.</p>
+      </div>
+      <div class="interact" style="grid-column: 1 / -1;">
+        <div class="who"><div class="ico" style="background: rgba(96,165,250,0.18); color: #93c5fd;">💬</div><h4>Support Triage Agent</h4></div>
+        <p>For chat-originating issues, Support Triage's bidirectional sync reads Impl Agent's PR labels to update the in-app chat thread when the preview is ready, when the PR merges, and when the wave-2 rollout completes.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Implementation Agent design infographic · 2026-05-16 · companion to <code>docs/superpowers/specs/2026-05-16-implementation-agent-design.md</code> · part of the v7 plan
+  </footer>
+</div>
+</body>
+</html>

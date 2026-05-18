@@ -37,3 +37,16 @@ Thumbs.db
 **/terraform.tfvars
 **/*.auto.tfvars
 **/.terraform.lock.hcl
+
+# Node.js
+**/node_modules/
+**/dist/
+**/*.tsbuildinfo
+
+# Python — agents/ runtime
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+
+# Vercel
+**/.vercel/

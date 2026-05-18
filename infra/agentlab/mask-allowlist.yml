@@ -1,0 +1,80 @@
+# Mask allow-list — columns explicitly safe to leave UNMASKED.
+#
+# Default behaviour: every column in tenant DBs is masked when snapshots
+# enter agentlab. This file lists exceptions — columns the security team has
+# explicitly cleared as non-PII.
+#
+# Format: <table>.<column>
+#
+# Adding a column requires:
+#   - PR review by 2 security-leads.
+#   - Justification in the PR body: why is this column non-PII?
+#   - Pass the weekly random-row audit.
+
+allowed:
+
+  # Core Odoo metadata — non-PII technical fields
+  res_users:
+    - id
+    - login                # already pseudonymous in tenant context; safe
+    - active
+    - share
+    - create_date
+    - write_date
+
+  res_partner:
+    - id
+    - is_company
+    - active
+    - create_date
+    - write_date
+    - country_id
+    - state_id
+    # Note: NOT name, NOT email, NOT phone, NOT vat — those stay masked
+
+  res_company:
+    - id
+    - active
+    - currency_id
+    - country_id
+
+  # Product catalog — non-tenant-specific (mostly)
+  product_template:
+    - id
+    - type
+    - active
+    - sale_ok
+    - purchase_ok
+    - default_code
+    - categ_id
+
+  product_product:
+    - id
+    - active
+    - product_tmpl_id
+
+  # Accounting metadata — structural, not transactional
+  account_account:
+    - id
+    - code
+    - account_type
+    - reconcile
+    - currency_id
+    - active
+
+  account_journal:
+    - id
+    - code
+    - type
+    - active
+    - currency_id
+
+  # Aggregate counts on saas_tenant_gate — for KB context, no PII
+  saas_tenant_metrics:
+    - tenant_id
+    - active_users_count
+    - addon_count
+    - last_login_date
+
+# Anything not listed above is masked by default.
+# See `masking-rules.yml` for the per-type masking strategy applied.

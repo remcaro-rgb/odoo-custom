@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spec-Driven Dev & CI/CD Plan v7 — Odoo SaaS</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --card: #171f3d;
+    --card-2: #1f2950;
+    --line: #2a356a;
+    --text: #e8ecff;
+    --muted: #9aa3c7;
+    --accent: #7c5cff;
+    --accent-2: #22d3ee;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad:  #f87171;
+    --pillar-a: #7c5cff;
+    --pillar-b: #22d3ee;
+    --pillar-c: #34d399;
+    --pillar-d: #fb7185;
+    --stage-1: #fbbf24;  /* intake / spec */
+    --stage-2: #60a5fa;  /* build + reporter */
+    --stage-3: #34d399;  /* human + ship */
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(124,92,255,0.25), transparent 60%),
+                radial-gradient(900px 500px at 90% 10%, rgba(34,211,238,0.18), transparent 60%),
+                var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* HERO */
+  .hero {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; align-items: center;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(124,92,255,0.22), rgba(34,211,238,0.10));
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    margin-bottom: 36px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content:""; position:absolute; right:-120px; top:-120px;
+    width:360px; height:360px;
+    background: radial-gradient(circle, rgba(124,92,255,0.35), transparent 60%);
+  }
+  .eyebrow { text-transform:uppercase; letter-spacing:2px; font-size:12px; color:var(--accent-2); margin-bottom:12px; }
+  .v-pill {
+    display:inline-block; margin-left:10px; padding:2px 10px; border-radius:999px;
+    background: linear-gradient(120deg, var(--stage-3), var(--accent));
+    color:#0b1020; font-weight:700; font-size:12px; letter-spacing:1px;
+    vertical-align: middle;
+  }
+  h1 { font-size:42px; line-height:1.1; margin:0 0 14px; letter-spacing:-0.5px; }
+  h1 .grad { background: linear-gradient(120deg, #c4b5fd, #67e8f9 60%, #6ee7b7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { color: var(--muted); font-size:17px; max-width:640px; }
+  .stats { display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; }
+  .stat { background:rgba(255,255,255,0.04); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .stat .n { font-size:26px; font-weight:700; background:linear-gradient(120deg, #a5b4fc, #67e8f9); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .stat .l { color:var(--muted); font-size:13px; }
+
+  section { margin-top: 44px; }
+  h2 { font-size:26px; margin:0 0 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  h2 .badge { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:10px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#0b1020; font-weight:800; font-size:14px; }
+  h2 .vtag { font-size:11px; color:var(--muted); font-weight:400; }
+  h3 { margin:0 0 8px; font-size:18px; }
+  .lead { color: var(--muted); margin:0 0 18px; max-width:980px; }
+
+  .grid-4 { display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; }
+  .grid-5 { display:grid; grid-template-columns: repeat(5, 1fr); gap:14px; }
+  .grid-3 { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+  .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+  .card { background: var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; position:relative; overflow:hidden; }
+  .card.pa { border-top: 3px solid var(--pillar-a); }
+  .card.pb { border-top: 3px solid var(--pillar-b); }
+  .card.pc { border-top: 3px solid var(--pillar-c); }
+  .card.pd { border-top: 3px solid var(--pillar-d); }
+  .card .pill { display:inline-block; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; padding:3px 8px; border-radius:999px; margin-bottom:10px; }
+  .pill.pa { background:rgba(124,92,255,0.16); color:#c4b5fd; }
+  .pill.pb { background:rgba(34,211,238,0.16); color:#67e8f9; }
+  .pill.pc { background:rgba(52,211,153,0.16); color:#6ee7b7; }
+  .pill.pd { background:rgba(251,113,133,0.16); color:#fda4af; }
+  .card ul { padding-left:18px; margin:8px 0 0; color:var(--muted); font-size:14px; }
+  .card ul li { margin:4px 0; }
+
+  /* THREE-STAGE FLOW */
+  .flow-frame {
+    background: linear-gradient(180deg, rgba(124,92,255,0.05), rgba(96,165,250,0.05));
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding: 22px;
+  }
+  .stage {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 14px;
+    align-items: stretch;
+    padding: 14px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.06);
+  }
+  .stage:last-child { border-bottom: 0; }
+  .stage-label {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center;
+  }
+  .stage-label .num { font-size: 28px; font-weight: 700; line-height: 1; }
+  .stage-label .ttl { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-top: 6px; }
+  .stage-1 .stage-label { border-color: rgba(251,191,36,0.35); }
+  .stage-1 .stage-label .num { color: var(--stage-1); }
+  .stage-2 .stage-label { border-color: rgba(96,165,250,0.40); }
+  .stage-2 .stage-label .num { color: var(--stage-2); }
+  .stage-3 .stage-label { border-color: rgba(52,211,153,0.40); }
+  .stage-3 .stage-label .num { color: var(--stage-3); }
+
+  .nodes {
+    display: grid;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .stage-1 .nodes { grid-template-columns: repeat(3, 1fr); }
+  .stage-2 .nodes { grid-template-columns: repeat(4, 1fr); }
+  .stage-3 .nodes { grid-template-columns: repeat(4, 1fr); }
+
+  .node {
+    background: rgba(255,255,255,0.04);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 10px;
+    text-align:center;
+    position:relative;
+    min-height: 100px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+  }
+  .node .ic { font-size: 22px; line-height: 1; }
+  .node .ttl { font-size:12px; font-weight:600; margin-top:6px; line-height: 1.2; }
+  .node .lbl { font-size:10px; color:var(--muted); margin-top:4px; line-height:1.35; }
+  .node + .node::before {
+    content: "▶";
+    color: var(--accent-2);
+    position:absolute; left:-11px; top:50%; transform: translateY(-50%);
+    font-size: 12px;
+  }
+  .node.s1 { border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.06); }
+  .node.s2 { border-color: rgba(96,165,250,0.35); background: rgba(96,165,250,0.06); }
+  .node.s3 { border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.06); }
+  .node.loop { border-color: rgba(124,92,255,0.40); background: rgba(124,92,255,0.08); }
+  .node.loop::after {
+    content: "↻";
+    position: absolute; top: 6px; right: 8px;
+    font-size: 16px; color: #c4b5fd;
+  }
+
+  .handoff-note {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .handoff-note strong { color: var(--text); }
+
+  .flow-legend { display:flex; flex-wrap:wrap; gap: 16px; margin-top: 18px; font-size:12px; color:var(--muted); }
+  .flow-legend span { display:flex; align-items:center; gap:6px; }
+  .swatch { width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+  /* PR LIFECYCLE LABELS */
+  .labels { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .label {
+    font-size: 10px; padding: 3px 9px; border-radius: 999px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--line);
+    color: var(--muted); font-family: 'SF Mono', Monaco, monospace;
+  }
+  .label.l1 { color: #fde68a; border-color: rgba(251,191,36,0.30); }
+  .label.l2 { color: #93c5fd; border-color: rgba(96,165,250,0.30); }
+  .label.l3 { color: #6ee7b7; border-color: rgba(52,211,153,0.30); }
+  .label.lk { color: #fca5a5; border-color: rgba(248,113,113,0.30); }
+
+  /* LADDER */
+  .ladder { display:grid; grid-template-columns:repeat(6, 1fr); gap:10px; align-items:stretch; }
+  .env { background:var(--card-2); border:1px solid var(--line); border-radius:14px; padding:14px; }
+  .env h4 { margin:0 0 6px; font-size:14px; display:flex; align-items:center; gap:8px; }
+  .env .icon { font-size:18px; }
+  .env .desc { font-size:11px; color:var(--muted); }
+  .env .meta { font-size:10px; color:var(--accent-2); margin-top:8px; text-transform:uppercase; letter-spacing:1px; }
+
+  /* GATES */
+  .gates { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .gate { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; position:relative; }
+  .gate::before { content:attr(data-gate); position:absolute; top:-14px; left:16px; background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#0b1020; font-weight:800; font-size:12px; padding:4px 10px; border-radius:999px; letter-spacing:1px; }
+  .checks { list-style:none; padding:0; margin:12px 0 0; }
+  .checks li { display:grid; grid-template-columns:22px 1fr auto; gap:10px; align-items:center; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.06); font-size:13px; }
+  .checks li:last-child { border-bottom:0; }
+  .checks .dot { width:10px; height:10px; border-radius:50%; background:var(--good); box-shadow:0 0 0 4px rgba(52,211,153,0.12); }
+  .checks .dot.warn { background:var(--warn); box-shadow:0 0 0 4px rgba(251,191,36,0.12); }
+  .checks .dot.bad  { background:var(--bad);  box-shadow:0 0 0 4px rgba(248,113,113,0.12); }
+  .tag { font-size:10px; padding:2px 8px; border-radius:999px; text-transform:uppercase; letter-spacing:1px; }
+  .tag.hard { background:rgba(248,113,113,0.12); color:#fca5a5; }
+  .tag.soft { background:rgba(251,191,36,0.12); color:#fde68a; }
+  .tag.new  { background:rgba(34,211,238,0.16); color:#67e8f9; }
+  .tag.have { background:rgba(52,211,153,0.16); color:#6ee7b7; }
+
+  /* WAVES */
+  .waves { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  .wave { background:var(--card-2); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .wave .num { font-size:12px; text-transform:uppercase; letter-spacing:2px; color:var(--accent-2); }
+  .wave h4 { margin:6px 0; font-size:18px; }
+  .wave p { margin:0; color:var(--muted); font-size:13px; }
+  .bar { height:8px; border-radius:999px; background:rgba(255,255,255,0.06); margin-top:12px; overflow:hidden; }
+  .bar > span { display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+  /* AGENTS */
+  .agents { display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; }
+  .agent {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px;
+    position:relative;
+  }
+  .agent .head { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .agent .ico { width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .agent.spec .ico { background:rgba(251,191,36,0.18); color:#fde68a; }
+  .agent.impl .ico { background:rgba(96,165,250,0.20); color:#93c5fd; }
+  .agent.code .ico { background:rgba(124,92,255,0.18); color:#c4b5fd; }
+  .agent.sec  .ico { background:rgba(251,113,133,0.18); color:#fda4af; }
+  .agent.opt  .ico { background:rgba(52,211,153,0.18); color:#6ee7b7; }
+  .agent.spec { border-color: rgba(251,191,36,0.35); }
+  .agent.impl { border-color: rgba(96,165,250,0.40); }
+  .agent h3 { font-size: 15px; margin: 0; }
+  .agent .cadence { color: var(--muted); font-size:11px; }
+  .agent .role { font-size:10px; text-transform:uppercase; letter-spacing:1.5px; }
+  .agent.spec .role { color:#fde68a; }
+  .agent.impl .role { color:#93c5fd; }
+  .agent.code .role { color:#c4b5fd; }
+  .agent.sec  .role { color:#fda4af; }
+  .agent.opt  .role { color:#6ee7b7; }
+  .agent p { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+  .loops { margin-top:10px; display:flex; flex-wrap:wrap; gap:5px; }
+  .loop { font-size:10px; padding:3px 8px; background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:999px; color:var(--muted); }
+  .agent .guard { margin-top:12px; font-size:11px; color:var(--muted); padding-top:10px; border-top:1px dashed rgba(255,255,255,0.08); }
+
+  /* TIMELINE */
+  .timeline { position:relative; padding-left:24px; }
+  .timeline::before { content:""; position:absolute; left:9px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg, var(--stage-1), var(--stage-2), var(--stage-3)); border-radius:2px; }
+  .tl { position:relative; padding:8px 0 14px 14px; }
+  .tl::before { content:""; position:absolute; left:-19px; top:14px; width:12px; height:12px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px rgba(124,92,255,0.2); }
+  .tl.t-1::before { background:var(--stage-1); box-shadow:0 0 0 4px rgba(251,191,36,0.2); }
+  .tl.t-2::before { background:var(--stage-2); box-shadow:0 0 0 4px rgba(96,165,250,0.2); }
+  .tl.t-3::before { background:var(--stage-3); box-shadow:0 0 0 4px rgba(52,211,153,0.2); }
+  .tl .when { color:var(--accent-2); font-size:11px; text-transform:uppercase; letter-spacing:1.5px; }
+  .tl h4 { margin: 2px 0 4px; font-size: 14px; }
+  .tl p { margin: 0; color: var(--muted); font-size: 13px; }
+
+  /* ROADMAP */
+  .roadmap { position:relative; padding-left:24px; }
+  .roadmap::before { content:""; position:absolute; left:9px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg, var(--accent), var(--accent-2), var(--good)); border-radius:2px; }
+  .step { position:relative; padding:10px 0 18px 14px; }
+  .step::before { content:""; position:absolute; left:-19px; top:18px; width:12px; height:12px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px rgba(124,92,255,0.2); }
+  .step h4 { margin:0 0 4px; font-size:16px; }
+  .step .when { color:var(--accent-2); font-size:11px; text-transform:uppercase; letter-spacing:1.5px; }
+  .step p { margin:4px 0 0; color:var(--muted); font-size:13px; }
+
+  /* METRICS */
+  .metrics { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
+  .metric { background: var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .metric .v { font-size: 20px; font-weight:700; background:linear-gradient(120deg, #a5b4fc, #67e8f9); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .metric .k { font-size:12px; color:var(--muted); margin-top:4px; }
+  .metric.new { border-color: rgba(52,211,153,0.40); }
+  .metric.new .v { background:linear-gradient(120deg, #6ee7b7, #93c5fd); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+  /* COMPARISON v3 vs v4 */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .col {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .col.old { border-left: 3px solid var(--muted); }
+  .col.new { border-left: 3px solid var(--stage-3); }
+  .col .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .col .tag-v { font-size: 11px; color: var(--muted); }
+  .col.new .tag-v { color: var(--stage-3); font-weight: 600; }
+  .col ol { margin: 0; padding-left: 20px; color: var(--muted); font-size: 13px; }
+  .col ol li { margin: 6px 0; }
+  .col .delta { background: rgba(52,211,153,0.10); padding: 8px 12px; border-radius: 8px; margin-top: 12px; font-size: 12px; color: #6ee7b7; }
+
+  /* RISKS */
+  .risks { display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; }
+  .risk { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--bad); border-radius:12px; padding:14px 16px; }
+  .risk h4 { margin:0 0 6px; font-size:14px; }
+  .risk p { margin:0; color:var(--muted); font-size:13px; }
+  .risk .mit { color:var(--good); font-weight:600; }
+  .risk.new { border-left-color: var(--stage-3); }
+  .risk.new h4::after { content: " · new"; color: var(--stage-3); font-size: 10px; }
+
+  /* DONE */
+  .done { background:linear-gradient(135deg, rgba(52,211,153,0.10), rgba(34,211,238,0.08)); border:1px solid rgba(52,211,153,0.25); border-radius:18px; padding:24px 28px; }
+  .done ul { margin:8px 0 0; padding-left:18px; color:var(--muted); }
+  .done li { margin:6px 0; }
+  .done strong { color: var(--text); }
+
+  footer { margin-top:48px; color:var(--muted); font-size:12px; text-align:center; }
+
+  @media (max-width: 1200px) {
+    .hero { grid-template-columns:1fr; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-5, .agents { grid-template-columns: repeat(2, 1fr); }
+    .grid-3, .gates, .ladder, .waves, .risks, .compare { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .stage { grid-template-columns: 1fr; }
+    .stage-1 .nodes, .stage-2 .nodes, .stage-3 .nodes { grid-template-columns: 1fr; }
+    .node + .node::before { content: "▼"; left: 50%; top: -14px; transform: translateX(-50%); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Plan · 2026-05-16 <span class="v-pill">v7 · portable agent runtime · no vendor lock-in</span></div>
+      <h1>Reporter confirms intent — <span class="grad">agent builds — reporter approves — humans review the package</span></h1>
+      <p class="sub">Three stages, one PR. The agent starts building the moment the reporter confirms intent; the reporter validates a real Odoo URL; humans review spec + diff + reporter conversation together at the end before DevOps merges and rolls out.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">6</div><div class="l">AI agents · vendor-agnostic runtime</div></div>
+      <div class="stat"><div class="n">10</div><div class="l">port interfaces · swap any vendor</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">OCI image runs every agent everywhere</div></div>
+      <div class="stat"><div class="n">~1 wk</div><div class="l">worst-case vendor migration</div></div>
+    </div>
+  </div>
+
+  <!-- THE THREE-STAGE FLOW -->
+  <section>
+    <h2><span class="badge">★</span>The three-stage flow <span class="vtag">— same branch from spec to ship</span></h2>
+    <p class="lead">Spec Generator + Implementation Agent + reviewing humans all commit to one branch <code>agent/spec-&lt;NNN&gt;</code>. The PR accumulates the spec, the plan, the code, the reporter conversation, and the preview link — humans review the whole package once at the end.</p>
+
+    <div class="flow-frame">
+      <!-- STAGE 0 — Intake sources (v6) -->
+      <div class="stage stage-1">
+        <div class="stage-label">
+          <div class="num">0</div>
+          <div class="ttl">Intake</div>
+        </div>
+        <div class="nodes" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="node s1"><div class="ic">🧑‍💻</div><div class="ttl">GitHub issue</div><div class="lbl">devs file directly</div></div>
+          <div class="node s1"><div class="ic">📧</div><div class="ttl">Email-to-issue</div><div class="lbl">support inbox · external customers</div></div>
+          <div class="node s1" style="border-color: rgba(96,165,250,0.45); background: rgba(96,165,250,0.10);"><div class="ic">💬</div><div class="ttl">In-app chatbot <span style="color:#93c5fd; font-size:9px">v6</span></div><div class="lbl">Support Triage Agent · in Odoo</div></div>
+        </div>
+        <div class="handoff-note">
+          <strong>All three converge</strong> on a labelled GitHub issue (<code>feature-request</code> or <code>bug</code>; the chatbot adds <code>source:chatbot</code>) which fires Stage 1 below.
+        </div>
+      </div>
+
+      <!-- STAGE 1 -->
+      <div class="stage stage-1">
+        <div class="stage-label">
+          <div class="num">1</div>
+          <div class="ttl">Capture intent</div>
+        </div>
+        <div class="nodes">
+          <div class="node s1"><div class="ic">📥</div><div class="ttl">Issue arrives</div><div class="lbl">labelled · routed</div></div>
+          <div class="node s1"><div class="ic">🤖</div><div class="ttl">Spec Generator drafts</div><div class="lbl">opens PR with spec file · asks Qs</div></div>
+          <div class="node s1"><div class="ic">💬</div><div class="ttl">Reporter confirms</div><div class="lbl"><code>/confirm</code> · or in-chat via bot · or 24h silence</div></div>
+        </div>
+        <div class="handoff-note">
+          <strong>Trigger out:</strong> label <code>intent-confirmed</code> fires the Implementation Agent. The spec PR is NOT merged here — it stays open and continues to accumulate work.
+        </div>
+      </div>
+
+      <!-- STAGE 2 -->
+      <div class="stage stage-2">
+        <div class="stage-label">
+          <div class="num">2</div>
+          <div class="ttl">Build &amp; validate with reporter</div>
+        </div>
+        <div class="nodes">
+          <div class="node s2"><div class="ic">⚙️</div><div class="ttl">Impl Agent builds</div><div class="lbl">commits to same branch</div></div>
+          <div class="node s2"><div class="ic">🚀</div><div class="ttl">Preview env up</div><div class="lbl"><code>preview-spec-&lt;N&gt;</code> on Fly</div></div>
+          <div class="node loop"><div class="ic">🔁</div><div class="ttl">Reporter iterates</div><div class="lbl">cap 5 · agent redeploys same URL</div></div>
+          <div class="node s2"><div class="ic">✅</div><div class="ttl">Reporter <code>/approve</code></div><div class="lbl">label <code>reporter-approved</code></div></div>
+        </div>
+        <div class="handoff-note">
+          <strong>Trigger out:</strong> label <code>awaiting-human-review</code>. Pre-review reports from Security &amp; Code agents auto-post on the PR.
+        </div>
+      </div>
+
+      <!-- STAGE 3 -->
+      <div class="stage stage-3">
+        <div class="stage-label">
+          <div class="num">3</div>
+          <div class="ttl">Human review &amp; ship</div>
+        </div>
+        <div class="nodes">
+          <div class="node s3"><div class="ic">👥</div><div class="ttl">CODEOWNERS review</div><div class="lbl">spec · diff · reporter convo</div></div>
+          <div class="node loop"><div class="ic">✏️</div><div class="ttl">Refine</div><div class="lbl">cap 3 · every commit auto-pings reporter</div></div>
+          <div class="node s3"><div class="ic">🛡️</div><div class="ttl">DevOps merges</div><div class="lbl">final sanity check · to <code>main</code></div></div>
+          <div class="node s3"><div class="ic">🌊</div><div class="ttl">Wave rollout</div><div class="lbl">canary → w1 → w2</div></div>
+        </div>
+        <div class="handoff-note">
+          <strong>v5 · Every human commit on <code>agent/spec-*</code></strong> auto-redeploys the preview and pings the reporter on the issue. PR cannot move to <code>awaiting-devops</code> until reporter <code>/approves</code> again OR 24h pass silently after the last human commit.
+        </div>
+      </div>
+
+      <div class="flow-legend">
+        <span><span class="swatch" style="background:var(--stage-1)"></span>Stage 1 · Spec Generator</span>
+        <span><span class="swatch" style="background:var(--stage-2)"></span>Stage 2 · Implementation Agent + reporter</span>
+        <span><span class="swatch" style="background:var(--stage-3)"></span>Stage 3 · Humans</span>
+        <span><span class="swatch" style="background:var(--accent)"></span>Iteration loops (capped)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3 vs v4 COMPARISON -->
+  <section>
+    <h2><span class="badge">Δ</span>What changed from v3 — and why</h2>
+    <p class="lead">v3 made humans review the spec <em>before</em> the agent could start. v4 has them review the spec, the implementation, and the reporter approval all together at the end. Faster for the reporter; one heavier (but better-informed) review for humans.</p>
+    <div class="compare">
+      <div class="col old">
+        <div class="head"><strong>v3 flow</strong><span class="tag-v">previous</span></div>
+        <ol>
+          <li>Issue arrives</li>
+          <li>Spec Generator drafts spec PR</li>
+          <li>Reporter confirms intent</li>
+          <li><strong>Humans review &amp; merge spec PR</strong> ← serial bottleneck</li>
+          <li>Implementation Agent builds on a new branch</li>
+          <li>Preview env up</li>
+          <li>Reporter iterates</li>
+          <li>DevOps reviews diff + merges</li>
+          <li>Rollout</li>
+        </ol>
+      </div>
+      <div class="col new">
+        <div class="head"><strong>v4 flow</strong><span class="tag-v">this revision</span></div>
+        <ol>
+          <li>Issue arrives</li>
+          <li>Spec Generator drafts on shared branch <code>agent/spec-&lt;NNN&gt;</code></li>
+          <li>Reporter confirms intent</li>
+          <li>Implementation Agent picks up <strong>immediately</strong> (no human wait)</li>
+          <li>Preview env up</li>
+          <li>Reporter iterates</li>
+          <li>Reporter <code>/approve</code></li>
+          <li><strong>CODEOWNERS review</strong> — spec + diff + conversation + agent reports</li>
+          <li>Refinement loop (cap 3) — push commits or direct agent</li>
+          <li>DevOps merges → rollout</li>
+        </ol>
+        <div class="delta">↓ Saves ~24 h of reporter wait time. Humans review once, with full context.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PR LIFECYCLE LABELS -->
+  <section>
+    <h2><span class="badge">🏷</span>PR lifecycle — label state machine</h2>
+    <p class="lead">One PR per issue. These labels move it through the three stages. CODEOWNERS approval is non-bypassable; <code>awaiting-devops</code> is reached only after <code>human-review-approved</code>.</p>
+    <div class="grid-3">
+      <div class="card pa">
+        <span class="pill pa">Stage 1 · Capture intent</span>
+        <h3>Spec phase</h3>
+        <div class="labels">
+          <span class="label l1">spec-drafted</span>
+          <span class="label l1">awaiting-reporter-confirm</span>
+          <span class="label l1">intent-confirmed</span>
+        </div>
+      </div>
+      <div class="card pb">
+        <span class="pill pb">Stage 2 · Build &amp; reporter</span>
+        <h3>Implementation phase</h3>
+        <div class="labels">
+          <span class="label l2">implementing</span>
+          <span class="label l2">awaiting-preview</span>
+          <span class="label l2">awaiting-reviewer</span>
+          <span class="label l2">iterating</span>
+          <span class="label l2">reporter-approved</span>
+        </div>
+      </div>
+      <div class="card pc">
+        <span class="pill pc">Stage 3 · Humans &amp; ship</span>
+        <h3>Review &amp; deploy phase</h3>
+        <div class="labels">
+          <span class="label l3">awaiting-human-review</span>
+          <span class="label l3">human-refining</span>
+          <span class="label l3">human-review-approved</span>
+          <span class="label l3" style="background:rgba(96,165,250,0.10);border-color:rgba(96,165,250,0.40);color:#93c5fd">awaiting-reporter-reconfirm</span>
+          <span class="label l3">awaiting-devops</span>
+          <span class="label l3">merged</span>
+          <span class="label l3">rolling-out</span>
+          <span class="label l3">done</span>
+        </div>
+        <div style="margin-top: 10px; font-size: 12px; color: var(--muted);">Off-path:</div>
+        <div class="labels">
+          <span class="label lk">needs-human</span>
+          <span class="label lk">abandoned</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HAPPY PATH TIMELINE -->
+  <section>
+    <h2><span class="badge">⏱</span>Happy path · customer email → all-tenants prod</h2>
+    <p class="lead">Reporter sees a real preview ~2.5 h after they confirm intent — no waiting on a human spec merge. Total ~5 days, most of it intentional soak.</p>
+    <div class="timeline">
+      <div class="tl t-1"><div class="when">t = 0</div><h4>Customer email auto-creates issue #1500</h4><p>Label <code>feature-request</code>.</p></div>
+      <div class="tl t-1"><div class="when">t + 6 min</div><h4>Spec Generator opens PR #1501 on <code>agent/spec-1500</code></h4><p>Draft spec; comments on #1500 with 3 questions.</p></div>
+      <div class="tl t-1"><div class="when">t + 1 h</div><h4>Reporter answers questions</h4><p>Spec Generator updates the spec file in the same branch.</p></div>
+      <div class="tl t-1"><div class="when">t + 2 h</div><h4>Reporter <code>/confirm</code> → label <code>intent-confirmed</code></h4><p>Implementation Agent fires immediately — no human wait.</p></div>
+      <div class="tl t-2"><div class="when">t + 2 h 30 min</div><h4>Preview URL posted to #1500</h4><p>Spec → plan → code → Gate-1 → preview, all in ~30 min.</p></div>
+      <div class="tl t-2"><div class="when">t + 5 h</div><h4>Reporter finds XLSX issue, comments</h4><p>Agent iterates (iter 2 of 5); redeploys same URL.</p></div>
+      <div class="tl t-2"><div class="when">t + 6 h</div><h4>Reporter <code>/approve</code> → <code>awaiting-human-review</code></h4><p>CODEOWNERS pinged; pre-review reports auto-posted.</p></div>
+      <div class="tl t-3"><div class="when">t + 1 d</div><h4>Lead-dev pushes one refactor commit, asks for missing edge-case test</h4><p>Iter 1 of 3 on human-refinement loop.</p></div>
+      <div class="tl t-3"><div class="when">t + 1 d 1 h</div><h4>Impl Agent adds the test; Gate 1 green</h4><p>Preview still up for spot-check.</p></div>
+      <div class="tl t-3"><div class="when">t + 1 d 2 h</div><h4>Lead-dev approves: <code>human-review-approved</code> → <code>awaiting-devops</code></h4></div>
+      <div class="tl t-3"><div class="when">t + 1 d 3 h</div><h4>DevOps merges PR to <code>main</code></h4><p>Preview destruction queued.</p></div>
+      <div class="tl t-3"><div class="when">t + 1 d 3 h 30 m</div><h4>Gate 2 green · cross-platform staging deploys + parity</h4></div>
+      <div class="tl t-3"><div class="when">t + 3 d 3 h 30 m</div><h4>promote-to-prod canary (after 24 h soak)</h4></div>
+      <div class="tl t-3"><div class="when">t + 5 d 3 h 30 m</div><h4>wave-2 — all tenants live</h4></div>
+      <div class="tl t-1"><div class="when">t + 5 d 4 h</div><h4>Spec Generator drafts customer reply</h4><p>"What we shipped" → support inbox.</p></div>
+    </div>
+  </section>
+
+  <!-- 4 PILLARS -->
+  <section>
+    <h2><span class="badge">1</span>The four pillars (unchanged shape)</h2>
+    <div class="grid-4">
+      <div class="card pa">
+        <span class="pill pa">Pillar A</span>
+        <h3>Spec-driven dev</h3>
+        <ul>
+          <li>Design spec + fix-brief</li>
+          <li>ADRs for architecture</li>
+          <li><code>spec-required</code> CI gate</li>
+          <li>Same workflow for humans + agents</li>
+        </ul>
+      </div>
+      <div class="card pb">
+        <span class="pill pb">Pillar B</span>
+        <h3>Environments &amp; rollout</h3>
+        <ul>
+          <li>Trunk-based on <code>main</code></li>
+          <li>Dev · CI · staging × 2 · preview · agentlab · prod × 2</li>
+          <li>Per-client waves</li>
+          <li>Per-tenant migration queue</li>
+        </ul>
+      </div>
+      <div class="card pc">
+        <span class="pill pc">Pillar C</span>
+        <h3>Three-gate test ladder</h3>
+        <ul>
+          <li>Gate 1 PR · ~5 min</li>
+          <li>Gate 2 staging · ~20 min</li>
+          <li>Gate 3 prod · hours + human</li>
+          <li>Preview gets abbreviated Gate 1</li>
+        </ul>
+      </div>
+      <div class="card pd">
+        <span class="pill pd">Pillar D</span>
+        <h3>Six AI agents</h3>
+        <ul>
+          <li>Spec Generator · intake</li>
+          <li>Implementation · build + reporter</li>
+          <li>Support Triage · customer chat <span style="color:#93c5fd;font-size:11px">v6</span></li>
+          <li>Code · autonomous improvement</li>
+          <li>Security · scans + fixes</li>
+          <li>Optimization · perf + cost</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENV LADDER -->
+  <section>
+    <h2><span class="badge">2</span>Environment ladder</h2>
+    <div class="ladder">
+      <div class="env"><h4><span class="icon">💻</span>Dev</h4><div class="desc">Local <code>docker-compose</code>.</div><div class="meta">Laptop</div></div>
+      <div class="env"><h4><span class="icon">🧪</span>CI</h4><div class="desc">Ephemeral GHA runner.</div><div class="meta">Every PR</div></div>
+      <div class="env"><h4><span class="icon">🚂</span>Staging × 2</h4><div class="desc">Railway + Fly. Parity gate.</div><div class="meta">Push to main</div></div>
+      <div class="env" style="border-color:#60a5fa;background:linear-gradient(180deg,rgba(96,165,250,0.07),transparent)"><h4><span class="icon">🔍</span>Preview · per spec</h4><div class="desc">One Fly app per intent-confirmed spec.</div><div class="meta" style="color:#93c5fd">intent-confirmed label</div></div>
+      <div class="env" style="border-color:#fb7185;background:linear-gradient(180deg,rgba(251,113,133,0.07),transparent)"><h4><span class="icon">🤖</span>Agentlab</h4><div class="desc">Daily masked clone.</div><div class="meta" style="color:#fda4af">Cron + agents</div></div>
+      <div class="env" style="border-color:#34d399;background:linear-gradient(180deg,rgba(52,211,153,0.07),transparent)"><h4><span class="icon">🌍</span>Prod × 2</h4><div class="desc">Per-client waves.</div><div class="meta" style="color:#6ee7b7">Manual approval</div></div>
+    </div>
+  </section>
+
+  <!-- GATES -->
+  <section>
+    <h2><span class="badge">3</span>The three-gate test ladder</h2>
+    <div class="gates">
+      <div class="gate" data-gate="GATE 1 · PR → MAIN">
+        <h3>Fast feedback (~5 min)</h3>
+        <ul class="checks">
+          <li><span class="dot"></span>build · odoo / pg / traefik<span class="tag have">have</span></li>
+          <li><span class="dot"></span>saas_tenant_gate tests<span class="tag have">have</span></li>
+          <li><span class="dot"></span>test-changed-addons<span class="tag new">new</span></li>
+          <li><span class="dot"></span>lint · ruff + black + xml<span class="tag new">new</span></li>
+          <li><span class="dot"></span>manifest hygiene<span class="tag new">new</span></li>
+          <li><span class="dot"></span>security-scan<span class="tag new">new</span></li>
+          <li><span class="dot"></span>spec-required<span class="tag new">new</span></li>
+          <li><span class="dot warn"></span>schema-diff<span class="tag soft">soft</span></li>
+        </ul>
+      </div>
+      <div class="gate" data-gate="GATE 2 · MAIN → STAGING">
+        <h3>Pre-prod parity (~20 min)</h3>
+        <ul class="checks">
+          <li><span class="dot"></span>deploy Railway staging<span class="tag have">have</span></li>
+          <li><span class="dot"></span>deploy Fly staging<span class="tag have">have</span></li>
+          <li><span class="dot"></span>cross-platform-gate<span class="tag have">have</span></li>
+          <li><span class="dot"></span>smoke probes<span class="tag new">new</span></li>
+          <li><span class="dot"></span>migration-dry-run<span class="tag new">new</span></li>
+          <li><span class="dot"></span>addon-upgrade-matrix<span class="tag new">new</span></li>
+        </ul>
+      </div>
+      <div class="gate" data-gate="GATE 3 · STAGING → PROD">
+        <h3>The slow gate</h3>
+        <ul class="checks">
+          <li><span class="dot"></span>24h soak<span class="tag new">new</span></li>
+          <li><span class="dot"></span>migration replay<span class="tag new">new</span></li>
+          <li><span class="dot"></span>data-integrity<span class="tag new">new</span></li>
+          <li><span class="dot"></span>Playwright E2E<span class="tag new">new</span></li>
+          <li><span class="dot bad"></span>manual approval<span class="tag hard">hard</span></li>
+          <li><span class="dot"></span>post-deploy smoke<span class="tag new">new</span></li>
+          <li><span class="dot warn"></span>rollback rehearsal<span class="tag soft">soft</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAVES -->
+  <section>
+    <h2><span class="badge">4</span>Per-client rollout — waves</h2>
+    <div class="waves">
+      <div class="wave"><div class="num">Step 1</div><h4>🐤 Canary</h4><p>1–2 friendly tenants. 24h soak.</p><div class="bar"><span style="width:8%"></span></div></div>
+      <div class="wave"><div class="num">Step 2</div><h4>🌊 Wave-1</h4><p>Low-risk tenants. 48h soak.</p><div class="bar"><span style="width:35%"></span></div></div>
+      <div class="wave"><div class="num">Step 3</div><h4>🌍 Wave-2</h4><p>Everyone else.</p><div class="bar"><span style="width:100%"></span></div></div>
+    </div>
+  </section>
+
+  <!-- PORTABLE RUNTIME (v7) -->
+  <section>
+    <h2><span class="badge">★</span>Portable agent runtime <span class="vtag">v7 · ports + adapters · swap any vendor with a config change</span></h2>
+    <p class="lead">Agent core logic is pure Python depending only on <strong>ports</strong> (interfaces). <strong>Adapters</strong> bind those ports to concrete vendors. One OCI image runs every agent on every CI platform — GitHub Actions, GitLab CI, Kubernetes, local cron — because all platform specifics live in the adapter layer.</p>
+
+    <div style="background: linear-gradient(180deg, rgba(96,165,250,0.05), rgba(124,92,255,0.04)); border:1px solid rgba(96,165,250,0.25); border-radius:18px; padding:22px;">
+      <div style="display:grid; grid-template-columns: 220px 1fr 1fr; gap:14px; align-items:stretch;">
+        <!-- Agent core -->
+        <div style="background: rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.35); border-radius:14px; padding:14px; display:flex; flex-direction:column; justify-content:center;">
+          <div style="font-size:11px; color:#fde68a; text-transform:uppercase; letter-spacing:2px;">Agent core</div>
+          <div style="font-weight:600; margin-top:6px;">Pure Python · no I/O</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:6px;">spec_generator · implementation · code · security · optimization · support_triage</div>
+          <div style="margin-top:14px; padding:8px 10px; background:rgba(255,255,255,0.04); border-radius:8px; font-size:11px; color:var(--muted);">
+            ↓ depends only on
+          </div>
+        </div>
+
+        <!-- Ports -->
+        <div style="background: rgba(124,92,255,0.10); border:1px solid rgba(124,92,255,0.35); border-radius:14px; padding:14px;">
+          <div style="font-size:11px; color:#c4b5fd; text-transform:uppercase; letter-spacing:2px;">10 ports (interfaces)</div>
+          <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:10px;">
+            <span class="loop">LLMProvider</span>
+            <span class="loop">Repo</span>
+            <span class="loop">IssueTracker</span>
+            <span class="loop">Notifier</span>
+            <span class="loop">SecretStore</span>
+            <span class="loop">ArtifactStore</span>
+            <span class="loop">ComputeEnv</span>
+            <span class="loop">KnowledgeBase</span>
+            <span class="loop">EventBus</span>
+            <span class="loop">Logger</span>
+          </div>
+          <div style="margin-top:10px; font-size:11px; color:var(--muted);">Stable ABCs · SemVer-protected · zero vendor types in signatures</div>
+        </div>
+
+        <!-- Adapters -->
+        <div style="background: rgba(96,165,250,0.10); border:1px solid rgba(96,165,250,0.35); border-radius:14px; padding:14px;">
+          <div style="font-size:11px; color:#93c5fd; text-transform:uppercase; letter-spacing:2px;">Adapters (pluggable)</div>
+          <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:10px;">
+            <span class="loop">Claude</span>
+            <span class="loop">OpenAI</span>
+            <span class="loop">Gemini</span>
+            <span class="loop">Ollama</span>
+            <span class="loop">LiteLLM</span>
+            <span class="loop">GitHub</span>
+            <span class="loop">GitLab</span>
+            <span class="loop">Gitea</span>
+            <span class="loop">Slack</span>
+            <span class="loop">Teams</span>
+            <span class="loop">Discord</span>
+            <span class="loop">Email</span>
+            <span class="loop">Vault</span>
+            <span class="loop">K8s Secrets</span>
+            <span class="loop">Fly</span>
+            <span class="loop">Railway</span>
+            <span class="loop">Kubernetes</span>
+            <span class="loop">pgvector</span>
+            <span class="loop">Pinecone</span>
+            <span class="loop">Chroma</span>
+            <span class="loop">S3 / R2 / GCS</span>
+            <span class="loop">Loki</span>
+            <span class="loop">Better Stack</span>
+            <span class="loop">Datadog</span>
+          </div>
+          <div style="margin-top:10px; font-size:11px; color:var(--muted);">First-party · one file per adapter · vendor SDKs imported nowhere else</div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px; padding:14px; background:rgba(255,255,255,0.04); border-radius:10px;">
+        <strong style="color:var(--text); font-size:13px;">Day-one default bindings (unchanged from v6):</strong>
+        <span style="font-size:13px; color:var(--muted); margin-left:8px;">
+          Claude (via LiteLLM) · GitHub · Slack · Fly · pgvector · S3-compatible · GitHub webhook · StdJSON → Better Stack
+        </span>
+      </div>
+
+      <div style="margin-top:14px; display:grid; grid-template-columns:repeat(4,1fr); gap:10px;">
+        <div style="background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px;">
+          <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px;">Move off Anthropic</div>
+          <div style="font-weight:600; margin-top:4px;">Hours</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;">flip <code>litellm.model</code> in config</div>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px;">
+          <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px;">Slack → Discord/Teams</div>
+          <div style="font-weight:600; margin-top:4px;">1 hour</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;">change <code>bindings.notifier</code></div>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px;">
+          <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px;">Better Stack → Loki</div>
+          <div style="font-weight:600; margin-top:4px;">1–2 days</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;">flip logger binding</div>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px;">
+          <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px;">GitHub → self-host GitLab</div>
+          <div style="font-weight:600; margin-top:4px;">~1 week</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;">worst-case migration</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px; padding:12px; background:rgba(255,255,255,0.03); border-radius:10px; font-size:12px; color:var(--muted);">
+        <strong style="color:var(--text);">Same image, every platform:</strong>
+        GitHub Actions · GitLab CI · Argo Workflows · Kubernetes Job · Nomad task · local cron.
+        Run via <code>docker run ghcr.io/&lt;org&gt;/odoo-saas-agents:&lt;v&gt; run &lt;agent&gt; …</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 AGENTS -->
+  <section>
+    <h2><span class="badge">5</span>Six AI agents <span class="vtag">— 5 engineering + 1 customer-facing · all on the portable runtime</span></h2>
+    <p class="lead">Five agents act on the codebase; one acts on the end user. They share patterns (charters, guardrails, kill switch, spend caps) but live in different planes.</p>
+    <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin: 8px 0;">Engineering · act on the code</div>
+    <div class="agents">
+      <div class="agent spec">
+        <div class="head"><div class="ico">📝</div><div><div class="role">intake</div><h3>Spec Generator</h3><div class="cadence">webhook</div></div></div>
+        <p>Issue → spec on shared branch. Stays available to refine.</p>
+        <div class="loops"><span class="loop">Draft</span><span class="loop">Reporter Q&amp;A</span><span class="loop">Bug repro</span><span class="loop">Refine on request</span></div>
+        <div class="guard">Cannot mark <code>intent-confirmed</code> without reporter signal.</div>
+      </div>
+      <div class="agent impl">
+        <div class="head"><div class="ico">⚙️</div><div><div class="role">delivery</div><h3>Implementation</h3><div class="cadence">on intent-confirmed</div></div></div>
+        <p>Builds on the same branch. Manages preview + reporter loop.</p>
+        <div class="loops"><span class="loop">Plan + code</span><span class="loop">Preview env</span><span class="loop">Reporter iter (5)</span><span class="loop">Human iter (3)</span></div>
+        <div class="guard">Spec corrections only — never wholesale rewrites.</div>
+      </div>
+      <div class="agent code">
+        <div class="head"><div class="ico">🛠️</div><div><div class="role">quality</div><h3>Code agent</h3><div class="cadence">every 6h</div></div></div>
+        <p>Autonomous improvement. Posts pre-review reports on impl PRs.</p>
+        <div class="loops"><span class="loop">Test backfill</span><span class="loop">Refactor</span><span class="loop">Manifests</span><span class="loop">Pre-review</span></div>
+        <div class="guard">No infra / workflow edits.</div>
+      </div>
+      <div class="agent sec">
+        <div class="head"><div class="ico">🛡️</div><div><div class="role">security</div><h3>Security agent</h3><div class="cadence">every 12h</div></div></div>
+        <p>Finds &amp; fixes. Posts pre-review reports on impl PRs.</p>
+        <div class="loops"><span class="loop">pip-audit</span><span class="loop">bandit</span><span class="loop">record-rules</span><span class="loop">tenant-iso</span><span class="loop">Pre-review</span></div>
+        <div class="guard">Tenancy issues are issue-only.</div>
+      </div>
+      <div class="agent opt">
+        <div class="head"><div class="ico">⚡</div><div><div class="role">performance</div><h3>Optimization</h3><div class="cadence">daily</div></div></div>
+        <p>Speed &amp; cost from <code>pg_stat_statements</code> + metrics.</p>
+        <div class="loops"><span class="loop">Slow queries</span><span class="loop">Computed</span><span class="loop">N+1</span><span class="loop">ir.cron</span></div>
+        <div class="guard">Dockerfile changes are issue-only.</div>
+      </div>
+    </div>
+
+    <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin: 22px 0 8px;">Customer-facing · acts on the end user</div>
+    <div class="agents" style="grid-template-columns: 1fr;">
+      <div class="agent impl" style="border-color: rgba(96,165,250,0.45); background: linear-gradient(180deg, rgba(96,165,250,0.08), rgba(96,165,250,0.02));">
+        <div class="head" style="justify-content: space-between;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="ico">💬</div>
+            <div>
+              <div class="role" style="color:#93c5fd">customer-facing · v6</div>
+              <h3>Support Triage Agent</h3>
+              <div class="cadence">in-app chat · always on</div>
+            </div>
+          </div>
+          <div style="font-size: 11px; color: var(--muted); max-width: 50%; text-align: right;">
+            Full design: <code>docs/superpowers/specs/2026-05-16-support-triage-agent-design.md</code>
+          </div>
+        </div>
+        <p style="margin-top: 10px;">Chat widget inside Odoo · users ask questions or report problems · bot answers from KB, helps decide bug vs feature vs config vs user-error, offers a workaround, files a sanitised GitHub issue when warranted.</p>
+        <div class="loops" style="margin-top: 12px;">
+          <span class="loop">Resolve in-chat</span>
+          <span class="loop">Triage + workaround</span>
+          <span class="loop">PII-mask + file</span>
+          <span class="loop">Webhook back-sync</span>
+          <span class="loop">In-chat <code>/approve</code></span>
+          <span class="loop">Sensitive-topic escalation</span>
+        </div>
+        <div class="guard">
+          <strong>3-layer PII mask</strong> before any GitHub call · per-tenant feature flag · 30 msg/user/h · 5 issues/tenant/d · 1 sensitive escalation/user/h · spend cap &lt; USD 300/mo.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHATBOT ARCHITECTURE -->
+  <section>
+    <h2><span class="badge">★</span>Support Triage Agent — architecture <span class="vtag">v6 · see design spec</span></h2>
+    <p class="lead">A new addon inside Odoo talks to a new Fly app over HMAC-signed HTTPS. The gateway holds the Claude token, GitHub PAT, and pgvector KB. Conversations live in tenant DBs (record-rule scoped); shared KB lives once on the gateway.</p>
+    <div class="grid-3">
+      <div class="card pa">
+        <span class="pill pa">in tenant</span>
+        <h3>🧩 <code>saas_support_chatbot</code></h3>
+        <p style="color:var(--muted);font-size:13px;margin:0">Chat widget · <code>/support/chat</code> controller · models <code>saas.support.thread</code>, <code>saas.support.message</code> · record rules: own threads only.</p>
+      </div>
+      <div class="card pb">
+        <span class="pill pb">Fly app</span>
+        <h3>🛰️ Support gateway</h3>
+        <p style="color:var(--muted);font-size:13px;margin:0">Claude SDK · pgvector KB (addon READMEs + Obsidian docs + past specs) · GitHub API · PII redactor · audit log · per-tenant rate limits.</p>
+      </div>
+      <div class="card pc">
+        <span class="pill pc">downstream</span>
+        <h3>↪️ <code>source:chatbot</code> issue</h3>
+        <p style="color:var(--muted);font-size:13px;margin:0">Filed with sanitised transcript · enters Spec Generator → Implementation Agent → reporter loop (v5 pipeline unchanged).</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;" class="grid-3">
+      <div class="card pa">
+        <span class="pill pa">outcomes</span>
+        <h3>✅ Resolve in chat</h3>
+        <p style="color:var(--muted);font-size:13px;margin:0">Bot answers from KB. Counts toward deflection rate. No issue. Target ≥ 40% (MVP) → 55% (Phase D).</p>
+      </div>
+      <div class="card pb">
+        <span class="pill pb">outcomes</span>
+        <h3>🐞 Triage + file</h3>
+        <p style="color:var(--muted);font-size:13px;margin:0">Asks clarifying Qs · classifies bug / feature · offers workaround · files masked GitHub issue with <code>source:chatbot</code>.</p>
+      </div>
+      <div class="card pd">
+        <span class="pill pd">outcomes</span>
+        <h3>🆘 Escalate</h3>
+        <p style="color:var(--muted);font-size:13px;margin:0">Billing, account recovery, security, legal · routed to support inbox · <strong>never</strong> to GitHub.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section>
+    <h2><span class="badge">6</span>Ten-phase roadmap <span class="vtag">v7 inserts the runtime as Phase 6</span></h2>
+    <div class="roadmap">
+      <div class="step"><div class="when">Week 1</div><h4>Phase 1 — Spec workflow enforcement</h4><p>Templates, ADR folder, <code>spec-required</code>, CODEOWNERS.</p></div>
+      <div class="step"><div class="when">Weeks 2–3</div><h4>Phase 2 — Test ladder hardening</h4><p>Gate 1 + Gate 2 additions.</p></div>
+      <div class="step"><div class="when">Weeks 4–5</div><h4>Phase 3 — Production environments</h4><p>Railway + Fly prod via Terraform, promote/rollback workflows.</p></div>
+      <div class="step"><div class="when">Week 6</div><h4>Phase 4 — Per-client rollout polish</h4><p>Migration queue, feature flags, size buckets, maintenance windows.</p></div>
+      <div class="step"><div class="when">Weeks 7–8</div><h4>Phase 5 — Observability &amp; agentlab</h4><p>Log drain, per-tenant metrics, audit log, agentlab app.</p></div>
+      <div class="step"><div class="when">Weeks 9–10</div><h4>Phase 6 — Portable agent runtime <span style="color:#93c5fd;font-size:11px">(v7 · NEW)</span></h4><p>Skeleton package · 10 port ABCs · default adapters (Claude/GitHub/Slack/Fly/pgvector) · contract tests · OCI image · CLI · trivial smoke agent end-to-end.</p></div>
+      <div class="step"><div class="when">Weeks 11–12</div><h4>Phase 7 — Spec Generator + intent-confirmed event</h4><p>Built on the runtime. Webhook on issues + comments, repro path, label state machine.</p></div>
+      <div class="step"><div class="when">Weeks 13–15</div><h4>Phase 8 — Implementation Agent + preview infra + human-review labels</h4><p>Preview spawn/seed/destroy, <code>implementation.yml</code>, <code>implementation-iterate.yml</code>, CODEOWNERS checklist + pre-review reports.</p></div>
+      <div class="step"><div class="when">Weeks 16–19</div><h4>Phase 9 — Code · Security · Optimization improvement agents</h4><p>Security &amp; Code online by end of week 18 — they produce the pre-review reports humans depend on.</p></div>
+      <div class="step"><div class="when">Weeks 20–28</div><h4>Phase 10 — Support Triage Agent</h4><p>10a MVP (20–22) → 10b back-sync (23–24) → 10c in-chat <code>/approve</code> (25–26) → 10d per-tenant context (27–28). Each sub-phase canary → w1 → w2.</p></div>
+      <div class="step"><div class="when">Optional</div><h4>Phase 11 — Alternative-stack validation <span style="color:#93c5fd;font-size:11px">(v7)</span></h4><p>Stand up a twin of the staging pipeline on GitLab + GPT-4o + Teams. Weekly smoke. Proves portability is real, not aspirational.</p></div>
+    </div>
+  </section>
+
+  <!-- METRICS -->
+  <section>
+    <h2><span class="badge">7</span>Success metrics</h2>
+    <p class="lead">v4-specific metrics highlighted.</p>
+    <div class="metrics">
+      <div class="metric"><div class="v">≥ 90%</div><div class="k">PRs with linked spec</div></div>
+      <div class="metric"><div class="v">&lt; 10 min</div><div class="k">issue → spec PR drafted</div></div>
+      <div class="metric new"><div class="v">&lt; 4 h</div><div class="k">spec drafted → intent-confirmed</div></div>
+      <div class="metric new"><div class="v">&lt; 30 min</div><div class="k">intent-confirmed → preview URL</div></div>
+      <div class="metric"><div class="v">&lt; 2 d</div><div class="k">preview → reporter <code>/approve</code></div></div>
+      <div class="metric"><div class="v">≤ 2</div><div class="k">reporter iteration count</div></div>
+      <div class="metric new"><div class="v">&lt; 1 d</div><div class="k"><code>/approve</code> → human-review-approved</div></div>
+      <div class="metric new"><div class="v">≤ 1</div><div class="k">human refinement iterations</div></div>
+      <div class="metric"><div class="v">≥ 4.0/5</div><div class="k">reporter satisfaction</div></div>
+      <div class="metric"><div class="v">&lt; 15%</div><div class="k">Impl Agent escalations</div></div>
+      <div class="metric new"><div class="v">&lt; 5%</div><div class="k">rubber-stamp suspicions (sampled)</div></div>
+      <div class="metric"><div class="v">&lt; 30 min</div><div class="k">main → staging</div></div>
+      <div class="metric"><div class="v">24–48 h</div><div class="k">staging → prod canary</div></div>
+      <div class="metric"><div class="v">≥ 99%</div><div class="k">migration job success</div></div>
+      <div class="metric"><div class="v">100%</div><div class="k">cross-platform parity</div></div>
+      <div class="metric"><div class="v">≤ 10</div><div class="k">concurrent preview envs</div></div>
+      <div class="metric new"><div class="v">≥ 40%</div><div class="k">chatbot deflection rate (MVP)</div></div>
+      <div class="metric new"><div class="v">≥ 55%</div><div class="k">chatbot deflection (Phase D)</div></div>
+      <div class="metric new"><div class="v">&lt; 5 s</div><div class="k">chatbot p95 first response</div></div>
+      <div class="metric new"><div class="v">0</div><div class="k">PII leaks in chatbot-filed issues</div></div>
+      <div class="metric new"><div class="v">&lt; $300/mo</div><div class="k">chatbot total spend cap</div></div>
+    </div>
+  </section>
+
+  <!-- RISKS -->
+  <section>
+    <h2><span class="badge">8</span>Top risks &amp; mitigations</h2>
+    <div class="risks">
+      <div class="risk new"><h4>Human rubber-stamping after reporter approval</h4><p>Reviewer waves through without examining diff.<br/><span class="mit">↳ Security + Code agents post pre-review reports; CODEOWNERS checklist; 10% sample audit.</span></p></div>
+      <div class="risk new"><h4>Wasted agent work on a flawed spec</h4><p>Spec direction wrong; agent already coded.<br/><span class="mit">↳ Reporter must signal <code>/confirm</code> or 24h pause; impl-agent self-escalates on contradictions.</span></p></div>
+      <div class="risk new"><h4>Human refinement happens behind reporter's back</h4><p>Reviewer changes anything without reporter visibility.<br/><span class="mit">↳ <strong>Every</strong> human commit auto-pings reporter + redeploys preview; PR cannot merge until <code>/approve</code> or 24h silence.</span></p></div>
+      <div class="risk"><h4>Implementation loop never converges</h4><p>Reporter keeps requesting changes.<br/><span class="mit">↳ 5-iter reporter cap; 3-iter human cap; per-PR spend cap.</span></p></div>
+      <div class="risk"><h4>Reporter approves something broken</h4><p>Bug ships even after the loop.<br/><span class="mit">↳ Human review is a hard gate AFTER reporter approval.</span></p></div>
+      <div class="risk"><h4>Preview env leaks data</h4><p>PII via reviewer login.<br/><span class="mit">↳ Allow-list masking; one-time creds; private issues.</span></p></div>
+      <div class="risk"><h4>Per-tenant migration drift</h4><p>One tenant fails, blocks wave.<br/><span class="mit">↳ Per-tenant queue; failures isolated.</span></p></div>
+      <div class="risk"><h4>Tenancy boundary regression</h4><p>Data leaks across tenants.<br/><span class="mit">↳ Tenancy loop is issue-only; CODEOWNERS on saas_tenant_gate.</span></p></div>
+      <div class="risk new"><h4>Chatbot leaks PII into a public issue</h4><p>Customer name, email, payment data slips into a filed issue.<br/><span class="mit">↳ 3-layer mask (deny-list → tenant allow-list → LLM cleanup); 0 leaks tracked as a hard metric; weekly random-row audit.</span></p></div>
+      <div class="risk new"><h4>Chatbot files low-quality issue spam</h4><p>Fuzzy reports flood GitHub.<br/><span class="mit">↳ Confidence threshold ≥ 0.5 to file; clarifying-questions step before filing; per-tenant cap 5 issues/day.</span></p></div>
+      <div class="risk new"><h4>Chatbot hallucinates a workaround</h4><p>Bot suggests something that breaks customer's data.<br/><span class="mit">↳ KB-sourced workarounds tagged <code>kb-sourced</code>; LLM-generated carry disclaimer; 👍/👎 telemetry surfaces bad ones.</span></p></div>
+      <div class="risk new"><h4>Chatbot misclassifies a sensitive topic</h4><p>Billing dispute filed as a "bug" in a public-ish issue.<br/><span class="mit">↳ Sensitive-topic detector at <code>infra/agentlab/sensitive-topics.yml</code> owned by <code>security-leads</code>; quarterly classifier retraining; 5% sample audit.</span></p></div>
+      <div class="risk new"><h4>Vendor outage / lock-in <span style="color:#93c5fd;font-size:10px">(v7)</span></h4><p>Anthropic API down, GitHub Actions outage, Slack rate-limit.<br/><span class="mit">↳ Hexagonal runtime; LiteLLM fallback chain (Claude → GPT-4o → Gemini); same OCI image runs on GitLab CI / K8s; notifier swap is config change. Worst-case migration ~1 week.</span></p></div>
+      <div class="risk new"><h4>Adapter contract drift <span style="color:#93c5fd;font-size:10px">(v7)</span></h4><p>New adapter silently breaks an agent.<br/><span class="mit">↳ Contract test suite per port; every adapter must pass; CI blocks PRs that break the contract.</span></p></div>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section>
+    <h2><span class="badge">✓</span>What "done" looks like</h2>
+    <div class="done">
+      <ul>
+        <li><strong>The reporter sees a real Odoo URL within ~30 min of confirming intent</strong> — no waiting on a human spec merge.</li>
+        <li><strong>Humans review the package</strong> — spec, diff, reporter conversation, agent pre-review reports — once at the end with full context.</li>
+        <li><strong>A single PR per issue</strong> accumulates every artifact (spec, plan, code, conversation, preview link).</li>
+        <li><strong>≥ 90% of merged PRs link to a spec or fix-brief.</strong></li>
+        <li><strong>8 green checks gate <code>main</code></strong>; 4 more checks + 24h soak gate prod.</li>
+        <li><strong>A single client can roll forward or be paused independently</strong> via the wave system.</li>
+        <li><strong>Six AI agents with distinct charters</strong>; humans always merge.</li>
+        <li><strong>Either Railway or Fly can fail</strong> without taking customers down.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Spec-driven dev plan v7 · Odoo SaaS · 2026-05-16 · companion to <code>2026-05-15-spec-driven-dev-plan.md</code> + design specs in <code>docs/superpowers/specs/2026-05-16-*.md</code>
+  </footer>
+</div>
+</body>
+</html>

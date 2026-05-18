@@ -1,0 +1,68 @@
+# Sensitive topics — auto-route to the support inbox, NEVER to GitHub Issues.
+#
+# Used by the Support Triage Agent (per its design spec §8.3). When a chat
+# message matches one of these patterns, the bot routes it to the human
+# support team via email and does NOT file an issue.
+#
+# Owned by @your-org/security-leads. Changes require 2 approvals.
+
+topics:
+
+  - name: "Billing & refunds"
+    regex_patterns:
+      - '(?i)\brefund\b'
+      - '(?i)\bcharged twice\b'
+      - '(?i)\bdouble charged?\b'
+      - '(?i)\bdispute\b.*\bcharge\b'
+      - '(?i)\binvoice\b.*\bwrong\b'
+      - '(?i)\bcobro\s+duplicado\b'      # Spanish
+      - '(?i)\breembolso\b'                # Spanish
+    embedding_seeds:
+      - "I want a refund for the payment I made"
+      - "I was charged twice for the same invoice"
+      - "Necesito un reembolso por el cargo duplicado"
+
+  - name: "Account recovery & access"
+    regex_patterns:
+      - '(?i)\b(can.t|cannot)\s+(log|sign)\s+in\b'
+      - '(?i)\bforgot\b.*\bpassword\b'
+      - '(?i)\breset\s+(my\s+)?password\b'
+      - '(?i)\bMFA\b'
+      - '(?i)\b2FA\b'
+      - '(?i)\baccount\s+locked\b'
+      - '(?i)\bno\s+puedo\s+ingresar\b'    # Spanish
+
+  - name: "PII corrections & data deletion (GDPR / Habeas Data)"
+    regex_patterns:
+      - '(?i)\bdelete\b.*\b(my|all)\s+data\b'
+      - '(?i)\b(habeas\s+data|right\s+to\s+be\s+forgotten)\b'
+      - '(?i)\b(GDPR|habeas)\b'
+      - '(?i)\beliminar\b.*\b(mis\s+datos|toda\s+la\s+información)\b'
+
+  - name: "Security concerns"
+    regex_patterns:
+      - '(?i)\b(hacked|breach|breached|leak(ed)?|stolen)\b'
+      - '(?i)\b(suspicious|unauthori[sz]ed)\s+(activity|login|access)\b'
+      - '(?i)\bcompromis(ed|e)\b'
+      - '(?i)\bbrecha\s+de\s+seguridad\b'
+
+  - name: "Legal threats"
+    regex_patterns:
+      - '(?i)\b(lawyer|attorney|sue|lawsuit|court)\b'
+      - '(?i)\b(SIC|Superintendencia)\b'    # Colombian regulator
+      - '(?i)\babogado\b'
+      - '(?i)\bdemanda\b'
+
+  - name: "Self-harm / wellbeing (route to safe-message handler, not support)"
+    regex_patterns:
+      - '(?i)\b(suicide|self.harm|kill\s+myself)\b'
+      - '(?i)\b(suicidio|hacerme\s+daño)\b'
+    routing: "wellbeing-handler"   # special: not support inbox, not GitHub
+
+# Action for matched messages:
+default_action: "escalate-to-support-inbox"
+exception_actions:
+  wellbeing-handler: "route-to-wellbeing-response"
+
+# Audit: every match writes to gateway_events with event='sensitive-topic-detected',
+# scrubbed of the original message body to preserve user privacy.

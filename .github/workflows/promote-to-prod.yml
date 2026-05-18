@@ -1,0 +1,271 @@
+# promote-to-prod
+#
+# Implements docs/superpowers/specs/2026-05-16-promote-to-prod-design.md.
+#
+# Triggered manually. Promotes a SHA from staging to a chosen prod wave.
+# Enforces:
+#   - SHA passed Gate 1 + Gate 2
+#   - Soak time elapsed (24h for risk:low|medium, 72h for risk:high)
+#   - Cross-platform parity (Railway + Fly both succeed or both abort)
+#   - Per-tenant migration via saas.tenant.migration.job queue
+#   - Feature-flag flip for the wave
+#   - Manual approval via GitHub Environments
+
+name: promote-to-prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'Commit SHA to promote (blank = latest green on main)'
+        required: false
+      wave:
+        description: 'Wave to promote'
+        required: true
+        type: choice
+        options: [canary, w1, w2, all]
+      platforms:
+        description: 'Comma-separated platforms (default: both)'
+        default: 'railway,fly'
+      dry_run:
+        description: 'Dry-run mode'
+        default: 'true'
+        type: choice
+        options: ['true', 'false']
+
+concurrency:
+  group: promote-to-prod-${{ inputs.wave }}
+  cancel-in-progress: false
+
+jobs:
+
+  preflight:
+    name: Preflight checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      target_sha: ${{ steps.resolve.outputs.target_sha }}
+      target_tenants: ${{ steps.tenants.outputs.target_tenants }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve target SHA
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.sha }}" ]; then
+            sha="${{ inputs.sha }}"
+          else
+            # Latest successful main commit via ci.yml
+            sha=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?branch=main&status=success&per_page=1" \
+                | jq -r '.workflow_runs[0].head_sha')
+          fi
+          echo "target_sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "::notice::Target SHA: $sha"
+
+      - name: Assert SHA has passed Gate 1 + Gate 2
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ steps.resolve.outputs.target_sha }}
+        run: |
+          set -euo pipefail
+          # ci.yml's final job is cross-platform-gate
+          state=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
+              | jq -r '.check_runs[] | select(.name == "Cross-platform parity gate") | .conclusion')
+          if [ "$state" != "success" ]; then
+              echo "::error::SHA $SHA did not pass Gate 1+2 (cross-platform-gate=$state)." >&2
+              exit 1
+          fi
+
+      - name: Soak time check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ steps.resolve.outputs.target_sha }}
+        run: |
+          set -euo pipefail
+          # Check risk label on the merged PR
+          pr_number=$(gh api "repos/${{ github.repository }}/commits/$SHA/pulls" \
+              | jq -r '.[0].number // empty')
+          if [ -z "$pr_number" ]; then
+              echo "::warning::No merged PR found for SHA $SHA; assuming risk:medium."
+              required_soak_h=24
+          else
+              labels=$(gh api "repos/${{ github.repository }}/pulls/$pr_number" \
+                  | jq -r '[.labels[].name] | join(",")')
+              if echo "$labels" | tr ',' '\n' | grep -qx 'risk:high'; then
+                  required_soak_h=72
+              else
+                  required_soak_h=24
+              fi
+          fi
+          merged_at=$(gh api "repos/${{ github.repository }}/commits/$SHA" \
+              | jq -r '.commit.committer.date')
+          merged_epoch=$(date -u -d "$merged_at" +%s)
+          now_epoch=$(date -u +%s)
+          age_h=$(( (now_epoch - merged_epoch) / 3600 ))
+          echo "SHA age: ${age_h}h (required: ${required_soak_h}h)"
+          if [ "$age_h" -lt "$required_soak_h" ]; then
+              echo "::error::Soak time not elapsed. SHA is ${age_h}h old; ${required_soak_h}h required." >&2
+              exit 1
+          fi
+
+      - name: List target tenants from wave
+        id: tenants
+        env:
+          PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+        run: |
+          # Query control-plane DB for tenants in the wave that need migration
+          # (last_migrated_sha != target). Output as JSON array.
+          tenants=$(psql "$PG_DSN" -t -A -c "
+            SELECT json_agg(name)
+            FROM saas.tenant
+            WHERE wave = '${{ inputs.wave }}'
+              AND last_migrated_sha IS DISTINCT FROM '${{ steps.resolve.outputs.target_sha }}'
+              AND state = 'active'
+          " || echo "[]")
+          echo "target_tenants=$tenants" >> "$GITHUB_OUTPUT"
+          echo "::notice::Target tenants: $tenants"
+
+  approval:
+    name: Awaiting prod-deployers approval
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    # Requires N=1 from prod-deployers (N=2 if wave=all — enforced by a stricter
+    # environment 'prod-rollout-strict' configured in repo settings)
+    environment: ${{ inputs.wave == 'all' && 'prod-rollout-strict' || 'prod-rollout' }}
+    steps:
+      - run: echo "Approved for wave=${{ inputs.wave }}, sha=${{ needs.preflight.outputs.target_sha }}"
+
+  tag-image:
+    name: Tag prod image
+    needs: [approval, preflight]
+    runs-on: ubuntu-latest
+    if: inputs.dry_run == 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.target_sha }}
+      - name: Tag image
+        env:
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          tag="prod-$(date -u +%Y.%m.%d)-${{ github.run_number }}"
+          echo "::notice::Tagging image as $tag"
+          # Pseudo: docker pull <staging-image-at-sha>; docker tag; docker push
+          # Implementation depends on the registry. Cloudflare R2 / GHCR / Dockerhub.
+
+  deploy-railway:
+    name: Deploy → Railway prod
+    needs: [tag-image, preflight]
+    if: contains(inputs.platforms, 'railway')
+    runs-on: ubuntu-latest
+    environment: prod-railway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: npm install -g @railway/cli
+      - name: railway up (prod)
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+              echo "::notice::dry_run=true; skipping actual deploy"
+              exit 0
+          fi
+          railway up --service "${{ secrets.RAILWAY_PROD_ODOO_SERVICE_ID }}" --detach
+
+  deploy-fly:
+    name: Deploy → Fly prod
+    needs: [tag-image, preflight]
+    if: contains(inputs.platforms, 'fly')
+    runs-on: ubuntu-latest
+    environment: prod-fly
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: flyctl deploy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_PROD_API_TOKEN }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+              echo "::notice::dry_run=true; skipping actual deploy"
+              exit 0
+          fi
+          flyctl deploy --config infra/fly/odoo-prod/fly.toml \
+              --dockerfile Dockerfile --remote-only --strategy rolling \
+              --wait-timeout 900
+
+  parity-gate:
+    name: Cross-platform parity gate
+    needs: [deploy-railway, deploy-fly]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          railway="${{ needs.deploy-railway.result }}"
+          fly="${{ needs.deploy-fly.result }}"
+          # 'skipped' is OK (user opted out of that platform via inputs.platforms);
+          # mismatched success/failure is not.
+          if [ "$railway" != "$fly" ] && [ "$railway" != "skipped" ] && [ "$fly" != "skipped" ]; then
+              echo "::error::Parity gate FAILED. Railway=$railway Fly=$fly" >&2
+              exit 1
+          fi
+          echo "::notice::Parity OK. Railway=$railway Fly=$fly"
+
+  queue-migrations:
+    name: Enqueue per-tenant migration jobs
+    needs: [parity-gate, preflight]
+    runs-on: ubuntu-latest
+    if: inputs.dry_run == 'false'
+    env:
+      PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+      SHA: ${{ needs.preflight.outputs.target_sha }}
+      TENANTS: ${{ needs.preflight.outputs.target_tenants }}
+    steps:
+      - name: Enqueue jobs
+        run: |
+          echo "$TENANTS" | jq -r '.[]' | while read tenant; do
+              psql "$PG_DSN" -c "
+                INSERT INTO saas.tenant.migration.job (tenant_id, target_sha, status, enqueued_by)
+                SELECT id, '$SHA', 'queued', '${{ github.run_id }}'
+                FROM saas.tenant WHERE name = '$tenant'
+                ON CONFLICT DO NOTHING
+              "
+          done
+
+  smoke:
+    name: Post-deploy smoke
+    needs: [queue-migrations, preflight]
+    runs-on: ubuntu-latest
+    if: inputs.dry_run == 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe /web/health per tenant
+        env:
+          TENANTS: ${{ needs.preflight.outputs.target_tenants }}
+        run: |
+          echo "$TENANTS" | jq -r '.[]' | head -3 | while read t; do
+              code=$(curl -s -o /dev/null -w '%{http_code}' "https://${t}.<your-domain>/web/health")
+              if [ "$code" != "200" ]; then
+                  echo "::error::Smoke failed for $t (HTTP $code)" >&2
+                  exit 1
+              fi
+              echo "::notice::Smoke OK for $t"
+          done
+
+  notify:
+    name: Notify Slack
+    needs: [smoke]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post summary
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_DEPLOY_WEBHOOK }}
+        run: |
+          status="${{ needs.smoke.result }}"
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\": \"promote-to-prod wave=${{ inputs.wave }} sha=${{ needs.preflight.outputs.target_sha }} dry_run=${{ inputs.dry_run }} status=$status\"}" \
+            "$SLACK_WEBHOOK"

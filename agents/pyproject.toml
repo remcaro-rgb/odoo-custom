@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "odoo-saas-agents"
+version = "0.1.0"
+description = "Portable AI-agent runtime for odoo-saas"
+requires-python = ">=3.12"
+license = { text = "AGPL-3.0-or-later" }
+authors = [{ name = "Manuel Caro" }]
+
+dependencies = [
+    "click>=8.1",
+    "pyyaml>=6.0",
+    "pydantic>=2.0",
+    "structlog>=24.0",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+# Each adapter lists only its own SDK; unused adapters incur no install cost.
+llm-litellm    = ["litellm>=1.40"]
+llm-claude     = ["anthropic>=0.34"]
+llm-openai     = ["openai>=1.30"]
+llm-ollama     = ["ollama>=0.2"]
+
+repo-github    = ["PyGithub>=2.3"]
+repo-gitlab    = ["python-gitlab>=4.0"]
+
+issues-linear  = ["gql>=3.5"]
+issues-jira    = ["atlassian-python-api>=3.41"]
+
+notifier-slack    = ["slack_sdk>=3.27"]
+notifier-discord  = ["discord-webhook>=1.3"]
+
+secret-vault   = ["hvac>=2.0"]
+secret-k8s     = ["kubernetes>=29.0"]
+
+artifact-s3    = ["boto3>=1.34"]
+
+compute-fly        = ["httpx>=0.27"]   # Fly is just HTTP
+compute-kubernetes = ["kubernetes>=29.0"]
+
+kb-pgvector    = ["psycopg[binary]>=3.1", "pgvector>=0.3"]
+kb-pinecone    = ["pinecone-client>=4.0"]
+kb-chroma      = ["chromadb>=0.5"]
+
+logger-loki         = ["python-logging-loki>=0.3"]
+logger-betterstack  = ["httpx>=0.27"]
+
+# Bundles
+all = [
+    "odoo-saas-agents[llm-litellm,repo-github,notifier-slack,secret-vault,artifact-s3,compute-fly,kb-pgvector,logger-betterstack]",
+]
+
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.5",
+    "black>=24.0",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+agents = "agents.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agents*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "S", "C4", "DTZ", "PIE"]
+ignore = ["S101"]   # assert is fine in tests
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"

@@ -1,0 +1,112 @@
+# odoo-saas-agents — config template.
+# Copy to agents/config.yml and fill in real values for your environment.
+# Per-environment overrides go in agents/config.{dev,staging,prod}.yml.
+# Env vars override everything: AGENTS_BINDINGS_LLM=ollama overrides bindings.llm.
+
+runtime:
+  log_level: info
+  spend_cap_monthly_usd: 250
+  agents_enabled: true       # kill switch; flipping false pauses every agent
+
+bindings:
+  llm:        litellm
+  repo:       github
+  issues:     github
+  notifier:   slack
+  secrets:    envvar
+  artifacts:  s3
+  compute:    fly
+  kb:         pgvector
+  events:     github_webhook
+  logger:     stdjson
+
+# --- LLM ---
+litellm:
+  model: claude-sonnet-4-6
+  fallback_models:
+    - gpt-4o
+    - gemini-2.5-pro
+  api_key_secret: ANTHROPIC_API_KEY
+
+# --- Repo + Issues ---
+github:
+  org: your-org
+  repo: odoo-saas
+  token_secret: GITHUB_TOKEN
+  service_account: odoo-saas-agents-bot
+
+# --- Notifier ---
+slack:
+  workspace_secret: SLACK_BOT_TOKEN
+  default_channel: "#devops-agents"
+  channels_per_agent:
+    spec_generator:  "#devops-intake"
+    implementation:  "#devops-implementations"
+    code:            "#devops-agents"
+    security:        "#devops-security"
+    optimization:    "#devops-agents"
+    support_triage:  "#support-quality"
+
+# --- Compute (preview envs, agentlab) ---
+fly:
+  org: odoo-saas
+  region_primary: iad
+  preview_app_prefix: odoo-saas-preview-spec-
+  preview_app_size: shared-cpu-1x
+  agentlab_app: odoo-saas-odoo-agentlab
+
+# --- Artifact store (S3-compatible) ---
+s3:
+  endpoint: https://<account>.r2.cloudflarestorage.com
+  bucket: odoo-saas-artifacts
+  region: auto
+  access_key_secret: S3_ACCESS_KEY
+  secret_key_secret: S3_SECRET_KEY
+
+# --- Knowledge base ---
+pgvector:
+  dsn_secret: SUPPORT_GATEWAY_PG_DSN
+
+# --- Logger ---
+stdjson:
+  sink: stdout                # platform log capture forwards to Better Stack
+
+# --- Per-agent caps ---
+agents:
+  spec_generator:
+    spend_cap_weekly_usd: 50
+    max_open_prs: 3
+  implementation:
+    spend_cap_weekly_usd: 100
+    spend_cap_per_pr_usd: 20
+    max_open_prs: 5
+    max_reporter_iterations: 5
+    max_human_iterations: 3
+    preview_env_cap: 10
+  code:
+    spend_cap_weekly_usd: 40
+    max_open_prs: 3
+  security:
+    spend_cap_weekly_usd: 60
+    max_open_prs: 3
+  optimization:
+    spend_cap_weekly_usd: 30
+    max_open_prs: 3
+  support_triage:
+    spend_cap_monthly_usd: 300
+    issues_per_tenant_per_day: 5
+    messages_per_user_per_hour: 30
+
+# --- Adapter allow-list (production safety) ---
+# In production config, set strict allow-list so a PR can't silently swap a vendor.
+allowed_adapters:
+  llm:        [litellm, claude, openai]    # not ollama in prod
+  repo:       [github]
+  issues:     [github]
+  notifier:   [slack, email, webhook]
+  secrets:    [envvar, vault]
+  artifacts:  [s3]
+  compute:    [fly, railway]
+  kb:         [pgvector]
+  events:     [github_webhook]
+  logger:     [stdjson]

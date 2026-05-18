@@ -1,0 +1,82 @@
+# Masking rules — per-type strategy for masked columns.
+#
+# Applied by mask-prod-data.sh after a snapshot is restored to agentlab.
+# Every column NOT in mask-allowlist.yml is masked according to its type
+# using these rules.
+
+rules:
+
+  # Strings
+  string:
+    short:                  # < 50 chars
+      strategy: hash
+      prefix: "MASKED:"
+    long:                   # ≥ 50 chars
+      strategy: redact
+      placeholder: "[REDACTED]"
+
+  # Email
+  email:
+    strategy: pattern
+    pattern: "user{hash}@masked.invalid"
+
+  # Phone numbers
+  phone:
+    strategy: pattern
+    pattern: "+57XXXXXXXXXX"
+
+  # Colombian identifiers
+  cedula:                   # Colombian national ID
+    strategy: pattern
+    pattern: "{random 8-10 digits}"
+  nit:                      # Colombian tax ID
+    strategy: pattern
+    pattern: "{random 9-10 digits}-{digit}"
+
+  # Financial
+  monetary:
+    strategy: noise          # add random ±10% noise; preserve aggregate scale
+    range: 0.10
+  payment_card:
+    strategy: redact
+    placeholder: "[REDACTED]"
+  iban:
+    strategy: redact
+    placeholder: "[REDACTED]"
+
+  # Free-form notes / comments / descriptions
+  text:
+    strategy: redact
+    placeholder: "[REDACTED text length={original_length}]"
+
+  # Dates (less sensitive; preserved for analytics)
+  date:
+    strategy: passthrough
+
+  # Boolean / enum
+  boolean:
+    strategy: passthrough
+  selection:
+    strategy: passthrough
+
+  # IDs / FKs
+  foreign_key:
+    strategy: passthrough     # IDs alone aren't PII
+
+# Universal deny-list (PII patterns the LLM detects in any free-text column,
+# applied as a final pass after the column-type rules above):
+deny_list_patterns:
+  - name: "Email-like"
+    regex: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b'
+  - name: "Phone-like"
+    regex: '\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}'
+  - name: "IPv4"
+    regex: '\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b'
+  - name: "IPv6"
+    regex: '(?i)\b(?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\b'
+  - name: "Cédula"
+    regex: '\bC\.?C\.?\s*\d{6,10}\b'
+  - name: "NIT"
+    regex: '\bNIT\.?\s*\d{9,10}-?\d?\b'
+  - name: "Payment card (Luhn checked downstream)"
+    regex: '\b(?:\d[ -]?){13,19}\b'

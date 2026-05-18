@@ -1,0 +1,74 @@
+# CODEOWNERS for odoo-saas
+#
+# Syntax: <path-pattern> <owners>
+# Owners listed here are AUTO-REQUESTED for review on any PR touching the
+# path. At least one approving review from a code owner is required for the
+# path to be considered approved.
+#
+# Current state (2026-05-17): solo operator. Every path falls to
+# @remcaro-rgb. When the team scales, split per-area to dedicated GitHub
+# teams (see the commented references below for the eventual layout the
+# AFK 2026-05-16 plan landed on: maintainers / security-leads /
+# prod-deployers / agent-team / senior-engineers / per-addon-owners).
+
+# ---------------------------------------------------------------------------
+# Default ownership (catch-all) — future: @your-org/maintainers
+# ---------------------------------------------------------------------------
+*                                          @remcaro-rgb
+
+# ---------------------------------------------------------------------------
+# Infrastructure & CI — future: @your-org/security-leads + prod-deployers
+# ---------------------------------------------------------------------------
+/infra/                                    @remcaro-rgb
+/.github/workflows/                        @remcaro-rgb
+/.github/CODEOWNERS                        @remcaro-rgb
+/Dockerfile                                @remcaro-rgb
+/docker-compose.yml                        @remcaro-rgb
+/railway.toml                              @remcaro-rgb
+/.railwayignore                            @remcaro-rgb
+/.dockerignore                             @remcaro-rgb
+
+# ---------------------------------------------------------------------------
+# Control-plane addons — tenancy boundary (future: security-leads, N=2)
+# ---------------------------------------------------------------------------
+/custom-addons/saas_tenant_gate/           @remcaro-rgb
+/custom-addons/saas_tenant_gate/security/  @remcaro-rgb
+/custom-addons/saas_provisioning_gateway/  @remcaro-rgb
+/custom-addons/saas_filestore_backup/      @remcaro-rgb
+/custom-addons/saas_license_gate/          @remcaro-rgb
+
+# ---------------------------------------------------------------------------
+# Agent charters — special rule (future: 2 security-leads approvals via
+# branch protection)
+# ---------------------------------------------------------------------------
+/agents/charters/                          @remcaro-rgb
+
+# ---------------------------------------------------------------------------
+# Agent runtime (portable) — future: agent-team + security-leads on adapters
+# ---------------------------------------------------------------------------
+/agents/                                   @remcaro-rgb
+/agents/adapters/                          @remcaro-rgb
+
+# ---------------------------------------------------------------------------
+# Specs, plans, ADRs
+# ---------------------------------------------------------------------------
+/docs/superpowers/specs/                   @remcaro-rgb
+/docs/superpowers/plans/                   @remcaro-rgb
+/docs/adr/                                 @remcaro-rgb
+/docs/runbooks/                            @remcaro-rgb
+/infra/runbooks/                           @remcaro-rgb
+
+# ---------------------------------------------------------------------------
+# Per-addon ownership — future: per-domain owner teams (club-, accounting-,
+# colombia-localization, etc.). Solo for now.
+# ---------------------------------------------------------------------------
+/custom-addons/club_*/                     @remcaro-rgb
+/custom-addons/account_*/                  @remcaro-rgb
+/custom-addons/co_*/                       @remcaro-rgb
+/jorels-addons/                            @remcaro-rgb
+
+# ---------------------------------------------------------------------------
+# Masking & sensitive-topic configuration (per v6 Q3)
+# ---------------------------------------------------------------------------
+/infra/agentlab/mask-allowlist.yml         @remcaro-rgb
+/infra/agentlab/sensitive-topics.yml       @remcaro-rgb

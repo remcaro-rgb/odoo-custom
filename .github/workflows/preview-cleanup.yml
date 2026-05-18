@@ -1,0 +1,136 @@
+# preview-cleanup
+#
+# Implements docs/superpowers/specs/2026-05-16-implementation-agent-design.md §6.5.
+# Nightly destruction of Implementation Agent preview envs:
+#   - PR merged → destroy
+#   - PR closed without merge → destroy
+#   - No activity ≥ 14 days → warn at 7d, destroy at 14d
+
+name: preview-cleanup
+
+on:
+  schedule:
+    - cron: '0 4 * * *'    # daily 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry-run mode'
+        default: 'true'
+        type: choice
+        options: ['true', 'false']
+      spec_id:
+        description: 'Destroy a specific preview (issue number); blank = sweep all'
+        required: false
+
+concurrency:
+  group: preview-cleanup
+  cancel-in-progress: false
+
+jobs:
+
+  cleanup:
+    name: Sweep preview envs
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Identify preview apps
+        id: list
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          flyctl apps list --json | jq -r '
+              .[] | select(.Name | startswith("odoo-saas-preview-spec-")) | .Name
+          ' > /tmp/preview_apps.txt
+          echo "Found $(wc -l </tmp/preview_apps.txt) preview apps"
+
+      - name: Decide destruction set
+        id: decide
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SPEC_ID: ${{ inputs.spec_id }}
+        run: |
+          set -euo pipefail
+          : > /tmp/to_destroy.txt
+          : > /tmp/to_warn.txt
+
+          while read app; do
+              spec_id=${app#odoo-saas-preview-spec-}
+              # If a specific spec was named, target only that one
+              if [ -n "$SPEC_ID" ] && [ "$spec_id" != "$SPEC_ID" ]; then
+                  continue
+              fi
+
+              # Find the PR for this spec
+              pr_json=$(gh api "repos/${{ github.repository }}/issues/${spec_id}/timeline" \
+                  --paginate 2>/dev/null | jq -s 'add // []' | \
+                  jq '[.[] | select(.event == "cross-referenced") | .source.issue] | map(select(.pull_request)) | first // empty')
+
+              # Treat missing PR as destroy-eligible
+              if [ -z "$pr_json" ] || [ "$pr_json" = "null" ]; then
+                  echo "$app  no-PR-found" >> /tmp/to_destroy.txt
+                  continue
+              fi
+
+              pr_state=$(echo "$pr_json" | jq -r '.state // "open"')
+              if [ "$pr_state" = "closed" ]; then
+                  echo "$app  PR-closed" >> /tmp/to_destroy.txt
+                  continue
+              fi
+
+              # Open PR — check staleness via last update on the branch/PR
+              last_activity=$(echo "$pr_json" | jq -r '.updated_at')
+              last_epoch=$(date -u -d "$last_activity" +%s)
+              now_epoch=$(date -u +%s)
+              age_days=$(( (now_epoch - last_epoch) / 86400 ))
+
+              if [ "$age_days" -ge 14 ]; then
+                  echo "$app  stale-${age_days}d" >> /tmp/to_destroy.txt
+              elif [ "$age_days" -ge 7 ]; then
+                  echo "$app  warn-${age_days}d" >> /tmp/to_warn.txt
+              fi
+          done < /tmp/preview_apps.txt
+
+          echo "::notice::To destroy: $(wc -l </tmp/to_destroy.txt) apps"
+          echo "::notice::To warn:    $(wc -l </tmp/to_warn.txt) apps"
+
+      - name: Destroy preview apps
+        if: inputs.dry_run != 'true'
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          while read app reason; do
+              echo "::notice::Destroying $app (reason: $reason)"
+              flyctl apps destroy "$app" --yes
+              # Also destroy the paired Postgres app
+              flyctl apps destroy "${app}-db" --yes || true
+          done < /tmp/to_destroy.txt
+
+      - name: Post warn comments on stale PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          while read app reason; do
+              spec_id=${app#odoo-saas-preview-spec-}
+              gh issue comment "$spec_id" --body \
+                "🕓 Preview env <code>$app</code> has been idle for $(echo $reason | sed 's/warn-//'). \
+It will be destroyed in 7 more days if there's no activity. Push a commit, comment to keep it alive."
+          done < /tmp/to_warn.txt
+
+      - name: Audit
+        if: always()
+        env:
+          PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+        run: |
+          if [ -s /tmp/to_destroy.txt ]; then
+              psql "$PG_DSN" -c "
+                INSERT INTO saas.audit.event (actor_kind, actor_name, action, payload)
+                VALUES ('system', 'preview-cleanup', 'preview-env-destroyed',
+                        '$(jq -Rs . </tmp/to_destroy.txt)'::jsonb)
+              " || true
+          fi

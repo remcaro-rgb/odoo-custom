@@ -1,0 +1,155 @@
+# rollback-prod
+#
+# Implements docs/superpowers/specs/2026-05-16-promote-to-prod-design.md §4.
+# Rolls back a wave to a previous prod tag. Requires paste-back confirmation
+# and N=2 prod-deployers approval. Operator-opt-in data restore.
+
+name: rollback-prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: 'SHA to roll back TO (must be a prior prod tag)'
+        required: true
+      wave:
+        description: 'Wave to roll back'
+        required: true
+        type: choice
+        options: [canary, w1, w2, all]
+      platforms:
+        default: 'railway,fly'
+      restore_data:
+        description: 'Restore tenant data to pre-promotion snapshot? (destructive only)'
+        default: 'false'
+        type: choice
+        options: ['true', 'false']
+      paste_back:
+        description: 'Type "ROLLBACK <wave>" to confirm (must match exactly)'
+        required: true
+
+concurrency:
+  group: rollback-prod-${{ inputs.wave }}
+  cancel-in-progress: false
+
+jobs:
+
+  preflight:
+    name: Verify rollback request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify paste-back
+        run: |
+          expected="ROLLBACK ${{ inputs.wave }}"
+          if [ "${{ inputs.paste_back }}" != "$expected" ]; then
+              echo "::error::Paste-back text did not match. Expected exactly: '$expected'" >&2
+              exit 1
+          fi
+
+      - uses: actions/checkout@v4
+      - name: Verify target SHA was previously a prod tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ inputs.target_sha }}
+        run: |
+          set -euo pipefail
+          tags=$(gh api "repos/${{ github.repository }}/tags" --paginate \
+              | jq -r ".[] | select(.commit.sha == \"$SHA\") | .name")
+          if ! echo "$tags" | grep -q "^prod-"; then
+              echo "::error::SHA $SHA was never deployed to prod (no prod-* tag)." >&2
+              exit 1
+          fi
+
+  approval:
+    name: Awaiting prod-deployers approval (N=2)
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    environment: prod-rollback   # configure N=2 in repo settings
+    steps:
+      - run: echo "Rollback approved by 2 prod-deployers"
+
+  deploy-railway:
+    name: Roll back Railway
+    needs: [approval]
+    if: contains(inputs.platforms, 'railway')
+    runs-on: ubuntu-latest
+    environment: prod-railway
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_sha }}
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: npm install -g @railway/cli
+      - name: railway up (rollback)
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+        run: |
+          railway up --service "${{ secrets.RAILWAY_PROD_ODOO_SERVICE_ID }}" --detach
+
+  deploy-fly:
+    name: Roll back Fly
+    needs: [approval]
+    if: contains(inputs.platforms, 'fly')
+    runs-on: ubuntu-latest
+    environment: prod-fly
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_sha }}
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: flyctl deploy (rollback)
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_PROD_API_TOKEN }}
+        run: |
+          flyctl deploy --config infra/fly/odoo-prod/fly.toml \
+              --dockerfile Dockerfile --remote-only --strategy rolling \
+              --wait-timeout 900
+
+  tenant-restore:
+    name: Restore tenant data (optional)
+    needs: [deploy-railway, deploy-fly]
+    if: inputs.restore_data == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+    steps:
+      - name: Restore per tenant in wave
+        run: |
+          tenants=$(psql "$PG_DSN" -t -A -c "
+            SELECT name FROM saas.tenant WHERE wave = '${{ inputs.wave }}' AND state = 'active'
+          ")
+          echo "$tenants" | while read t; do
+              echo "::notice::Restoring tenant $t to pre-promotion snapshot"
+              # pgbackrest restore — implementation depends on existing backup infra.
+              # ./infra/runbooks/restore-tenant.sh "$t" --before "${{ github.event.created_at }}"
+          done
+
+  audit:
+    name: Audit log
+    needs: [deploy-railway, deploy-fly, tenant-restore]
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+    steps:
+      - run: |
+          psql "$PG_DSN" -c "
+            INSERT INTO saas.audit.event
+              (actor_kind, actor_name, action, target_kind, target_id, sha, wave, reason, payload)
+            VALUES
+              ('human', '${{ github.actor }}', 'rollback-prod', 'wave', '${{ inputs.wave }}',
+               '${{ inputs.target_sha }}', '${{ inputs.wave }}', '${{ inputs.paste_back }}',
+               '{\"restore_data\": \"${{ inputs.restore_data }}\", \"platforms\": \"${{ inputs.platforms }}\"}'::jsonb)
+          "
+
+  notify:
+    name: Notify Slack + page on-call
+    needs: [audit]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\": \"⏪ ROLLBACK wave=${{ inputs.wave }} → ${{ inputs.target_sha }} by ${{ github.actor }}\"}" \
+            "${{ secrets.SLACK_DEPLOY_WEBHOOK }}"

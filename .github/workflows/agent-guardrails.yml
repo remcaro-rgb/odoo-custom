@@ -1,0 +1,148 @@
+# Agent guardrails — enforced rules for agent-authored PRs.
+#
+# Triggers on any PR opened from a branch matching `agent/*`. Enforces:
+#   - PR title starts with `[agent:<name>]`.
+#   - Changes do NOT touch .github/workflows/**, infra/**, Dockerfile,
+#     or agents/*/CHARTER.md (unless `agent-bypass-guardrails` label is
+#     applied by a human admin).
+#   - Diff size <= 400 added and <= 400 deleted lines.
+#   - Test count is not reduced vs the PR base.
+#   - For agent/implementation/* branches: spec commit prefix audit
+#     (every commit touching docs/superpowers/specs/** must start with
+#     `[impl-agent] spec correction:`).
+#   - AGENTS_ENABLED repo variable must be "true" — otherwise the workflow
+#     short-circuits and rejects the PR (kill switch).
+#
+# Used by all six agents.
+
+name: agent-guardrails
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+    branches: [main]
+
+jobs:
+  check:
+    name: Agent guardrails
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'agent/')
+    timeout-minutes: 8
+    steps:
+      - name: Kill-switch check
+        env:
+          AGENTS_ENABLED: ${{ vars.AGENTS_ENABLED }}
+        run: |
+          if [ "${AGENTS_ENABLED:-true}" != "true" ]; then
+              echo "::error::AGENTS_ENABLED repo variable is not 'true'. Agent workflows are disabled. Closing the PR." >&2
+              exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PR title prefix
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          # Extract agent name from branch: agent/<name>/<slug>
+          agent_name="${BRANCH#agent/}"
+          agent_name="${agent_name%%/*}"
+          expected_prefix="[agent:$agent_name]"
+          case "$TITLE" in
+            "$expected_prefix"*)
+              echo "::notice::Title prefix OK ($expected_prefix)" ;;
+            *)
+              echo "::error::PR title from branch $BRANCH must start with '$expected_prefix'." >&2
+              exit 1 ;;
+          esac
+
+      - name: Forbidden-paths check
+        id: forbidden
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          changed=$(git diff --name-only "$base" "$head")
+          forbidden=$(
+            echo "$changed" | grep -E '^(\.github/workflows/|infra/|Dockerfile$|agents/.*CHARTER\.md$)' || true
+          )
+          if [ -n "$forbidden" ]; then
+              # Check for bypass label
+              labels="${{ join(github.event.pull_request.labels.*.name, ',') }}"
+              if echo "$labels" | tr ',' '\n' | grep -qx 'agent-bypass-guardrails'; then
+                  echo "::warning::Agent touched forbidden paths but agent-bypass-guardrails label is set:"
+                  echo "$forbidden"
+              else
+                  echo "::error::Agent PRs may not modify these paths without a human admin's agent-bypass-guardrails label:" >&2
+                  echo "$forbidden" >&2
+                  exit 1
+              fi
+          fi
+
+      - name: Diff size cap
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          added=$(git diff --shortstat "$base" "$head" | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' || echo 0)
+          deleted=$(git diff --shortstat "$base" "$head" | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+' || echo 0)
+          echo "Added: $added · Deleted: $deleted"
+          if [ "${added:-0}" -gt 400 ] || [ "${deleted:-0}" -gt 400 ]; then
+              echo "::error::Agent PR exceeds 400 LOC cap (added=$added deleted=$deleted). Split the work." >&2
+              exit 1
+          fi
+
+      - name: Test count must not shrink
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+
+          count_tests() {
+              ref="$1"
+              git show "$ref:./" >/dev/null 2>&1 || true
+              git ls-tree -r --name-only "$ref" \
+                | grep -E '(^|/)(tests?/.*\.py|test_.*\.py|.*_test\.py)$' \
+                | wc -l
+          }
+          base_n=$(count_tests "$base")
+          head_n=$(count_tests "$head")
+          echo "Test files — base=$base_n  head=$head_n"
+          if [ "$head_n" -lt "$base_n" ]; then
+              echo "::error::Agent PR reduces test-file count (was $base_n, now $head_n). Agents may not shrink tests." >&2
+              exit 1
+          fi
+
+      - name: Spec-correction commit prefix audit (impl-agent only)
+        if: startsWith(github.head_ref, 'agent/implementation/') || startsWith(github.head_ref, 'agent/spec-')
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          # For every commit by implementation-bot that touches a spec file,
+          # the commit message must start with "[impl-agent] spec correction:".
+          while read -r sha; do
+              author_email=$(git log -1 --format='%ae' "$sha")
+              if [ "$author_email" != "implementation-bot@your-domain" ]; then
+                  continue
+              fi
+              touches_spec=$(git diff-tree --no-commit-id --name-only -r "$sha" \
+                  | grep -E '^docs/superpowers/specs/' || true)
+              if [ -z "$touches_spec" ]; then
+                  continue
+              fi
+              msg=$(git log -1 --format='%s' "$sha")
+              case "$msg" in
+                "[impl-agent] spec correction:"*)
+                  : ok
+                  ;;
+                *)
+                  echo "::error::Commit $sha by implementation-bot touches a spec file but is not prefixed '[impl-agent] spec correction:'." >&2
+                  echo "::error::Subject was: $msg" >&2
+                  exit 1
+                  ;;
+              esac
+          done < <(git rev-list "$base..$head")

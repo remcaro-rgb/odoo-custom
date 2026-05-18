@@ -1,0 +1,121 @@
+# Spec-required gate.
+#
+# Enforces §2.6 of docs/2026-05-15-spec-driven-dev-plan.md:
+#   PRs touching custom-addons/**, infra/**, .github/workflows/**, or
+#   Dockerfile MUST either:
+#     - have a body line "Spec: docs/superpowers/specs/<slug>-design.md"
+#       OR "Spec: docs/superpowers/specs/<slug>-fix.md" pointing to a real
+#       file, OR
+#     - carry the `spec-exempt` label (only repo admins can apply).
+#
+# For each addon directory in custom-addons/ touched, the linked spec must
+# mention that addon name (grep-level check — not airtight, just enough to
+# keep people honest).
+
+name: spec-required
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  check:
+    name: Spec link present
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve PR body & labels
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          pr_json=$(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+          body=$(jq -r '.body // ""' <<<"$pr_json")
+          labels=$(jq -r '[.labels[].name] | join(",")' <<<"$pr_json")
+          {
+            echo "labels=$labels"
+            echo "body<<EOF"
+            echo "$body"
+            echo "EOF"
+          } >>"$GITHUB_OUTPUT"
+
+      - name: Detect spec-touching paths
+        id: paths
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          changed=$(git diff --name-only "$base" "$head")
+          echo "$changed" > /tmp/changed_files.txt
+
+          needs_spec="false"
+          if grep -qE '^(custom-addons|infra|\.github/workflows)/' /tmp/changed_files.txt; then
+              needs_spec="true"
+          fi
+          if grep -q '^Dockerfile$' /tmp/changed_files.txt; then
+              needs_spec="true"
+          fi
+          echo "needs_spec=$needs_spec" >> "$GITHUB_OUTPUT"
+
+      - name: Check exemption label
+        id: exempt
+        run: |
+          if echo "${{ steps.pr.outputs.labels }}" | tr ',' '\n' | grep -qx 'spec-exempt'; then
+              echo "exempt=true" >> "$GITHUB_OUTPUT"
+              echo "::notice::PR carries spec-exempt label; skipping spec checks."
+          else
+              echo "exempt=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Parse Spec: line
+        id: spec
+        if: steps.paths.outputs.needs_spec == 'true' && steps.exempt.outputs.exempt == 'false'
+        env:
+          BODY: ${{ steps.pr.outputs.body }}
+        run: |
+          set -euo pipefail
+          # Look for a line like:
+          #   Spec: docs/superpowers/specs/2026-05-16-foo-design.md
+          spec_path=$(printf '%s\n' "$BODY" \
+            | grep -Eo 'docs/superpowers/specs/[A-Za-z0-9_./-]+-(design|fix)\.md' \
+            | head -n1 || true)
+          if [ -z "$spec_path" ]; then
+              echo "::error::PR touches addons/infra/workflows/Dockerfile but no 'Spec:' line found in body. Add 'Spec: docs/superpowers/specs/<slug>-design.md' (or '-fix.md'), or apply the spec-exempt label." >&2
+              exit 1
+          fi
+          if [ ! -f "$spec_path" ]; then
+              echo "::error::Spec referenced but file does not exist: $spec_path" >&2
+              exit 1
+          fi
+          echo "spec_path=$spec_path" >> "$GITHUB_OUTPUT"
+          echo "::notice::Spec found at $spec_path"
+
+      - name: Check spec mentions each touched addon
+        if: steps.paths.outputs.needs_spec == 'true' && steps.exempt.outputs.exempt == 'false'
+        env:
+          SPEC_PATH: ${{ steps.spec.outputs.spec_path }}
+        run: |
+          set -euo pipefail
+          # For each top-level custom-addons/<name>/ touched, ensure the spec
+          # mentions that addon name at least once.
+          touched_addons=$(grep -oE '^custom-addons/[^/]+/' /tmp/changed_files.txt \
+                           | sed 's|^custom-addons/\([^/]*\)/|\1|' \
+                           | sort -u || true)
+          missing=""
+          for a in $touched_addons; do
+              if ! grep -q "$a" "$SPEC_PATH"; then
+                  missing="$missing $a"
+              fi
+          done
+          if [ -n "$missing" ]; then
+              echo "::error::Linked spec ($SPEC_PATH) does not mention these touched addons:$missing" >&2
+              echo "::error::Either expand the spec or split the PR." >&2
+              exit 1
+          fi
+          echo "::notice::Spec mentions all touched addons"
