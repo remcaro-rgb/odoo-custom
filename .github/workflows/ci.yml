@@ -320,9 +320,16 @@ jobs:
             odoo-saas:httpcase \
             --workers=0 \
             --max-cron-threads=0 \
+            --db-filter='.*' \
             --test-enable \
             --test-tags '/saas_tenant_gate' \
             > /tmp/httpcase-cid
+          # --db-filter='.*' overrides the production dbfilter=^%d$ pattern.
+          # In prod, hostname must match the DB name (multi-tenant routing).
+          # In HttpCase, the test client hits 127.0.0.1/localhost, which never
+          # matches a DB name → controller routes return 404 even when
+          # method+path are right. Loosening dbfilter here lets the single
+          # test DB receive every request.
           # Tag-syntax note: Odoo's --test-tags treats commas as OR. The
           # previous form '/saas_tenant_gate,post_install' matched all 458
           # post_install tests across base/web/html_editor — including 74
