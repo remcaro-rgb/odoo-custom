@@ -1,0 +1,83 @@
+# Fly.io app descriptor for the agentlab environment.
+#
+# Implements docs/superpowers/specs/2026-05-16-agentlab-environment-design.md.
+#
+# What runs here:
+#   - One Odoo worker pre-loaded with the same image used in prod, pointed
+#     at the agentlab Postgres (separate Fly Postgres app `odoo-saas-odoo-agentlab-db`).
+#   - Daily masked-restore workflow refreshes the data:
+#     1. pg_dump from staging-pool tenants
+#     2. pg_restore into this app's DB
+#     3. infra/agentlab/mask-prod-data.sh applies masking
+#     4. Preview DBs (`preview_<spec_id>`) are spawned from this as a template
+#
+# Why this is shared-cpu-2x (not shared-cpu-1x like preview):
+#   The masking pipeline touches every column in every tenant DB; runtime is
+#   the bottleneck on the nightly cron. shared-cpu-2x cuts the masking pass
+#   from ~30 min to ~12 min at our current data volume.
+#
+# Deploy with:
+#   fly deploy --config infra/fly/agentlab/fly.toml --dockerfile Dockerfile --remote-only
+#
+# Secrets (set with `fly secrets set --app odoo-saas-odoo-agentlab KEY=VALUE`):
+#   ADMIN_PASSWORD              — Odoo master password
+#   PGHOST, PGPORT, PGUSER      — connection details for the agentlab Postgres
+#   PGPASSWORD                  — agentlab Postgres password
+#   AGENTLAB_DSN                — psycopg DSN for the masking script
+#   STAGING_PG_DSN              — read access to the staging pool DB (for nightly restore)
+#   CONTROL_PLANE_PG_DSN        — for audit-event writes after restore
+#
+# Network policy:
+#   No egress except to: github.com, api.anthropic.com, *.fly.dev (control plane),
+#   the staging Postgres endpoint. Enforced via Fly Machines outbound firewall
+#   (configure with `fly machines proxy ...` — see runbook).
+
+app            = "odoo-saas-odoo-agentlab"
+primary_region = "iad"
+kill_signal    = "SIGINT"
+kill_timeout   = "30s"
+
+[build]
+  dockerfile = "../../../Dockerfile"
+
+[env]
+  PLATFORM = "fly"
+  PORT = "8069"
+  # Agentlab-specific: never run cron jobs that would call out to real
+  # external services. The entrypoint reads AGENTLAB_MODE=true to:
+  #  - disable the saas_filestore_backup ir.cron
+  #  - disable saas_tenant_gate's telemetry POST
+  #  - log a banner on startup so reviewers know they're in agentlab.
+  AGENTLAB_MODE = "true"
+
+[http_service]
+  internal_port        = 8069
+  force_https          = true
+  # Agentlab is idle most of the day; auto-stop saves cost. The morning
+  # cron explicitly wakes it via `fly machines start` before running the
+  # restore (see agentlab-daily-restore.yml).
+  auto_start_machines  = true
+  auto_stop_machines   = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    interval     = "30s"
+    timeout      = "5s"
+    grace_period = "120s"
+    method       = "GET"
+    path         = "/web/health"
+
+[[mounts]]
+  source      = "agentlab_data"
+  destination = "/var/lib/odoo"
+  # 5 GB initial — enough for the masked tenant snapshots at current scale.
+  # Grow with `fly volumes extend` if the agentlab DB exceeds.
+
+[[vm]]
+  size   = "shared-cpu-2x"
+  memory = "2gb"
+
+# Reviewer access:
+#   `fly ssh console --app odoo-saas-odoo-agentlab` for interactive shell.
+#   Web UI at https://odoo-saas-odoo-agentlab.fly.dev/web/login with a daily
+#   one-time password rotated by the restore workflow.
