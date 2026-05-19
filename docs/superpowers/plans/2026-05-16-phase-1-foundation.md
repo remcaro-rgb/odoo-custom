@@ -18,7 +18,7 @@
 - Create: `docs/superpowers/specs/_TEMPLATE-fix.md` ✅ delivered
 - Create: `docs/superpowers/plans/_TEMPLATE.md` ✅ delivered
 
-- [ ] **Step 1: Verify the templates render correctly in GitHub**
+- [x] **Step 1: Verify the templates render correctly in GitHub**
 
 ```bash
 gh repo view --web
@@ -27,7 +27,7 @@ gh repo view --web
 
 Expected: markdown renders cleanly; section numbering matches §2.4 of main plan.
 
-- [ ] **Step 2: Add a CONTRIBUTING.md pointer to these templates**
+- [x] **Step 2: Add a CONTRIBUTING.md pointer to these templates** (2026-05-19: `CONTRIBUTING.md` created)
 
 ```bash
 cat >> CONTRIBUTING.md <<'EOF'
@@ -70,7 +70,7 @@ prod-deployers and security-leads see it.
 **Files:**
 - Modify: `.github/CODEOWNERS` ✅ scaffold delivered
 
-- [ ] **Step 1: Replace `@your-org/*` placeholders with real team slugs**
+- [x] **Step 1: Replace `@your-org/*` placeholders with real team slugs** (2026-05-19: solo-operator layout uses `@remcaro-rgb`; `@your-org/*` strings remain as `# future:` comments only — re-audit on org migration)
 
 ```bash
 # Find every placeholder
@@ -80,7 +80,7 @@ grep -n '@your-org' .github/CODEOWNERS
 Expected: a list of lines to edit. Replace each `@your-org/<team>` with your
 real org slug and team name.
 
-- [ ] **Step 2: Create the GitHub teams if they don't exist**
+- [ ] **Step 2: Create the GitHub teams if they don't exist** (deferred: personal repo, no org — see ADR 0004)
 
 ```bash
 gh api orgs/<org>/teams -X POST -f name=maintainers
@@ -104,7 +104,7 @@ For each team, add the right humans via GitHub web UI or
 Expected: every team has ≥ 1 member (use repo `maintainers` as a fallback
 for unstaffed teams).
 
-- [ ] **Step 4: Verify CODEOWNERS parses correctly**
+- [x] **Step 4: Verify CODEOWNERS parses correctly** (2026-05-19: `gh api repos/remcaro-rgb/odoo-custom/codeowners/errors` → `{"errors":[]}`)
 
 ```bash
 gh api repos/<org>/<repo>/codeowners/errors
@@ -176,7 +176,7 @@ Expected: PRs cannot merge to main without this check passing.
 **Files:**
 - Create: `.github/workflows/agent-guardrails.yml` ✅ delivered
 
-- [ ] **Step 1: Create the AGENTS_ENABLED repo variable**
+- [x] **Step 1: Create the AGENTS_ENABLED repo variable** (2026-05-19: set to `true`)
 
 ```bash
 gh variable set AGENTS_ENABLED --body "true"

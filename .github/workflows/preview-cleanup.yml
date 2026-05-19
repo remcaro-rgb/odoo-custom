@@ -118,8 +118,7 @@ jobs:
           while read app reason; do
               spec_id=${app#odoo-saas-preview-spec-}
               gh issue comment "$spec_id" --body \
-                "🕓 Preview env <code>$app</code> has been idle for $(echo $reason | sed 's/warn-//'). \
-It will be destroyed in 7 more days if there's no activity. Push a commit, comment to keep it alive."
+                "🕓 Preview env <code>$app</code> has been idle for $(echo $reason | sed 's/warn-//'). It will be destroyed in 7 more days if there's no activity. Push a commit, comment to keep it alive."
           done < /tmp/to_warn.txt
 
       - name: Audit
