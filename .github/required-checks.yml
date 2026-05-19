@@ -15,20 +15,28 @@
 #  PUT /repos/.../branches/{branch}/protection with a personal admin token).
 
 main:
-  # Always-running checks: job-level if: may skip them, but the workflow
-  # is triggered on every PR to main and SKIPPED counts as success.
+  # Always-running checks: workflow triggers on every PR to main; if the
+  # job's `if:` condition skips it, GitHub reports SKIPPED, which counts
+  # as success for required-check semantics (post-Aug-2022 behavior).
   - Spec link present
   - Agent guardrails
+  - Spec quality checks
   - Build Odoo image
   - Build Postgres image
   - Build Traefik image
   - saas_tenant_gate test suite
 
-  # Below: enable after the first run completes on a PR. Adding to required
-  # before any run has reported a status would block every PR forever.
-  # - Spec quality checks
-  # - Workflow lint (yamllint + actionlint)
-  # - Protection-drift audit
+  # NOT included (paths-filtered workflows that only trigger on relevant
+  # file changes; would never report a status on unrelated PRs):
+  #   - Workflow lint (yamllint + actionlint)   (runs on .github/workflows edits)
+  #   - Protection-drift audit                  (runs on .github/workflows or required-checks.yml edits)
+  # These workflows still run and fail loudly when relevant; they just
+  # don't block PRs that don't touch their watched paths.
+
+  # NOT included (push-only triggers on main, never run on PRs):
+  #   - Deploy → Railway staging
+  #   - Deploy → Fly staging
+  #   - Cross-platform parity gate
 
 agent_spec_pattern:
   # Same as main plus spec-quality, applied via the agent-spec-branches Ruleset

@@ -51,19 +51,20 @@ Record the following as the Phase 1 outcome and let it inform Phase 2 onward.
   `false` halts all agent CI immediately.
 - **CONTRIBUTING.md:** new file pointing developers at the templates and
   explaining the `spec-required` and `agent-guardrails` gates.
-- **Branch protection on `main`** (classic protection): 6 required
-  status checks (`Spec link present`, `Agent guardrails`, `Build Odoo
-  image`, `Build Postgres image`, `Build Traefik image`,
-  `saas_tenant_gate test suite`), `strict=true` (branch must be up to
-  date), `enforce_admins=true` (no admin bypass), `required_linear_history`,
-  `allow_force_pushes=false`, `allow_deletions=false`,
-  `required_conversation_resolution=true`. Direct-push restriction
-  scoped to the `prod-deployers` team. Spec-quality and the
-  cross-platform deploy/parity jobs intentionally omitted from required
-  checks — `spec-quality` is paths-filtered (would block any PR that
-  doesn't touch specs), and `Deploy → Railway/Fly staging` +
-  `Cross-platform parity gate` only run on push to main, not on PRs
-  (would never report a status).
+- **Branch protection on `main`** (classic protection): 7 required
+  status checks (`Spec link present`, `Agent guardrails`, `Spec quality
+  checks`, `Build Odoo image`, `Build Postgres image`, `Build Traefik
+  image`, `saas_tenant_gate test suite`), `strict=true` (branch must be
+  up to date), `enforce_admins=true` (no admin bypass),
+  `required_linear_history`, `required_signatures=true` (added
+  2026-05-19 after item 6), `allow_force_pushes=false`,
+  `allow_deletions=false`, `required_conversation_resolution=true`.
+  Direct-push restriction scoped to the `prod-deployers` team. The
+  cross-platform deploy/parity jobs are intentionally omitted from
+  required checks — they only run on push to main, not on PRs (would
+  never report a status). `Spec quality checks` was added to the
+  required list after item 3 removed its paths filter so it triggers
+  on every PR (SKIPPED on non-agent branches still counts as pass).
 - **Ruleset for `agent/spec-*`** (id `16603187`, enforcement `active`):
   blocks deletion and non-fast-forward (no force-push, no history
   rewrite — satisfies §5.4.3.1 v5 invariant), requires signed commits
@@ -126,39 +127,89 @@ Record the following as the Phase 1 outcome and let it inform Phase 2 onward.
   which has only `@remcaro-rgb` until the first hire — so the intended
   N=2 approval rule must remain disabled in branch protection or every
   PR blocks.
-- **Signed commits not required on `main`.** Local repo isn't set up
-  for commit signing and every recent commit shows `%G? = N`. Enabling
-  `required_signatures` on main right now would block the very PR that
-  flips the switch. Tracked as a Phase 2 follow-up: set up
-  SSH/GPG signing, backfill is unnecessary (signatures only verified
-  going forward), then add the rule. Already required on
-  `agent/spec-*` since no commits exist there yet and agents will be
-  configured with signing keys when Phase 7 lands.
-- **No automated audit yet** that the required check list stays in
-  sync with the workflow job names. If a workflow renames a job, the
-  required-check name silently drifts and PRs block forever.
+(Both former gaps closed in the same-day follow-up batch — see
+"Same-day follow-ups (items 1-6)" below.)
+
+## Same-day follow-ups (items 1-6)
+
+The original list of deferrals from this ADR's first draft was audited
+for feasibility in the same session. Six items were viable solo and
+were executed in order:
+
+1. **SSH commit signing** — dedicated ed25519 key generated
+   (`~/.ssh/git_signing_ed25519`), `git config --global gpg.format ssh`,
+   `commit.gpgsign=true`, `tag.gpgsign=true`, allowed-signers file
+   populated. Local verification shows new commits report
+   `%G? = G` (good signature, trusted). GitHub-side registration of
+   the signing key still pending the operator running
+   `gh auth refresh -s admin:ssh_signing_key` and `gh ssh-key add
+   ~/.ssh/git_signing_ed25519.pub --type signing`.
+2. **yamllint + actionlint** — `.yamllint.yml`, `.pre-commit-config.yaml`,
+   and `.github/workflows/lint-workflows.yml` added. CONTRIBUTING.md
+   documents the local install path. The very first actionlint run
+   surfaced a latent bug: `promote-to-prod.yml` `notify` job referenced
+   `needs.preflight.outputs.target_sha` without declaring `preflight`
+   in its `needs:` list; fixed in the same commit.
+3. **`Spec quality checks` always-runs** — paths filter removed from
+   `on:`; existing job-level `if:` continues to skip non-agent
+   branches. The check now reports a status on every PR (SKIPPED
+   counts as pass) and is added to `main`'s required list.
+4. **Protection-drift audit** — initial design tried to read live
+   branch protection from the runner, which is impossible:
+   `GITHUB_TOKEN` cannot access that endpoint and there is no workflow
+   permission scope that grants it. Redesigned around a committed
+   source-of-truth at `.github/required-checks.yml`. The workflow
+   audits committed-config-against-job-names; a separate script
+   `infra/scripts/check-protection-drift.sh` does live-vs-committed
+   with a personal admin token. Today's run reports OK.
+5. **Verification probes** — see next section.
+6. **`required_signatures: true` on `main`** — enabled via
+   `POST /branches/main/protection/required_signatures`. PR #1 is
+   still `MERGEABLE` because squash-merges via the GitHub web UI/API
+   are signed by the `web-flow` key. Future direct pushes of unsigned
+   commits to `main` will be rejected.
+
+## Verification probes (2026-05-19)
+
+PR #1 served as the verification harness for the gates:
+
+- **Spec link present — failure path:** First run reported `FAILURE`. PR #1's
+  body links a *plan* (`docs/superpowers/plans/...`) rather than a *spec*
+  (`docs/superpowers/specs/...-design.md`); the workflow regex correctly
+  rejected the plan-only reference. Live evidence that the gate enforces
+  the design intent.
+- **Spec link present — `spec-exempt` bypass:** Adding the `spec-exempt`
+  label re-triggered the workflow and the check flipped to `SUCCESS`. This
+  is the designed bypass for process-bootstrap PRs that legitimately have
+  no spec (Phase 1 is itself the spec-workflow bootstrap, so it qualifies).
+- **`Agent guardrails` kill-switch:** Workflow logic verified by inspection
+  ([agent-guardrails.yml step 'Kill-switch check']) — fails fast if the
+  repo variable `AGENTS_ENABLED` is anything other than the literal string
+  `true`. Live-toggle test deferred: requires pushing an `agent/*` branch,
+  blocked by sandbox push-policy on this session. Run manually with:
+  `gh variable set AGENTS_ENABLED --body false`, open an `agent/foo/bar`
+  PR, observe `Agent guardrails: FAILURE`, then reset.
 
 ## Follow-ups (tracked separately)
 
-1. Add `yamllint` / `actionlint` as a pre-commit hook and CI step so the
-   strict-YAML drift that bit `spec-required.yml` and `preview-cleanup.yml`
-   never reaches a PR again.
-2. Re-run the Phase 1 verification checklist (open a malformed PR;
-   confirm the merge button is actually disabled, not just showing a
-   red check).
-3. Re-point external systems still trusting the old GitHub repo path:
+1. Register the SSH signing key on GitHub
+   (`gh auth refresh -s admin:ssh_signing_key && gh ssh-key add ~/.ssh/git_signing_ed25519.pub --type signing`).
+   Until done, signed commits in this session show "Unverified" on
+   github.com (the signature is cryptographically valid, GitHub just
+   doesn't know whose key it is).
+2. Re-point external systems still trusting the old GitHub repo path:
    GHA OIDC subject claims in Vercel/Fly/Railway
    (sub: `repo:GoliattCo/odoo-custom:*`), Vercel project Git connection,
    webhooks. Audit during Phase 2 setup.
-4. Set up commit signing locally (SSH or GPG via `gh ssh-key add` /
-   `gpg --gen-key`), then add `required_signatures: true` to the `main`
-   branch protection. No backfill needed — signatures are forward-only.
-5. When first hire lands:
+3. When first hire lands:
    - Flip `required_pull_request_reviews.required_approving_review_count`
      from 0 → 1 on `main`.
    - Flip `require_code_owner_reviews` to `true`.
    - For paths needing N=2 (`saas_tenant_gate/security/**`,
      `agents/charters/**`), add a path-scoped Ruleset with
      `required_approving_review_count: 2`.
-6. Add a CI job that diffs the required-check list against the workflow
-   job names — drift here silently blocks merges.
+4. Live-run the `Agent guardrails` kill-switch probe (requires push of
+   a temporary `agent/*` branch; logic verified by inspection today).
+5. Design a PR-safe dry-run version of `Cross-platform parity gate` so
+   it can become a required check on `main` PRs without actually
+   deploying to Railway/Fly staging on every PR.
