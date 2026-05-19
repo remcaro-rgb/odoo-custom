@@ -362,9 +362,14 @@ jobs:
           # Container may still be alive (Odoo doesn't auto-stop without
           # --stop-after-init even after tests). Capture the test outcome
           # from the log, then send SIGTERM.
-          if grep -qE "^[0-9:., -]+ [0-9]+ INFO [a-z_0-9]+ odoo.tests.runner: [0-9]+ failed, [0-9]+ error\(s\)" /tmp/httpcase-logs/run.log; then
-            failures=$(grep -oE "[0-9]+ failed" /tmp/httpcase-logs/run.log | head -1 | awk '{print $1}')
-            errors=$(grep -oE "[0-9]+ error" /tmp/httpcase-logs/run.log | head -1 | awk '{print $1}')
+          #
+          # Odoo 19 emits the test summary as:
+          #   <ts> <pid> {INFO,ERROR} <db> odoo.tests.result: N failed, M error(s) of K tests when loading database '<db>'
+          # The level is INFO when N=M=0, ERROR otherwise. Don't pin to one.
+          if grep -qE "odoo\.tests\.result: [0-9]+ failed, [0-9]+ error\(s\) of [0-9]+ tests" /tmp/httpcase-logs/run.log; then
+            outcome=$(grep -oE "odoo\.tests\.result: [0-9]+ failed, [0-9]+ error\(s\)" /tmp/httpcase-logs/run.log | head -1)
+            failures=$(echo "$outcome" | grep -oE "[0-9]+ failed" | awk '{print $1}')
+            errors=$(echo "$outcome" | grep -oE "[0-9]+ error" | awk '{print $1}')
             echo "Reported: ${failures} failed, ${errors} error(s)"
             docker kill "$cid" >/dev/null 2>&1 || true
             if [ "$failures" != "0" ] || [ "$errors" != "0" ]; then

@@ -85,7 +85,10 @@ class TestSeatCap(TransactionCase):
         self._set_cap(current)
 
         def _audit_count():
-            with self.pool.cursor() as fresh_cr:
+            # TransactionCase exposes self.registry (and self.env.registry);
+            # there's no self.pool attribute. The registry's cursor() factory
+            # returns a fresh connection from the pool — same effect.
+            with self.env.registry.cursor() as fresh_cr:
                 fresh_env = api.Environment(fresh_cr, self.env.uid, self.env.context)
                 return fresh_env['ir.logging'].sudo().search_count(
                     [('name', '=', 'saas_tenant_gate')]
