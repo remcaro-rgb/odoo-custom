@@ -1,0 +1,96 @@
+name: protection-drift-audit
+
+# Compares the committed required-status-check list in
+# .github/required-checks.yml against the actual job names declared in
+# .github/workflows/. A required check referencing a job that no longer
+# exists silently blocks every PR; this catches that early.
+#
+# Live-vs-committed comparison (between this file and the API state) is NOT
+# done here because the workflow's GITHUB_TOKEN cannot read branch protection.
+# That comparison lives in ./infra/scripts/check-protection-drift.sh, run
+# manually with a personal admin token.
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/required-checks.yml'
+      - '.github/workflows/protection-drift-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - '.github/required-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Protection-drift audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit required-checks list against workflow job names
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, sys, yaml
+
+          # 1. Collect every job-level `name:` declared in workflows.
+          job_names = set()
+          for p in sorted(pathlib.Path('.github/workflows').glob('*.yml')):
+              try:
+                  doc = yaml.safe_load(p.read_text())
+              except yaml.YAMLError as e:
+                  print(f"::warning file={p}::YAML parse failed: {e}", file=sys.stderr)
+                  continue
+              if not isinstance(doc, dict):
+                  continue
+              for job in (doc.get('jobs') or {}).values():
+                  if isinstance(job, dict) and isinstance(job.get('name'), str):
+                      job_names.add(job['name'])
+
+          # 2. Load the committed required-checks list.
+          required = yaml.safe_load(
+              pathlib.Path('.github/required-checks.yml').read_text()
+          )
+          if not isinstance(required, dict):
+              print("::error::.github/required-checks.yml must be a mapping at the top level")
+              sys.exit(1)
+
+          # 3. Diff per scope.
+          had_error = False
+          for scope, checks in required.items():
+              if not isinstance(checks, list):
+                  print(f"::error file=.github/required-checks.yml::scope '{scope}' must be a list")
+                  had_error = True
+                  continue
+              missing = [c for c in checks if c not in job_names]
+              if missing:
+                  had_error = True
+                  print(f"::error::scope '{scope}': required checks with NO matching workflow job:")
+                  for m in missing:
+                      print(f"::error::  - {m!r}")
+              else:
+                  print(f"::notice::scope '{scope}': {len(checks)} required check(s) all match a workflow job.")
+
+          print()
+          print(f"Workflow job names ({len(job_names)}):")
+          for n in sorted(job_names):
+              print(f"  - {n}")
+
+          sys.exit(1 if had_error else 0)
+          PY
+
+      - name: Install pyyaml (fallback if absent)
+        if: failure()
+        run: |
+          # Ubuntu runners ship pyyaml in /usr/lib/python3/dist-packages.
+          # If the previous step failed due to missing pyyaml, this gives a
+          # diagnostic; the real fix is to ensure pyyaml is present.
+          python3 -c "import yaml; print('pyyaml', yaml.__version__)" \
+            || echo "::warning::pyyaml not available; install with pip if you fork to a different runner"

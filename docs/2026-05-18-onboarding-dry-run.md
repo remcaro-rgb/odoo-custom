@@ -69,7 +69,7 @@ Hand the customer:
 - Make the package public on GHCR (settings → "Change visibility" → Public) — anyone can pull, but only operator can push
 - Provide a customer-scoped GHCR PAT and document it in their install bundle
 
-**Recommend public** for the enterprise package. There's nothing secret in the image (the pubkey is intentionally embedded; the source is on github.com/remcaro-rgb/odoo-custom anyway).
+**Recommend public** for the enterprise package. There's nothing secret in the image (the pubkey is intentionally embedded; the source is on github.com/GoliattCo/odoo-custom anyway).
 
 ---
 

@@ -15,8 +15,8 @@ name: spec-quality
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'docs/superpowers/specs/**'
+    # Runs on every PR so the check can be made required on `main`.
+    # Job short-circuits with a `notice` when no spec files are touched.
 
 jobs:
 

@@ -1,0 +1,17 @@
+---
+# Run with: pre-commit install (one-time) then pre-commit run --all-files
+# CI mirrors these via .github/workflows/lint-workflows.yml
+
+repos:
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: ['-c', '.yamllint.yml']
+        files: '^\.github/workflows/.*\.ya?ml$'
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+        args: ['-shellcheck=', '-pyflakes=']

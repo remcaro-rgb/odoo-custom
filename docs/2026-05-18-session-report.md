@@ -231,7 +231,7 @@ All 5 active specs and all 3 active plans passed audit unchanged. The placeholde
 
 ## Commits landed this session
 
-**Data plane (`remcaro-rgb/odoo-custom`):**
+**Data plane (`GoliattCo/odoo-custom`):**
 - `c030b80` plan(admin-crud): consolidated 6-phase plan
 - `449981a` plan(renew+autocomplete): consolidated plan for both features
 - `dabb01a` docs(session): decisions log

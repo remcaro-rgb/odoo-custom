@@ -73,7 +73,7 @@ jobs:
               echo "exempt=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Parse Spec: line
+      - name: "Parse Spec: line"
         id: spec
         if: steps.paths.outputs.needs_spec == 'true' && steps.exempt.outputs.exempt == 'false'
         env:

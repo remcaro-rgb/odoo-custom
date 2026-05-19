@@ -52,12 +52,17 @@ class ResUsers(models.Model):
             % (tenant_id, cap, current, new_count)
         )
         _logger.warning(msg)
-        self.env['ir.logging'].sudo().create({
-            'name': 'saas_tenant_gate',
-            'type': 'server',
-            'level': 'WARNING',
-            'message': msg,
-            'path': 'saas_tenant_gate.res_users',
-            'func': '_saas_check_seat_cap',
-            'line': '0',
-        })
+        # The caller raises UserError immediately after this; that rolls back
+        # the current transaction, taking the audit row with it. Write via a
+        # fresh cursor so the audit survives the rollback.
+        with self.pool.cursor() as audit_cr:
+            audit_env = api.Environment(audit_cr, self.env.uid, self.env.context)
+            audit_env['ir.logging'].sudo().create({
+                'name': 'saas_tenant_gate',
+                'type': 'server',
+                'level': 'WARNING',
+                'message': msg,
+                'path': 'saas_tenant_gate.res_users',
+                'func': '_saas_check_seat_cap',
+                'line': '0',
+            })

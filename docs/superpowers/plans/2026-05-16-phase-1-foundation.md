@@ -18,7 +18,7 @@
 - Create: `docs/superpowers/specs/_TEMPLATE-fix.md` ✅ delivered
 - Create: `docs/superpowers/plans/_TEMPLATE.md` ✅ delivered
 
-- [ ] **Step 1: Verify the templates render correctly in GitHub**
+- [x] **Step 1: Verify the templates render correctly in GitHub**
 
 ```bash
 gh repo view --web
@@ -27,7 +27,7 @@ gh repo view --web
 
 Expected: markdown renders cleanly; section numbering matches §2.4 of main plan.
 
-- [ ] **Step 2: Add a CONTRIBUTING.md pointer to these templates**
+- [x] **Step 2: Add a CONTRIBUTING.md pointer to these templates** (2026-05-19: `CONTRIBUTING.md` created)
 
 ```bash
 cat >> CONTRIBUTING.md <<'EOF'
@@ -70,7 +70,7 @@ prod-deployers and security-leads see it.
 **Files:**
 - Modify: `.github/CODEOWNERS` ✅ scaffold delivered
 
-- [ ] **Step 1: Replace `@your-org/*` placeholders with real team slugs**
+- [x] **Step 1: Replace `@your-org/*` placeholders with real team slugs** (2026-05-19: rewritten to `@GoliattCo/*` after repo transfer from `remcaro-rgb` → `GoliattCo`)
 
 ```bash
 # Find every placeholder
@@ -80,7 +80,7 @@ grep -n '@your-org' .github/CODEOWNERS
 Expected: a list of lines to edit. Replace each `@your-org/<team>` with your
 real org slug and team name.
 
-- [ ] **Step 2: Create the GitHub teams if they don't exist**
+- [x] **Step 2: Create the GitHub teams if they don't exist** (2026-05-19: 8 teams created in `GoliattCo` org with `@remcaro-rgb` as maintainer of each)
 
 ```bash
 gh api orgs/<org>/teams -X POST -f name=maintainers
@@ -96,7 +96,7 @@ gh api orgs/<org>/teams -X POST -f name=colombia-localization
 
 Expected: all teams created with 0 members (you add humans next).
 
-- [ ] **Step 3: Add team members**
+- [x] **Step 3: Add team members** (2026-05-19: `@remcaro-rgb` set as maintainer of all 8 teams; second-human N=2 deferred to first hire)
 
 For each team, add the right humans via GitHub web UI or
 `gh api orgs/<org>/teams/<team>/memberships/<user> -X PUT`.
@@ -104,7 +104,7 @@ For each team, add the right humans via GitHub web UI or
 Expected: every team has ≥ 1 member (use repo `maintainers` as a fallback
 for unstaffed teams).
 
-- [ ] **Step 4: Verify CODEOWNERS parses correctly**
+- [x] **Step 4: Verify CODEOWNERS parses correctly** (2026-05-19: `gh api repos/GoliattCo/odoo-custom/codeowners/errors` → `{"errors":[]}`)
 
 ```bash
 gh api repos/<org>/<repo>/codeowners/errors
@@ -163,7 +163,7 @@ gh pr checks <number> --watch
 
 Expected: check now passes with a notice ("PR carries spec-exempt label").
 
-- [ ] **Step 3: Add `spec-required` to required status checks on `main`**
+- [x] **Step 3: Add `spec-required` to required status checks on `main`** (2026-05-19: `Spec link present` included in classic protection on main)
 
 In GitHub repo settings → Branches → main → Branch protection rules:
 - Require status checks to pass before merging
@@ -176,7 +176,7 @@ Expected: PRs cannot merge to main without this check passing.
 **Files:**
 - Create: `.github/workflows/agent-guardrails.yml` ✅ delivered
 
-- [ ] **Step 1: Create the AGENTS_ENABLED repo variable**
+- [x] **Step 1: Create the AGENTS_ENABLED repo variable** (2026-05-19: set to `true`)
 
 ```bash
 gh variable set AGENTS_ENABLED --body "true"
@@ -195,7 +195,7 @@ Reset:
 gh variable set AGENTS_ENABLED --body "true"
 ```
 
-- [ ] **Step 3: Add `agent-guardrails` to required status checks**
+- [x] **Step 3: Add `agent-guardrails` to required status checks** (2026-05-19: included in main protection and agent/spec-* ruleset)
 
 Same as Step 3 of Task 5, for `Agent guardrails` check.
 
@@ -207,32 +207,32 @@ Expected: agent-branch PRs cannot merge without this check passing.
 
 ### Task 7: Configure branch protection on `main`
 
-- [ ] **Step 1: Required status checks**
+- [x] **Step 1: Required status checks** (2026-05-19: 6 checks set via classic protection, cross-platform deploy jobs excluded — push-only triggers)
 
 In settings → Branches → main:
 - Required: `Spec link present`, `Agent guardrails`, `Build Odoo image`,
   `Build Postgres image`, `Build Traefik image`, `saas_tenant_gate test suite`,
   `Cross-platform parity gate`.
 
-- [ ] **Step 2: Require linear history**
+- [x] **Step 2: Require linear history** (2026-05-19: `required_linear_history=true`)
 
-- [ ] **Step 3: Require signed commits** (optional but recommended)
+- [ ] **Step 3: Require signed commits** (deferred for `main`: local signing not set up; active on `agent/spec-*` ruleset since no commits exist there yet)
 
-- [ ] **Step 4: Require ≥ 1 CODEOWNERS approval**
+- [ ] **Step 4: Require ≥ 1 CODEOWNERS approval** (deferred: would block solo operator since CODEOWNERS auto-routes to the author. Flip when headcount >= 2)
 
-- [ ] **Step 5: Restrict pushes** (only `prod-deployers` can push directly)
+- [x] **Step 5: Restrict pushes** (2026-05-19: classic protection `restrictions.teams=[prod-deployers]`)
 
 ### Task 8: Configure branch protection on `agent/spec-*`
 
-- [ ] **Step 1: Pattern-based rule for `agent/spec-*`**
+- [x] **Step 1: Pattern-based rule for `agent/spec-*`** (2026-05-19: ruleset id 16603187, `refs/heads/agent/spec-*`)
 
-- [ ] **Step 2: Refuse force-push and history rewrite**
+- [x] **Step 2: Refuse force-push and history rewrite** (2026-05-19: ruleset rules `non_fast_forward` + `deletion`)
 
 (Required for the v5 reporter-ping policy — no force-push circumvention.)
 
-- [ ] **Step 3: Require signed commits**
+- [x] **Step 3: Require signed commits** (2026-05-19: ruleset rule `required_signatures`)
 
-- [ ] **Step 4: Require status checks**
+- [x] **Step 4: Require status checks** (2026-05-19: 7 checks via ruleset — 6 main checks + `Spec quality checks`)
 
 Same as for `main`, plus the spec-quality workflow.
 

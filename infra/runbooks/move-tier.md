@@ -28,7 +28,7 @@ All env vars must exist on the Vercel admin app (production environment). The li
 | `FLY_ODOO_APP_NAME` | `odoo-saas-odoo` | The shared Fly Odoo pool. |
 | `FLY_POSTGRES_ADMIN_URL` | `postgres://odoo:<pw>@odoo-saas-postgres.internal:5432/postgres` | Used by source-side cluster routing for dumpSource. **Sensitive**. |
 | `FLY_TRAEFIK_REDIS_URL` | `redis://odoo-saas-redis.internal:6379` | Internal hostname; only the runner uses it. |
-| `RAILWAY_REPO_FULL_NAME` | `remcaro-rgb/odoo-custom` | GitHub repo for Railway service-create source. |
+| `RAILWAY_REPO_FULL_NAME` | `GoliattCo/odoo-custom` | GitHub repo for Railway service-create source. |
 | `RAILWAY_*` (full set) | See `packages/infra/src/providers/railway.ts` constructor | Required only if doing moveTier targeting Railway. |
 | `BACKUP_RUNNER_URL` | `https://odoo-saas-backup-runner.fly.dev` | Must be the **public** URL, not the 6PN internal. |
 | `BACKUP_RUNNER_TOKEN` | Strong random, mirrored on the runner's secret | **Sensitive**. |

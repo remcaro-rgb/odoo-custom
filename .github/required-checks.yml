@@ -1,0 +1,50 @@
+---
+# Source of truth for the required-status-check list on protected branches.
+#
+# Why this file exists: the GitHub branch-protection REST API requires
+# `repo admin` permission, which the workflow's GITHUB_TOKEN does NOT have.
+# Drift detection therefore compares workflow job names against this committed
+# list, not against the live API.
+#
+# When you change branch protection in the GitHub UI (or via gh CLI), update
+# this file in the SAME PR so the drift audit stays accurate.
+#
+# Apply this file to live protection with:
+#   ./infra/scripts/apply-required-checks.sh
+# (script reads protection.yml, generates the API payload, calls
+#  PUT /repos/.../branches/{branch}/protection with a personal admin token).
+
+main:
+  # Always-running checks: workflow triggers on every PR to main; if the
+  # job's `if:` condition skips it, GitHub reports SKIPPED, which counts
+  # as success for required-check semantics (post-Aug-2022 behavior).
+  - Spec link present
+  - Agent guardrails
+  - Spec quality checks
+  - Build Odoo image
+  - Build Postgres image
+  - Build Traefik image
+  - saas_tenant_gate test suite
+
+  # NOT included (paths-filtered workflows that only trigger on relevant
+  # file changes; would never report a status on unrelated PRs):
+  #   - Workflow lint (yamllint + actionlint)   (runs on .github/workflows edits)
+  #   - Protection-drift audit                  (runs on .github/workflows or required-checks.yml edits)
+  # These workflows still run and fail loudly when relevant; they just
+  # don't block PRs that don't touch their watched paths.
+
+  # NOT included (push-only triggers on main, never run on PRs):
+  #   - Deploy → Railway staging
+  #   - Deploy → Fly staging
+  #   - Cross-platform parity gate
+
+agent_spec_pattern:
+  # Same as main plus spec-quality, applied via the agent-spec-branches Ruleset
+  # rather than classic branch protection.
+  - Spec link present
+  - Agent guardrails
+  - Build Odoo image
+  - Build Postgres image
+  - Build Traefik image
+  - saas_tenant_gate test suite
+  - Spec quality checks

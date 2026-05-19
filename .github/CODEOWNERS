@@ -1,74 +1,73 @@
-# CODEOWNERS for odoo-saas
+# CODEOWNERS for odoo-custom (GoliattCo org)
 #
 # Syntax: <path-pattern> <owners>
 # Owners listed here are AUTO-REQUESTED for review on any PR touching the
 # path. At least one approving review from a code owner is required for the
 # path to be considered approved.
 #
-# Current state (2026-05-17): solo operator. Every path falls to
-# @remcaro-rgb. When the team scales, split per-area to dedicated GitHub
-# teams (see the commented references below for the eventual layout the
-# AFK 2026-05-16 plan landed on: maintainers / security-leads /
-# prod-deployers / agent-team / senior-engineers / per-addon-owners).
+# Org migrated to GoliattCo on 2026-05-19. Teams below are real and have
+# repo push access (prod-deployers: maintain). @remcaro-rgb is solo maintainer
+# of every team — N=2 rules in branch protection should stay disabled until
+# headcount >= 2.
 
 # ---------------------------------------------------------------------------
-# Default ownership (catch-all) — future: @your-org/maintainers
+# Default ownership (catch-all)
 # ---------------------------------------------------------------------------
-*                                          @remcaro-rgb
+*                                          @GoliattCo/maintainers
 
 # ---------------------------------------------------------------------------
-# Infrastructure & CI — future: @your-org/security-leads + prod-deployers
+# Infrastructure & CI
 # ---------------------------------------------------------------------------
-/infra/                                    @remcaro-rgb
-/.github/workflows/                        @remcaro-rgb
-/.github/CODEOWNERS                        @remcaro-rgb
-/Dockerfile                                @remcaro-rgb
-/docker-compose.yml                        @remcaro-rgb
-/railway.toml                              @remcaro-rgb
-/.railwayignore                            @remcaro-rgb
-/.dockerignore                             @remcaro-rgb
+/infra/                                    @GoliattCo/security-leads @GoliattCo/prod-deployers
+/.github/workflows/                        @GoliattCo/security-leads @GoliattCo/prod-deployers
+/.github/CODEOWNERS                        @GoliattCo/security-leads @GoliattCo/prod-deployers
+/Dockerfile                                @GoliattCo/security-leads @GoliattCo/prod-deployers
+/docker-compose.yml                        @GoliattCo/security-leads @GoliattCo/prod-deployers
+/railway.toml                              @GoliattCo/security-leads @GoliattCo/prod-deployers
+/.railwayignore                            @GoliattCo/security-leads @GoliattCo/prod-deployers
+/.dockerignore                             @GoliattCo/security-leads @GoliattCo/prod-deployers
 
 # ---------------------------------------------------------------------------
-# Control-plane addons — tenancy boundary (future: security-leads, N=2)
+# Control-plane addons — tenancy boundary
+# (When headcount >= 2: bump 'Required approving reviews' to 2 in branch
+# protection or use a Ruleset scoped to this path.)
 # ---------------------------------------------------------------------------
-/custom-addons/saas_tenant_gate/           @remcaro-rgb
-/custom-addons/saas_tenant_gate/security/  @remcaro-rgb
-/custom-addons/saas_provisioning_gateway/  @remcaro-rgb
-/custom-addons/saas_filestore_backup/      @remcaro-rgb
-/custom-addons/saas_license_gate/          @remcaro-rgb
+/custom-addons/saas_tenant_gate/           @GoliattCo/security-leads
+/custom-addons/saas_tenant_gate/security/  @GoliattCo/security-leads
+/custom-addons/saas_provisioning_gateway/  @GoliattCo/security-leads @GoliattCo/senior-engineers
+/custom-addons/saas_filestore_backup/      @GoliattCo/security-leads @GoliattCo/senior-engineers
+/custom-addons/saas_license_gate/          @GoliattCo/security-leads @GoliattCo/senior-engineers
 
 # ---------------------------------------------------------------------------
-# Agent charters — special rule (future: 2 security-leads approvals via
-# branch protection)
+# Agent charters — special rule (N=2 once team grows)
 # ---------------------------------------------------------------------------
-/agents/charters/                          @remcaro-rgb
+/agents/charters/                          @GoliattCo/security-leads @GoliattCo/agent-team
 
 # ---------------------------------------------------------------------------
-# Agent runtime (portable) — future: agent-team + security-leads on adapters
+# Agent runtime (portable)
 # ---------------------------------------------------------------------------
-/agents/                                   @remcaro-rgb
-/agents/adapters/                          @remcaro-rgb
+/agents/                                   @GoliattCo/agent-team
+/agents/adapters/                          @GoliattCo/agent-team @GoliattCo/security-leads
 
 # ---------------------------------------------------------------------------
 # Specs, plans, ADRs
 # ---------------------------------------------------------------------------
-/docs/superpowers/specs/                   @remcaro-rgb
-/docs/superpowers/plans/                   @remcaro-rgb
-/docs/adr/                                 @remcaro-rgb
-/docs/runbooks/                            @remcaro-rgb
-/infra/runbooks/                           @remcaro-rgb
+/docs/superpowers/specs/                   @GoliattCo/maintainers
+/docs/superpowers/plans/                   @GoliattCo/maintainers
+/docs/adr/                                 @GoliattCo/maintainers
+/docs/runbooks/                            @GoliattCo/prod-deployers
+/infra/runbooks/                           @GoliattCo/prod-deployers
 
 # ---------------------------------------------------------------------------
-# Per-addon ownership — future: per-domain owner teams (club-, accounting-,
-# colombia-localization, etc.). Solo for now.
+# Per-addon ownership
 # ---------------------------------------------------------------------------
-/custom-addons/club_*/                     @remcaro-rgb
-/custom-addons/account_*/                  @remcaro-rgb
-/custom-addons/co_*/                       @remcaro-rgb
-/jorels-addons/                            @remcaro-rgb
+/custom-addons/club_*/                     @GoliattCo/club-addon-owners
+/custom-addons/account_*/                  @GoliattCo/accounting-addon-owners
+/custom-addons/co_*/                       @GoliattCo/colombia-localization
+/jorels-addons/                            @GoliattCo/colombia-localization
 
 # ---------------------------------------------------------------------------
 # Masking & sensitive-topic configuration (per v6 Q3)
 # ---------------------------------------------------------------------------
-/infra/agentlab/mask-allowlist.yml         @remcaro-rgb
-/infra/agentlab/sensitive-topics.yml       @remcaro-rgb
+/infra/agentlab/mask-allowlist.yml         @GoliattCo/security-leads
+/infra/agentlab/sensitive-topics.yml       @GoliattCo/security-leads
