@@ -442,6 +442,10 @@ jobs:
         #   - 'installable': True (or absent — Odoo default is True)
         #   - 'depends' does NOT reference an enterprise-only module the
         #     Community-edition image doesn't ship.
+        #   - Name NOT in CI_DENY_LIST (addons with pre_init_hook gates
+        #     that intentionally refuse installation outside their
+        #     intended runtime — e.g., saas_license_gate guards against
+        #     unlicensed enterprise self-host installs).
         #
         # The community/enterprise split causes the obvious trap: jorels
         # ships `l10n_co_hr_payroll_enterprise` which depends on
@@ -471,6 +475,15 @@ jobs:
               'helpdesk',
           }
 
+          # Addons that intentionally refuse to install outside their
+          # production runtime via pre_init_hook gates. The matrix's
+          # purpose is to validate manifest dependencies and basic
+          # install paths for pool-side addons; these are tenant-side
+          # only.
+          CI_DENY_LIST = {
+              'saas_license_gate',  # pre_init_check requires LICENSE_ID env
+          }
+
           roots = [pathlib.Path('custom-addons'), pathlib.Path('jorels-addons')]
           manifests = {}  # name -> (path, deps)
           for root in roots:
@@ -483,6 +496,9 @@ jobs:
                       print(f'SKIP {manifest}: {e}', file=sys.stderr)
                       continue
                   if data.get('installable', True) is False:
+                      continue
+                  if manifest.parent.name in CI_DENY_LIST:
+                      print(f'EXCLUDE {manifest.parent.name}: in CI deny-list', file=sys.stderr)
                       continue
                   manifests[manifest.parent.name] = (
                       manifest, set(data.get('depends', []) or [])
