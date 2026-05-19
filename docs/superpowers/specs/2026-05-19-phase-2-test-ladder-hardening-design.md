@@ -24,7 +24,7 @@ Push the failure-discovery window left. Today the only addon coverage in CI is `
 
 **No direct impact on the tenancy boundary.** All work in this spec is CI infrastructure (workflow YAML, ruff/bandit configuration, test runners). No new addon code, no new fields on tenant-facing models, no changes to `saas_tenant_gate`'s seat-cap or telemetry surfaces, no changes to `saas_provisioning_gateway`'s HMAC contract.
 
-The only addon-touching changes are mechanical lint fixes the new ruff rules surface (raise-from-err, unused imports, percent-format → f-string). Those don't change runtime behavior; the existing test suite continues to pass.
+The only addon-touching changes are mechanical lint fixes the new ruff rules surface (raise-from-err, unused imports, percent-format → f-string) plus one test-runner fix in `saas_tenant_gate/tests/test_telemetry.py` (HttpCase `url_open(method='POST')`). Touched addons in this PR: `saas_tenant_gate`, `saas_provisioning_gateway`, `saas_filestore_backup`, `saas_license_gate`. None of the changes affect runtime behavior; the existing test suite continues to pass.
 
 **Indirect protective effect:** Bandit security scan catches hardcoded-secret regressions in `saas_*` controllers before they hit staging, lowering the chance of a tenant-data leak via misconfigured logging or auth code.
 

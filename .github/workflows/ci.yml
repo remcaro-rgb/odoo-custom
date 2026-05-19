@@ -111,6 +111,14 @@ jobs:
         #                            fetch from S3 presigned URLs. URLs come from
         #                            the control-plane HMAC-signed /issue-credentials
         #                            response; not user-controlled.
+        #   B108  hardcoded /tmp   — Odoo workers run in isolated containers
+        #                            (Fly/Railway machines). `/tmp` is the
+        #                            container's filesystem, not a shared host
+        #                            dir. tempfile.gettempdir() would return
+        #                            the same path; explicitness here is for
+        #                            log-reading clarity (incident response
+        #                            wants to know "look in /tmp" without
+        #                            chasing platform-dependent defaults).
         run: |
           bandit -r \
             custom-addons/saas_tenant_gate \
@@ -118,7 +126,7 @@ jobs:
             custom-addons/saas_filestore_backup \
             custom-addons/saas_license_gate \
             agents/ \
-            --skip B101,B603,B607,B310 \
+            --skip B101,B603,B607,B310,B108 \
             --severity-level medium \
             --confidence-level medium
 
