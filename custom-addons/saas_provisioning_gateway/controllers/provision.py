@@ -26,10 +26,10 @@ import re
 import time
 
 import odoo
+import odoo.sql_db
 from odoo import http
 from odoo.http import request
 from odoo.service.db import _create_empty_database, _initialize_db
-import odoo.sql_db
 
 _logger = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ class SaasProvisioningController(http.Controller):
         try:
             payload = json.loads(body or b'{}')
         except json.JSONDecodeError as exc:
-            return self._reject(400, 'bad-json: %s' % exc)
+            return self._reject(400, f'bad-json: {exc}')
 
         db_name = (payload.get('db_name') or '').strip()
         if not DB_NAME_PATTERN.match(db_name):
@@ -154,7 +154,7 @@ class SaasProvisioningController(http.Controller):
             db = odoo.sql_db.db_connect('postgres')
             with db.cursor() as cr:
                 cr._cnx.autocommit = True
-                cr.execute('DROP DATABASE IF EXISTS "%s"' % db_name)
+                cr.execute(f'DROP DATABASE IF EXISTS "{db_name}"')
         except Exception:
             _logger.exception(
                 'saas_provisioning_gateway: cleanup DROP DATABASE failed for %s; '

@@ -1,10 +1,8 @@
 import hashlib
 import hmac
-import json
 import time
 
 from odoo.tests import HttpCase, tagged
-
 
 TELEMETRY_PATH = '/saas/telemetry'
 

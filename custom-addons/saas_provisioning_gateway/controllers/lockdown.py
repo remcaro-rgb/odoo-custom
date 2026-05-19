@@ -29,8 +29,8 @@
 # in depth here regardless of whether Traefik is in front of them yet.
 
 from odoo import http
-from odoo.exceptions import AccessDenied
 from odoo.addons.web.controllers.database import Database
+from odoo.exceptions import AccessDenied
 
 
 class SaasDatabaseLockdown(Database):

@@ -112,7 +112,7 @@ class SaasFilestoreRestoreController(http.Controller):
         try:
             payload = json.loads(body or b'{}')
         except json.JSONDecodeError as exc:
-            return self._reject(400, 'bad-json: %s' % exc)
+            return self._reject(400, f'bad-json: {exc}')
 
         db_name = (payload.get('db_name') or '').strip()
         if not DB_NAME_PATTERN.match(db_name):
@@ -159,7 +159,7 @@ class SaasFilestoreRestoreController(http.Controller):
                 actual = self._sha256_file(ct_path)
                 if actual != expected_sha256:
                     return self._reject(
-                        422, 'sha256-mismatch got=%s expected=%s' % (actual, expected_sha256),
+                        422, f'sha256-mismatch got={actual} expected={expected_sha256}',
                     )
 
             tar_path = ct_path + '.tar'
@@ -224,12 +224,14 @@ class SaasFilestoreRestoreController(http.Controller):
                         break
                     out.write(chunk)
         except HTTPError as e:
+            detail = e.read()[:500].decode('utf-8', 'replace')
             raise RuntimeError(
-                'filestore-restore: S3 GET %s failed HTTP %d: %s'
-                % (s3_url, e.code, e.read()[:500].decode('utf-8', 'replace'))
-            )
+                f'filestore-restore: S3 GET {s3_url} failed HTTP {e.code}: {detail}'
+            ) from e
         except URLError as e:
-            raise RuntimeError('filestore-restore: S3 GET network error: %s' % e.reason)
+            raise RuntimeError(
+                f'filestore-restore: S3 GET network error: {e.reason}'
+            ) from e
 
     def _decrypt(self, ct_path, pt_path, dek, nonce, tag):
         size = os.path.getsize(ct_path)
@@ -253,12 +255,12 @@ class SaasFilestoreRestoreController(http.Controller):
         children = os.listdir(extract_root)
         if len(children) != 1:
             raise RuntimeError(
-                'filestore-restore: expected exactly 1 dir in tar, got %s' % children
+                f'filestore-restore: expected exactly 1 dir in tar, got {children}'
             )
         inner = os.path.join(extract_root, children[0])
         if not os.path.isdir(inner):
             raise RuntimeError(
-                'filestore-restore: tar root %s is not a directory' % inner
+                f'filestore-restore: tar root {inner} is not a directory'
             )
 
         # Target dir may exist (re-run of moveTier). Move it aside so we

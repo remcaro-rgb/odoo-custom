@@ -33,7 +33,7 @@ class GitHubRepoAdapter:
         self._gh_repo = self._gh.get_repo(f"{org}/{repo}")
 
     @classmethod
-    def from_config(cls, config: Config) -> "GitHubRepoAdapter":
+    def from_config(cls, config: Config) -> GitHubRepoAdapter:
         from .secrets_envvar import EnvVarSecretStore
         secrets = EnvVarSecretStore()
         gh_cfg = config.extras.get("github", {})
@@ -47,7 +47,11 @@ class GitHubRepoAdapter:
     # ---------------- workspace ops ----------------
 
     def _git(self, *args: str) -> str:
-        result = subprocess.run(
+        # Calling git with a fixed argv[0] and untrusted args in argv[1+] is
+        # safe — no shell interpolation, no PATH lookup ambiguity beyond
+        # whichever `git` is first on PATH (we accept that risk in CI;
+        # the runner image controls PATH).
+        result = subprocess.run(  # noqa: S603,S607
             ["git", *args],
             cwd=self._working_tree,
             check=True,
@@ -68,13 +72,6 @@ class GitHubRepoAdapter:
                author: GitIdentity) -> str:
         for p in paths:
             self._git("add", p)
-        env_str = (
-            f'GIT_AUTHOR_NAME="{author.name}" '
-            f'GIT_AUTHOR_EMAIL="{author.email}" '
-            f'GIT_COMMITTER_NAME="{author.name}" '
-            f'GIT_COMMITTER_EMAIL="{author.email}"'
-        )
-        # Use subprocess directly with env for safety
         env = {
             "GIT_AUTHOR_NAME": author.name,
             "GIT_AUTHOR_EMAIL": author.email,
@@ -84,7 +81,7 @@ class GitHubRepoAdapter:
         commit_cmd = ["git", "commit", "-m", message]
         if author.gpg_key_id:
             commit_cmd.append(f"--gpg-sign={author.gpg_key_id}")
-        subprocess.run(
+        subprocess.run(  # noqa: S603,S607
             commit_cmd,
             cwd=self._working_tree,
             check=True,
@@ -106,7 +103,7 @@ class GitHubRepoAdapter:
         return PullRequest(
             number=pr.number, head_sha=pr.head.sha, head_branch=pr.head.ref,
             base_branch=pr.base.ref, title=pr.title, body=pr.body or "",
-            labels=tuple(l.name for l in pr.labels), url=pr.html_url,
+            labels=tuple(label.name for label in pr.labels), url=pr.html_url,
         )
 
     def add_labels(self, pr: PullRequest, labels: tuple[str, ...]) -> None:
@@ -118,14 +115,16 @@ class GitHubRepoAdapter:
         for label in labels:
             try:
                 gh_pr.remove_from_labels(label)
-            except Exception:
-                pass  # Already removed
+            except Exception:  # noqa: BLE001
+                # Already removed or label doesn't exist; idempotent op.
+                logger = __import__("logging").getLogger(__name__)
+                logger.debug("remove_from_labels: %s not present on PR #%d", label, pr.number)
 
     # ---------------- file ops ----------------
 
     def read(self, path: str, *, ref: str = "HEAD") -> bytes:
         # Read from working tree at the given ref via git show
-        return subprocess.run(
+        return subprocess.run(  # noqa: S603,S607
             ["git", "show", f"{ref}:{path}"],
             cwd=self._working_tree, check=True, capture_output=True,
         ).stdout

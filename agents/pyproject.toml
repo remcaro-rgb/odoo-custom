@@ -77,6 +77,16 @@ target-version = "py312"
 select = ["E", "F", "W", "I", "B", "UP", "N", "S", "C4", "DTZ", "PIE"]
 ignore = ["S101"]   # assert is fine in tests
 
+[tool.ruff.lint.per-file-ignores]
+# Adapters wrapping system CLIs (git, fly, railway, flyctl) deliberately
+# call `subprocess.run(["<cli>", ...])`. Risk is reviewed at code-review
+# time; CI runner image controls PATH. S607 (partial path) and S603
+# (untrusted args) can't be silenced inline because ruff bills the
+# warning to the argv-list line, not the `subprocess.run(` line where
+# a `# noqa` would naturally sit.
+"agents/adapters/repo_*.py" = ["S603", "S607"]
+"agents/adapters/compute_*.py" = ["S603", "S607"]
+
 [tool.black]
 line-length = 100
 target-version = ["py312"]

@@ -58,7 +58,7 @@ class SaasTelemetryRotateController(http.Controller):
         try:
             payload = json.loads(body or b'{}')
         except json.JSONDecodeError as exc:
-            return self._reject(400, 'bad-json: %s' % exc)
+            return self._reject(400, f'bad-json: {exc}')
 
         new_secret = (payload.get('new_secret') or '').strip()
         if not new_secret or len(new_secret) < 32:

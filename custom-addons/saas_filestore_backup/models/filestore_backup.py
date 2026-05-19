@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Filestore backup runner — Phase 2 real flow (HARDENING.md item 5).
 
 Implements Option C from the HARDENING runbook: an Odoo-internal scheduled
@@ -36,7 +35,6 @@ Failure modes:
     and raise.
 """
 
-import hashlib
 import hashlib
 import hmac
 import json
@@ -346,8 +344,8 @@ class SaasFilestoreBackup(models.AbstractModel):
             raise RuntimeError(f'{url} network error: {e.reason}') from None
         try:
             payload = json.loads(raw or b'{}')
-        except json.JSONDecodeError:
-            raise RuntimeError(f'{url} returned non-JSON body')
+        except json.JSONDecodeError as err:
+            raise RuntimeError(f'{url} returned non-JSON body') from err
         if not payload.get('ok'):
             raise RuntimeError(f'{url} rejected: {payload.get("error")}')
         return payload

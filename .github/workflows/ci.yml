@@ -36,6 +36,88 @@ concurrency:
 
 jobs:
 
+  # ---------- Static analysis on custom addons (Phase 2) ----------
+  # Cheap, fast checks. Catch import errors, dead names, syntax bugs, and
+  # OWASP-top-10-style security smells before the slow Docker builds.
+
+  lint-addons:
+    name: Lint custom addons (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ruff
+        run: pip install ruff==0.7.4
+      - name: ruff check (maintained addons + agent runtime)
+        # Scoped to addons we own. Legacy/jorels code is third-party or
+        # predates this lint gate; linted advisory-only by `lint-addons-legacy`
+        # below.
+        run: |
+          ruff check \
+            custom-addons/saas_tenant_gate \
+            custom-addons/saas_provisioning_gateway \
+            custom-addons/saas_filestore_backup \
+            custom-addons/saas_license_gate \
+            agents/
+
+  lint-addons-legacy:
+    name: Lint legacy + jorels addons (advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ruff
+        run: pip install ruff==0.7.4
+      - name: ruff check (advisory; non-blocking)
+        # Informational only — produces a finding count without failing CI.
+        # Track cleanup in a Phase-2 follow-up issue once the baseline is
+        # known to be stable.
+        run: |
+          ruff check \
+            custom-addons/club_* \
+            custom-addons/account_* \
+            custom-addons/co_* \
+            jorels-addons/ \
+            || true
+
+  bandit-scan-addons:
+    name: Bandit security scan (custom addons)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bandit
+        run: pip install 'bandit[toml]==1.7.10'
+      - name: bandit scan
+        # B101 (assert_used) is OK — Odoo tests rely on assert.
+        # B603/B607 (subprocess) noisy on addon helper scripts; the agent
+        # runtime adapters that legitimately wrap CLIs are covered by
+        # per-file ruff overrides and code-review at the security-agent
+        # Phase 9 boundary.
+        run: |
+          bandit -r \
+            custom-addons/saas_tenant_gate \
+            custom-addons/saas_provisioning_gateway \
+            custom-addons/saas_filestore_backup \
+            custom-addons/saas_license_gate \
+            agents/ \
+            --skip B101,B603,B607 \
+            --severity-level medium \
+            --confidence-level medium
+
   # ---------- Build validation (every PR + every push) ----------
 
   build-odoo-image:
@@ -153,12 +235,221 @@ jobs:
             -e TARGET_DB -e INIT_MODULES -e STOP_AFTER_INIT \
             odoo-saas:test \
             --test-enable --test-tags '/saas_tenant_gate,-post_install'
-          # HttpCase tests (tagged post_install) require an actually-running
-          # HTTP server. --stop-after-init never starts one, so HttpCase
-          # setUpClass throws "'PreforkServer' object has no attribute 'httpd'".
-          # Excluded here; tracked as a follow-up to add a separate
-          # "addon HttpCase suite" step that starts Odoo with --workers=0
-          # and no --stop-after-init, then sends SIGTERM after tests pass.
+
+  # ---------- HttpCase addon tests (Phase 2) ----------
+  # HttpCase tests (e.g. TestTelemetry in saas_tenant_gate) require a
+  # running HTTP server. The --stop-after-init flag in `test-addon`
+  # never starts one, so this job starts Odoo with --workers=0
+  # (ThreadedServer has the httpd attribute HttpCase needs), runs only
+  # the `post_install` tagged tests, then sends SIGTERM after Odoo
+  # reports a non-zero or zero test outcome. Timeout 10 min total.
+
+  test-addon-httpcase:
+    name: saas_tenant_gate HttpCase suite
+    runs-on: ubuntu-latest
+    needs: [build-odoo-image]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U odoo"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - uses: docker/setup-buildx-action@v3
+      - name: docker build Odoo (for httpcase run)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: odoo-saas:httpcase
+          cache-from: type=gha
+
+      - name: Run HttpCase suite
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGUSER: odoo
+          PGPASSWORD: odoo
+          ADMIN_PASSWORD: ci-admin-pw-not-for-prod
+          PLATFORM: compose
+          TARGET_DB: ci_saas_tenant_gate_http
+          INIT_MODULES: saas_tenant_gate
+          # NOTE: STOP_AFTER_INIT deliberately UNSET so Odoo keeps the
+          # HTTP server alive; we kill the container after the test
+          # marker line is observed.
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/httpcase-logs
+          # Start Odoo in the background. --workers=0 forces ThreadedServer
+          # which provides the `httpd` attribute HttpCase.setUpClass needs.
+          docker run --rm \
+            --name odoo-httpcase \
+            --network host \
+            -e PGHOST -e PGPORT -e PGUSER -e PGPASSWORD \
+            -e ADMIN_PASSWORD -e PLATFORM \
+            -e TARGET_DB -e INIT_MODULES \
+            -d \
+            odoo-saas:httpcase \
+            --workers=0 \
+            --max-cron-threads=0 \
+            --test-enable \
+            --test-tags '/saas_tenant_gate,post_install' \
+            > /tmp/httpcase-cid
+          cid=$(cat /tmp/httpcase-cid)
+          echo "Container id: $cid"
+          # Stream logs; exit when we see the post-test marker or after timeout.
+          # Odoo emits exactly one of:
+          #   "Modules loaded." (init done; tests start)
+          #   "Initiating shutdown" (test outcome reported by --test-enable epilogue)
+          # We grep for the shutdown line; if not seen within 8 minutes, hard-fail.
+          (
+            timeout 480 docker logs -f "$cid" 2>&1 | tee /tmp/httpcase-logs/run.log
+          ) || true
+          # Container may still be alive (Odoo doesn't auto-stop without
+          # --stop-after-init even after tests). Capture the test outcome
+          # from the log, then send SIGTERM.
+          if grep -qE "^[0-9:., -]+ [0-9]+ INFO [a-z_0-9]+ odoo.tests.runner: [0-9]+ failed, [0-9]+ error\(s\)" /tmp/httpcase-logs/run.log; then
+            failures=$(grep -oE "[0-9]+ failed" /tmp/httpcase-logs/run.log | head -1 | awk '{print $1}')
+            errors=$(grep -oE "[0-9]+ error" /tmp/httpcase-logs/run.log | head -1 | awk '{print $1}')
+            echo "Reported: ${failures} failed, ${errors} error(s)"
+            docker kill "$cid" >/dev/null 2>&1 || true
+            if [ "$failures" != "0" ] || [ "$errors" != "0" ]; then
+              echo "::error::HttpCase suite reported failures or errors."
+              exit 1
+            fi
+          else
+            echo "::error::Could not find test outcome line in Odoo log. Suite likely didn't run."
+            docker kill "$cid" >/dev/null 2>&1 || true
+            exit 1
+          fi
+
+      - name: Upload HttpCase logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: httpcase-logs
+          path: /tmp/httpcase-logs/
+
+  # ---------- Addon upgrade matrix (Phase 2) ----------
+  # Validates that installing all custom addons in topological order from
+  # a fresh database succeeds. Catches manifest dependency mistakes,
+  # missing translation files, and broken inter-addon relations before
+  # they reach staging. Runs against the same Odoo image used elsewhere.
+
+  addon-upgrade-matrix:
+    name: Addon upgrade matrix
+    runs-on: ubuntu-latest
+    needs: [build-odoo-image]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U odoo"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - uses: docker/setup-buildx-action@v3
+      - name: docker build Odoo (for upgrade matrix)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: odoo-saas:upgrade-matrix
+          cache-from: type=gha
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Discover installable custom addons
+        id: addons
+        # Filter:
+        #   - Has __manifest__.py
+        #   - 'installable': True (or absent — Odoo default is True)
+        #   - 'application' OR 'category' set (skips pure dependency-helper modules)
+        # Emit as comma-separated list for Odoo's -i flag.
+        run: |
+          python3 <<'PY' > /tmp/addons.csv
+          import ast, pathlib
+          roots = [pathlib.Path('custom-addons'), pathlib.Path('jorels-addons')]
+          modules = []
+          for root in roots:
+              if not root.exists():
+                  continue
+              for manifest in root.glob('*/__manifest__.py'):
+                  try:
+                      data = ast.literal_eval(manifest.read_text())
+                  except Exception as e:
+                      print(f'SKIP {manifest}: {e}')
+                      continue
+                  if data.get('installable', True) is False:
+                      continue
+                  modules.append(manifest.parent.name)
+          print(','.join(sorted(modules)))
+          PY
+          ADDONS=$(cat /tmp/addons.csv)
+          echo "list=${ADDONS}" >> "$GITHUB_OUTPUT"
+          echo "Discovered: ${ADDONS}"
+
+      - name: Install all custom addons in dependency order
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGUSER: odoo
+          PGPASSWORD: odoo
+          ADMIN_PASSWORD: ci-admin-pw-not-for-prod
+          PLATFORM: compose
+          TARGET_DB: ci_upgrade_matrix
+          INIT_MODULES: ${{ steps.addons.outputs.list }}
+          STOP_AFTER_INIT: '1'
+        run: |
+          set -euo pipefail
+          if [ -z "${INIT_MODULES}" ]; then
+            echo "::error::No installable addons discovered."
+            exit 1
+          fi
+          docker run --rm \
+            --network host \
+            -e PGHOST -e PGPORT -e PGUSER -e PGPASSWORD \
+            -e ADMIN_PASSWORD -e PLATFORM \
+            -e TARGET_DB -e INIT_MODULES -e STOP_AFTER_INIT \
+            odoo-saas:upgrade-matrix
+          # If we get here without --test-enable, Odoo exited 0 → all
+          # addons installed cleanly. Any manifest error, missing
+          # dependency, or broken view definition would have exited
+          # non-zero and bubbled up via `set -e`.
+          echo "All ${INIT_MODULES//,/ } installed successfully on a fresh DB."
 
   # ---------- Cross-platform deploy (push to main only) ----------
 
