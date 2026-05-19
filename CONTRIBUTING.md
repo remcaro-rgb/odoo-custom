@@ -41,6 +41,22 @@ PRs on `agent/spec-*` branches are subject to the `agent-guardrails` CI gate:
 test count must not shrink. The kill switch is the repo variable
 `AGENTS_ENABLED` — set to `false` to halt all agent CI immediately.
 
+## Pre-commit hooks
+
+YAML and GitHub Actions workflow files are linted on every PR by
+`.github/workflows/lint-workflows.yml`. To catch issues locally before
+pushing:
+
+```bash
+pip install pre-commit
+pre-commit install            # one-time, installs the git hook
+pre-commit run --all-files    # ad-hoc full-repo scan
+```
+
+The hook config lives in [`.pre-commit-config.yaml`](.pre-commit-config.yaml)
+and runs `yamllint` (with [`.yamllint.yml`](.yamllint.yml)) and
+`actionlint`.
+
 ## Code review
 
 CODEOWNERS auto-requests review on every PR. See [`.github/CODEOWNERS`](.github/CODEOWNERS)

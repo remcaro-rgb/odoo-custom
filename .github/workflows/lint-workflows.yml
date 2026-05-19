@@ -1,0 +1,42 @@
+name: lint-workflows
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.yamllint.yml'
+      - '.github/actionlint.yml'
+      - '.github/workflows/lint-workflows.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Workflow lint (yamllint + actionlint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install --user yamllint==1.35.1
+
+      - name: yamllint .github/workflows
+        run: |
+          set -euo pipefail
+          ~/.local/bin/yamllint -c .yamllint.yml .github/workflows/
+
+      - name: Install actionlint
+        run: |
+          set -euo pipefail
+          bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint --version
+
+      - name: actionlint .github/workflows
+        run: |
+          set -euo pipefail
+          # shellcheck/pyflakes external deps not installed; rely on actionlint built-in rules.
+          ./actionlint -shellcheck= -pyflakes=

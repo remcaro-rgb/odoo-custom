@@ -257,7 +257,7 @@ jobs:
 
   notify:
     name: Notify Slack
-    needs: [smoke]
+    needs: [preflight, smoke]
     if: always()
     runs-on: ubuntu-latest
     steps:
