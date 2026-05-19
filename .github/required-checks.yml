@@ -1,0 +1,42 @@
+---
+# Source of truth for the required-status-check list on protected branches.
+#
+# Why this file exists: the GitHub branch-protection REST API requires
+# `repo admin` permission, which the workflow's GITHUB_TOKEN does NOT have.
+# Drift detection therefore compares workflow job names against this committed
+# list, not against the live API.
+#
+# When you change branch protection in the GitHub UI (or via gh CLI), update
+# this file in the SAME PR so the drift audit stays accurate.
+#
+# Apply this file to live protection with:
+#   ./infra/scripts/apply-required-checks.sh
+# (script reads protection.yml, generates the API payload, calls
+#  PUT /repos/.../branches/{branch}/protection with a personal admin token).
+
+main:
+  # Always-running checks: job-level if: may skip them, but the workflow
+  # is triggered on every PR to main and SKIPPED counts as success.
+  - Spec link present
+  - Agent guardrails
+  - Build Odoo image
+  - Build Postgres image
+  - Build Traefik image
+  - saas_tenant_gate test suite
+
+  # Below: enable after the first run completes on a PR. Adding to required
+  # before any run has reported a status would block every PR forever.
+  # - Spec quality checks
+  # - Workflow lint (yamllint + actionlint)
+  # - Protection-drift audit
+
+agent_spec_pattern:
+  # Same as main plus spec-quality, applied via the agent-spec-branches Ruleset
+  # rather than classic branch protection.
+  - Spec link present
+  - Agent guardrails
+  - Build Odoo image
+  - Build Postgres image
+  - Build Traefik image
+  - saas_tenant_gate test suite
+  - Spec quality checks
