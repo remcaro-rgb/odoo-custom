@@ -53,28 +53,38 @@ Spec: [`docs/superpowers/specs/2026-05-16-agentlab-environment-design.md`](../..
 
 ## First-time setup
 
+> **Status (2026-05-20):** steps 1–3 below are DONE — the Postgres
+> cluster, the app, the volume, and the app secrets are all provisioned
+> in the `personal` Fly org. What remains is step 4's `STAGING_PG_DSN`
+> secret and step 5's first restore. See "Daily-restore connectivity"
+> at the end before running step 5.
+
 ### 1. Provision the agentlab Postgres app
 
 Manual one-off via `flyctl` (cannot live in a workflow because it's a
-single-shot creation that has prompts):
+single-shot creation that has prompts). The Fly org is `personal` — all
+the other odoo-saas apps live there, there is no separate `goliatt` org.
 
 ```bash
 flyctl postgres create \
   --name odoo-saas-odoo-agentlab-db \
-  --org goliatt \
+  --org personal \
   --region iad \
   --vm-size shared-cpu-1x \
   --volume-size 5 \
-  --initial-cluster-size 1
-# Note the connection string and password printed at the end.
+  --initial-cluster-size 1 \
+  --flex \
+  --password "$(openssl rand -hex 20)"
+# Note the connection string and password printed at the end —
+# they are shown ONCE.
 ```
 
 ### 2. Deploy the agentlab Odoo app
 
 ```bash
-flyctl apps create odoo-saas-odoo-agentlab --org goliatt
+flyctl apps create odoo-saas-odoo-agentlab --org personal
 flyctl volumes create agentlab_data --app odoo-saas-odoo-agentlab \
-  --region iad --size 5
+  --region iad --size 5 --yes
 flyctl deploy \
   --app odoo-saas-odoo-agentlab \
   --config infra/fly/agentlab/fly.toml \
@@ -96,14 +106,20 @@ flyctl secrets set --app odoo-saas-odoo-agentlab \
 ### 4. Add the workflow secrets to the repo
 
 ```bash
+# DONE 2026-05-20 — set to the .flycast form (see connectivity note below).
 gh secret set AGENTLAB_DSN -R GoliattCo/odoo-custom \
-  --body "postgresql://postgres:<pwd>@odoo-saas-odoo-agentlab-db.internal:5432/postgres"
+  --body "postgres://postgres:<pwd>@odoo-saas-odoo-agentlab-db.flycast:5432/postgres"
+# STILL NEEDED — the staging pool's Postgres DSN, read access:
 gh secret set STAGING_PG_DSN -R GoliattCo/odoo-custom \
   --body "<staging pool DSN with read access>"
 # CONTROL_PLANE_PG_DSN and FLY_API_TOKEN already exist.
 ```
 
 ### 5. Trigger the first restore manually
+
+> Do NOT run this until the "Daily-restore connectivity" section below
+> is resolved — the workflow as written cannot reach the agentlab or
+> staging Postgres from a GitHub-hosted runner.
 
 ```bash
 gh workflow run agentlab-daily-restore.yml \
@@ -113,6 +129,37 @@ gh run watch -R GoliattCo/odoo-custom $(gh run list -R GoliattCo/odoo-custom --w
 ```
 
 Once dry-run passes, flip to `dry_run=false` for the real restore.
+
+---
+
+## Daily-restore connectivity — KNOWN GAP
+
+`odoo-saas-odoo-agentlab-db` (and the staging pool Postgres) live on
+Fly's private 6PN network. `*.internal` and `*.flycast` hostnames only
+resolve **inside** that network — an app-to-app path. A GitHub-hosted
+runner, where `agentlab-daily-restore.yml` executes, is outside it and
+cannot reach either Postgres directly.
+
+Before the daily-restore can run, the workflow needs a `flyctl proxy`
+tunnel for each Postgres it touches:
+
+```bash
+# in the workflow, before pg_dump / pg_restore / masking:
+flyctl proxy 6432:5432 -a <staging-pg-app>            &
+flyctl proxy 5432:5432 -a odoo-saas-odoo-agentlab-db  &
+# then connect to 127.0.0.1:6432 (staging) / 127.0.0.1:5432 (agentlab)
+```
+
+`flyctl` is already on the runner (`superfly/flyctl-actions/setup-flyctl`)
+and `FLY_API_TOKEN` is already a repo secret, so the tunnel is free to
+add — it just isn't wired yet. The `AGENTLAB_DSN` / `STAGING_PG_DSN`
+secrets would then point at `127.0.0.1:<port>` rather than the
+`.flycast` host.
+
+**Follow-up:** rework `agentlab-daily-restore.yml` to start the proxies
+and rewrite the DSN hosts to localhost. Tracked separately; until then
+the daily-restore cron will fail at the connectivity check (by design —
+better a loud failure than a silent no-op).
 
 ---
 
