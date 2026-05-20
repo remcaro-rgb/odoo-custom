@@ -69,6 +69,14 @@ allowed:
     - active
     - currency_id
 
+  # Saved filters — `sort` is a JSON array of sort directives
+  # (e.g. ["name asc"]): field/column technical names and asc/desc, never
+  # personal data. It also carries a CHECK constraint
+  # (jsonb_typeof(sort::jsonb) = 'array') that rejects any non-JSON masked
+  # value, so it must pass through. name/domain/context stay masked.
+  ir_filters:
+    - sort
+
   # Aggregate counts on saas_tenant_gate — for KB context, no PII
   saas_tenant_metrics:
     - tenant_id
