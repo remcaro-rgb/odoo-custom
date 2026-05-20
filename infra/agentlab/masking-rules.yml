@@ -68,8 +68,11 @@ rules:
 deny_list_patterns:
   - name: "Email-like"
     regex: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b'
+  # Requires at least 7 digits — a real phone number — so a 4-digit run
+  # inside a technical identifier (e.g. `image_1920`, `l10n_din5008_sale`)
+  # no longer registers as a false positive.
   - name: "Phone-like"
-    regex: '\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}'
+    regex: '\+?(?:\d[ .-]?){6,14}\d'
   - name: "IPv4"
     regex: '\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b'
   - name: "IPv6"

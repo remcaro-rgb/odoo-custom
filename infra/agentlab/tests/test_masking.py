@@ -388,6 +388,68 @@ def test_scan_for_pii_empty(deny_patterns):
 
 
 # --------------------------------------------------------------------------
+# is_masked_value — recognises the masker's own replacement output
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("value", [
+    "MASKED:abcdef012345",
+    "[REDACTED]",
+    "[REDACTED text length=42]",
+    "+57XXXXXXXXXX",
+    "user6f08ba43@masked.invalid",
+    "  user6f08ba43@masked.invalid  ",
+])
+def test_is_masked_value_true(value):
+    assert m.is_masked_value(value) is True
+
+
+@pytest.mark.parametrize("value", [
+    "jane@example.com",
+    "image_1920",
+    "l10n_din5008_sale",
+    "+57 312 345 6789",
+    "",
+    None,
+])
+def test_is_masked_value_false(value):
+    assert m.is_masked_value(value) is False
+
+
+# --------------------------------------------------------------------------
+# Phone-like deny pattern — must require a real (>=7-digit) phone number
+# --------------------------------------------------------------------------
+
+@pytest.fixture
+def real_deny_patterns():
+    here = os.path.dirname(__file__)
+    _allowlist, rules = m.load_config(
+        os.path.join(here, "..", "mask-allowlist.yml"),
+        os.path.join(here, "..", "masking-rules.yml"),
+    )
+    return m.compile_deny_patterns(rules)
+
+
+@pytest.mark.parametrize("technical_name", [
+    "image_1920",
+    "l10n_din5008_sale",
+    "account_move_line_2024",
+])
+def test_phone_pattern_ignores_short_digit_runs(real_deny_patterns,
+                                                technical_name):
+    assert "Phone-like" not in m.scan_for_pii(technical_name,
+                                              real_deny_patterns)
+
+
+@pytest.mark.parametrize("phone", [
+    "+57 312 345 6789",
+    "3001234567",
+    "601-234-5678",
+])
+def test_phone_pattern_matches_real_numbers(real_deny_patterns, phone):
+    assert "Phone-like" in m.scan_for_pii(phone, real_deny_patterns)
+
+
+# --------------------------------------------------------------------------
 # load_config — exercised against the real committed config files
 # --------------------------------------------------------------------------
 
