@@ -53,6 +53,30 @@ import yaml
 # pass and as the classifier fallback when ir_model_fields has no entry).
 _TEXT_DATA_TYPES = frozenset({"character varying", "text", "character"})
 
+# pg_catalog `pg_type.typname` → the information_schema-style `data_type`
+# string that classify_column expects. Column types are read straight from
+# pg_catalog (not information_schema) because information_schema was observed
+# to misreport a jsonb column's data_type, so the physical-type guard in
+# classify_column fell through and a json column got a text strategy
+# (`ir_filters.sort` → "invalid input syntax for type json"). pg_catalog is
+# the source of truth information_schema is itself a view over. Any typname
+# not in this map passes through unchanged → classify_column routes it to
+# `_unsupported` (safe passthrough).
+_PG_TYPE_TO_DATA_TYPE = {
+    "bool": "boolean",
+    "int2": "smallint", "int4": "integer", "int8": "bigint",
+    "float4": "real", "float8": "double precision",
+    "numeric": "numeric",
+    "bpchar": "character", "varchar": "character varying",
+    "text": "text", "citext": "citext", "name": "name",
+    "json": "json", "jsonb": "jsonb", "bytea": "bytea",
+    "date": "date",
+    "timestamp": "timestamp without time zone",
+    "timestamptz": "timestamp with time zone",
+    "time": "time without time zone",
+    "timetz": "time with time zone",
+}
+
 # Odoo ttypes that never carry PII — masking them would corrupt referential
 # integrity (FKs) or break enum/boolean semantics.
 _PASSTHROUGH_TTYPES = frozenset({
@@ -312,6 +336,25 @@ def scan_for_pii(text: str, patterns: list[tuple[str, re.Pattern]]) -> list[str]
     return [name for name, rx in patterns if rx.search(text)]
 
 
+def is_masked_value(value: str | None) -> bool:
+    """True when a cell is recognizably this masker's own replacement output.
+
+    The sample audit re-scans masked columns with the deny-list patterns;
+    the replacements themselves can match (`user…@masked.invalid` is an
+    Email-like hit) and would otherwise register as surviving PII. A value
+    in the masker's own output shape is masked-by-definition, not a leak.
+    """
+    if not value:
+        return False
+    v = value.strip()
+    return (
+        v.startswith("MASKED:")
+        or v.startswith("[REDACTED")
+        or v == "+57XXXXXXXXXX"
+        or "@masked.invalid" in v
+    )
+
+
 # --------------------------------------------------------------------------
 # DB layer — impure
 # --------------------------------------------------------------------------
@@ -373,20 +416,37 @@ def _load_odoo_ttypes(conn) -> dict[tuple[str, str], str]:
 
 def _list_columns(conn) -> list[tuple[str, str, str, int | None]]:
     """Every (table, column, data_type, char_max_len) in the public schema,
-    base tables only (skips views)."""
+    ordinary tables only (skips views, partitions, system tables).
+
+    Column types are read from pg_catalog rather than information_schema:
+    the latter was observed to misreport a jsonb column, defeating the
+    physical-type guard in classify_column. `typname` is normalised to the
+    information_schema-style string classify_column expects; an unknown
+    typname is passed through verbatim and lands in the `_unsupported`
+    branch. char_max_len is recovered from atttypmod for varchar/char.
+    """
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT c.table_name, c.column_name, c.data_type, "
-            "       c.character_maximum_length "
-            "FROM information_schema.columns c "
-            "JOIN information_schema.tables t "
-            "  ON t.table_schema = c.table_schema "
-            " AND t.table_name = c.table_name "
-            "WHERE c.table_schema = 'public' "
-            "  AND t.table_type = 'BASE TABLE' "
-            "ORDER BY c.table_name, c.ordinal_position"
+            "SELECT c.relname, a.attname, t.typname, "
+            "       CASE WHEN a.atttypmod >= 4 "
+            "            AND t.typname IN ('varchar', 'bpchar') "
+            "            THEN a.atttypmod - 4 END "
+            "FROM pg_attribute a "
+            "JOIN pg_class c ON c.oid = a.attrelid "
+            "JOIN pg_namespace n ON n.oid = c.relnamespace "
+            "JOIN pg_type t ON t.oid = a.atttypid "
+            "WHERE n.nspname = 'public' "
+            "  AND c.relkind = 'r' "
+            "  AND a.attnum > 0 "
+            "  AND NOT a.attisdropped "
+            "ORDER BY c.relname, a.attnum"
         )
-        return [(r[0], r[1], r[2], r[3]) for r in cur.fetchall()]
+        return [
+            (r[0], r[1],
+             _PG_TYPE_TO_DATA_TYPE.get(r[2], (r[2] or "").lower()),
+             r[3])
+            for r in cur.fetchall()
+        ]
 
 
 def _load_unique_columns(conn) -> set[tuple[str, str]]:
@@ -592,6 +652,8 @@ def sample_audit(
                     (sample_size,),
                 )
                 for (value,) in cur.fetchall():
+                    if is_masked_value(value):
+                        continue
                     hits = scan_for_pii(value, deny_patterns)
                     if hits:
                         violations.append({
