@@ -119,7 +119,7 @@ def classify_column(
 
     Returns one of: email, phone, nit, cedula, iban, payment_card,
     monetary, text, string, date, boolean, selection, foreign_key,
-    binary, json.
+    binary, json, jsonb, or _unsupported.
 
     Classification order matters. The Postgres *physical* type is a hard
     constraint and is decided FIRST: a column whose physical type cannot
@@ -136,7 +136,9 @@ def classify_column(
     #      here and here only — no text strategy can touch them. ----
     if dt == "bytea":
         return "binary"
-    if dt in ("json", "jsonb"):
+    if dt == "jsonb":
+        return "jsonb"
+    if dt == "json":
         return "json"
     if dt == "boolean":
         return "boolean"
@@ -216,10 +218,14 @@ def strategy_sql(semantic_type: str, col_ident: str, rules: dict) -> str | None:
         # scanned ID), so we don't passthrough. NULL-preserving.
         return f"CASE WHEN {col_ident} IS NULL THEN NULL ELSE ''::bytea END"
 
-    if semantic_type == "json":
-        # json / jsonb columns — replace with an empty object. The bare
-        # '{}' literal coerces to whichever of json/jsonb the column is.
-        return f"CASE WHEN {col_ident} IS NULL THEN NULL ELSE '{{}}' END"
+    if semantic_type in ("json", "jsonb"):
+        # json / jsonb columns — replace with an empty object. The cast
+        # must be explicit and match the column type: a bare '{}' inside
+        # a CASE resolves to `text` (Postgres types unknown literals as
+        # text), and text is not assignment-castable to json/jsonb.
+        cast = "jsonb" if semantic_type == "jsonb" else "json"
+        return (f"CASE WHEN {col_ident} IS NULL THEN NULL "
+                f"ELSE '{{}}'::{cast} END")
 
     if semantic_type == "email":
         return (f"CASE WHEN {col_ident} IS NULL THEN NULL ELSE "

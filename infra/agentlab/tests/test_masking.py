@@ -162,17 +162,20 @@ def test_classify_binary_ttype():
 
 @pytest.mark.parametrize("dtype", ["json", "jsonb"])
 def test_classify_json_via_data_type(dtype):
+    # json and jsonb are distinct semantic types — the masking strategy
+    # casts to the exact column type, so they must not be conflated.
     assert m.classify_column(
         "some_table", "config",
         odoo_ttype=None, data_type=dtype, char_max_len=None,
-    ) == "json"
+    ) == dtype
 
 
-def test_classify_json_ttype():
+def test_classify_jsonb_column():
+    # iap_service.description — the jsonb column that crashed restore #5.
     assert m.classify_column(
-        "res_config", "settings",
+        "iap_service", "description",
         odoo_ttype="json", data_type="jsonb", char_max_len=None,
-    ) == "json"
+    ) == "jsonb"
 
 
 # --------------------------------------------------------------------------
@@ -287,7 +290,17 @@ def test_strategy_sql_json_empties_to_object():
     sql = m.strategy_sql("json", '"settings"', {})
     assert sql is not None
     assert "{}" in sql
+    # explicit ::json cast — a bare '{}' in a CASE resolves to text,
+    # which won't assignment-cast into a json column.
+    assert "::json" in sql
     assert '"settings" IS NULL THEN NULL' in sql
+
+
+def test_strategy_sql_jsonb_casts_to_jsonb():
+    sql = m.strategy_sql("jsonb", '"description"', {})
+    assert sql is not None
+    assert "::jsonb" in sql
+    assert "{}" in sql
 
 
 def test_strategy_sql_unknown_raises():
