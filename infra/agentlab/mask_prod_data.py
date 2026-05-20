@@ -271,6 +271,28 @@ def strategy_sql(semantic_type: str, col_ident: str, rules: dict) -> str | None:
     raise ValueError(f"unknown semantic type: {semantic_type!r}")
 
 
+def clamp_expr_to_column(
+    expr: str, data_type: str | None, char_max_len: int | None
+) -> str:
+    """Wrap a text-producing masking expression so its result can't
+    overflow a length-bounded varchar/character column.
+
+    The masking strategies emit fixed-shape text (`MASKED:` + 12 hex,
+    `user…@masked.invalid`, etc.) that is longer than a tightly-sized
+    column — e.g. a `character varying(1)` — would accept. LEFT() is
+    NULL-preserving, so a NULL stays NULL.
+
+    Only varchar/character columns are length-bounded AND only ever
+    receive text strategies (classify_column routes numeric/bytea/json
+    elsewhere), so wrapping with LEFT is always type-valid here.
+    """
+    if char_max_len is not None and (data_type or "").lower() in (
+        "character varying", "character"
+    ):
+        return f"LEFT({expr}, {char_max_len})"
+    return expr
+
+
 def compile_deny_patterns(rules: dict) -> list[tuple[str, re.Pattern]]:
     """Compile the deny_list_patterns section into (name, regex) pairs."""
     out: list[tuple[str, re.Pattern]] = []
@@ -415,6 +437,7 @@ def mask_database(
                 if expr is None:
                     passthrough_cols += 1
                     continue
+                expr = clamp_expr_to_column(expr, data_type, char_len)
                 cur.execute(
                     f"UPDATE {_quote_ident(table)} "
                     f"SET {_quote_ident(column)} = {expr}"

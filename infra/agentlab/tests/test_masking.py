@@ -309,6 +309,37 @@ def test_strategy_sql_unknown_raises():
 
 
 # --------------------------------------------------------------------------
+# clamp_expr_to_column — keep masked output inside a bounded varchar
+# --------------------------------------------------------------------------
+
+def test_clamp_wraps_bounded_varchar():
+    # varchar(1) — the column type that crashed restore #6.
+    out = m.clamp_expr_to_column("SOME_EXPR", "character varying", 1)
+    assert out == "LEFT(SOME_EXPR, 1)"
+
+
+def test_clamp_wraps_bounded_character():
+    out = m.clamp_expr_to_column("E", "character", 8)
+    assert out == "LEFT(E, 8)"
+
+
+def test_clamp_noop_on_unbounded_varchar():
+    # An unlimited varchar reports NULL character_maximum_length.
+    assert m.clamp_expr_to_column("E", "character varying", None) == "E"
+
+
+def test_clamp_noop_on_text():
+    assert m.clamp_expr_to_column("E", "text", None) == "E"
+
+
+def test_clamp_noop_on_non_text_types():
+    # numeric / bytea / jsonb never receive text strategies, and LEFT()
+    # would be invalid on them — clamp must leave them alone.
+    for dt in ("numeric", "bytea", "jsonb", "integer"):
+        assert m.clamp_expr_to_column("E", dt, 4) == "E"
+
+
+# --------------------------------------------------------------------------
 # deny-list scanning
 # --------------------------------------------------------------------------
 
