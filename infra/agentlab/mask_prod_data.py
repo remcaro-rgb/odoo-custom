@@ -389,6 +389,32 @@ def _list_columns(conn) -> list[tuple[str, str, str, int | None]]:
         return [(r[0], r[1], r[2], r[3]) for r in cur.fetchall()]
 
 
+def _load_unique_columns(conn) -> set[tuple[str, str]]:
+    """Every (table, column) that participates in a UNIQUE index or
+    constraint (primary keys included).
+
+    Such columns are skipped by the masker: masking inherently collapses
+    or randomizes values, which violates the uniqueness guarantee
+    (observed: `res_country.code` is varchar(2) UNIQUE — every masked
+    value clamped to 2 chars, all collapsed to one value → duplicate
+    key). In an Odoo schema a unique column is a structural key
+    (country/currency/lang code, login, xml-id) rather than free-form
+    PII, so passthrough is the correct call. Genuinely-unique PII
+    columns (e.g. res_users.login) are covered by the allow-list.
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT t.relname, a.attname "
+            "FROM pg_index i "
+            "JOIN pg_class t ON t.oid = i.indrelid "
+            "JOIN pg_namespace n ON n.oid = t.relnamespace "
+            "JOIN pg_attribute a "
+            "  ON a.attrelid = t.oid AND a.attnum = ANY(i.indkey) "
+            "WHERE i.indisunique AND n.nspname = 'public'"
+        )
+        return {(r[0], r[1]) for r in cur.fetchall()}
+
+
 def mask_database(
     db_dsn: str,
     allowlist: dict,
@@ -407,17 +433,25 @@ def mask_database(
     masked_cols = 0
     passthrough_cols = 0
     allowed_cols = 0
+    unique_skipped = 0
     deny_scrubbed = 0
     try:
         ttypes = _load_odoo_ttypes(conn)
+        unique_cols = _load_unique_columns(conn)
         columns = _list_columns(conn)
         log("mask.columns.discovered", count=len(columns),
-            odoo_fields=len(ttypes))
+            odoo_fields=len(ttypes), unique_columns=len(unique_cols))
 
         with conn.cursor() as cur:
             for table, column, data_type, char_len in columns:
                 if is_allowed(table, column, allowlist):
                     allowed_cols += 1
+                    continue
+                if (table, column) in unique_cols:
+                    # Masking can't preserve a uniqueness guarantee;
+                    # unique columns in an Odoo schema are structural
+                    # keys, not free PII. Passthrough.
+                    unique_skipped += 1
                     continue
                 semantic = classify_column(
                     table, column,
@@ -476,6 +510,7 @@ def mask_database(
         "masked_columns": masked_cols,
         "passthrough_columns": passthrough_cols,
         "allowed_columns": allowed_cols,
+        "unique_skipped_columns": unique_skipped,
         "deny_list_rows_scrubbed": deny_scrubbed,
     }
 
