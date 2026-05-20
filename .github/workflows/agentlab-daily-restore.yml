@@ -175,9 +175,13 @@ jobs:
           if [ -n "${TENANT_FILTER:-}" ]; then
             echo "$TENANT_FILTER" > /tmp/tenants.txt
           else
+            # 'repmgr' excluded too — if the staging Postgres is a Fly
+            # flex cluster it carries a repmgr metadata DB that must not
+            # be dumped/restored as if it were a tenant.
             psql "$STAGING_PG_DSN" -t -A -c \
               "SELECT datname FROM pg_database
-                WHERE datname NOT IN ('postgres','template0','template1');" \
+                WHERE datname NOT IN ('postgres','template0','template1','repmgr')
+                  AND NOT datistemplate;" \
               > /tmp/tenants.txt
           fi
           count=$(wc -l </tmp/tenants.txt | tr -d ' ')

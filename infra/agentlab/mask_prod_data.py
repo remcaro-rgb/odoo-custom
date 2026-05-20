@@ -260,16 +260,26 @@ def _quote_ident(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
 
 
+# Databases that must never be masked:
+#   postgres / template0 / template1 — Postgres-internal.
+#   repmgr — Fly flex-Postgres's replication-metadata DB. Running mask
+#            UPDATEs over its tables corrupts cluster replication. The
+#            agentlab Postgres is a --flex cluster, so repmgr always
+#            exists there.
+_INTERNAL_DATABASES = ("postgres", "template0", "template1", "repmgr")
+
+
 def list_databases(admin_dsn: str) -> list[str]:
-    """Every database in the cluster except the Postgres-internal ones."""
+    """Every database in the cluster except internal ones + templates."""
     import psycopg2
     conn = psycopg2.connect(admin_dsn)
     try:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT datname FROM pg_database "
-                "WHERE datname NOT IN ('postgres', 'template0', 'template1') "
-                "AND NOT datistemplate ORDER BY datname"
+                "WHERE NOT (datname = ANY(%s)) "
+                "AND NOT datistemplate ORDER BY datname",
+                (list(_INTERNAL_DATABASES),),
             )
             return [r[0] for r in cur.fetchall()]
     finally:
