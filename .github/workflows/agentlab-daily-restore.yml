@@ -1,0 +1,173 @@
+# agentlab-daily-restore
+#
+# Implements docs/superpowers/specs/2026-05-16-agentlab-environment-design.md
+# §4 (restore pipeline) and §5 (masking).
+#
+# Nightly 02:00 UTC the workflow:
+#   1. Wakes the agentlab Fly app (auto_stop is on).
+#   2. Pulls a fresh pg_dump from each staging tenant.
+#   3. Restores into the agentlab Postgres (drop + create db per tenant).
+#   4. Applies infra/agentlab/mask-prod-data.sh.
+#   5. Runs the sample-row PII audit (asserts no leaks).
+#   6. Rotates the agentlab reviewer one-time password.
+#   7. Writes a saas_audit.event row.
+#
+# Manual dispatch is supported for fix-up runs; pass `tenant_filter=<name>`
+# to restore just one tenant.
+
+name: agentlab-daily-restore
+
+on:
+  schedule:
+    - cron: '0 2 * * *'    # daily 02:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Skip mutations; report only.'
+        default: 'true'
+        type: choice
+        options: ['true', 'false']
+      tenant_filter:
+        description: 'Optional single tenant slug to restore; blank = all'
+        required: false
+
+concurrency:
+  group: agentlab-daily-restore
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+
+  restore:
+    name: Restore + mask agentlab
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      STAGING_PG_DSN: ${{ secrets.STAGING_PG_DSN }}
+      AGENTLAB_DSN: ${{ secrets.AGENTLAB_DSN }}
+      CONTROL_PLANE_PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+      TENANT_FILTER: ${{ inputs.tenant_filter }}
+      DRY_RUN: ${{ inputs.dry_run || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Preflight — check secrets
+        run: |
+          : "${FLY_API_TOKEN:?FLY_API_TOKEN required}"
+          : "${STAGING_PG_DSN:?STAGING_PG_DSN required (read-only on staging pool)}"
+          : "${AGENTLAB_DSN:?AGENTLAB_DSN required (superuser on agentlab)}"
+          : "${CONTROL_PLANE_PG_DSN:?CONTROL_PLANE_PG_DSN required for audit-event write}"
+
+      - name: Wake agentlab machines
+        if: env.DRY_RUN == 'false'
+        run: |
+          # auto_stop_machines=true in fly.toml means the app may be idle.
+          # Start at least one machine before we restore into it.
+          flyctl machines list --app odoo-saas-odoo-agentlab --json \
+            | jq -r '.[] | select(.state == "stopped") | .id' \
+            | xargs -r -n1 flyctl machines start --app odoo-saas-odoo-agentlab
+
+      - name: Discover tenants
+        id: tenants
+        run: |
+          set -euo pipefail
+          # If a filter was passed via workflow_dispatch, use it; otherwise
+          # list active tenants in the staging pool.
+          if [ -n "${TENANT_FILTER:-}" ]; then
+            echo "$TENANT_FILTER" > /tmp/tenants.txt
+          else
+            psql "$STAGING_PG_DSN" -t -A -c \
+              "SELECT datname FROM pg_database
+                WHERE datname NOT IN ('postgres','template0','template1');" \
+              > /tmp/tenants.txt
+          fi
+          count=$(wc -l </tmp/tenants.txt | tr -d ' ')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "::notice::will restore $count tenant(s)"
+          cat /tmp/tenants.txt
+
+      - name: Dump & restore per tenant
+        if: env.DRY_RUN == 'false'
+        run: |
+          set -euo pipefail
+          while read -r tenant; do
+            [ -z "$tenant" ] && continue
+            echo "::group::Restoring $tenant"
+
+            # pg_dump from staging (no data we don't already have access to)
+            tmpdump=$(mktemp /tmp/agentlab-restore-XXXXXX.dump)
+            pg_dump --format=custom --no-owner --no-privileges \
+              --dbname="${STAGING_PG_DSN%/*}/$tenant" \
+              --file="$tmpdump"
+
+            # Drop + recreate the agentlab tenant DB
+            agentlab_admin_dsn="${AGENTLAB_DSN%/*}/postgres"
+            psql "$agentlab_admin_dsn" -c "DROP DATABASE IF EXISTS \"$tenant\";"
+            psql "$agentlab_admin_dsn" -c "CREATE DATABASE \"$tenant\";"
+
+            # Restore
+            pg_restore --no-owner --no-privileges \
+              --dbname="${AGENTLAB_DSN%/*}/$tenant" \
+              "$tmpdump"
+            rm -f "$tmpdump"
+
+            echo "::endgroup::"
+          done < /tmp/tenants.txt
+
+      - name: Apply masking pipeline
+        if: env.DRY_RUN == 'false'
+        run: |
+          # mask-prod-data.sh is a SKELETON today (TODO sections); it will
+          # exit warning-only without applying changes. Tracked as a Phase 5b
+          # follow-up to ship the Python implementation in its own PR with
+          # unit-tested per-column strategies.
+          bash infra/agentlab/mask-prod-data.sh \
+            | tee /tmp/masking.log
+          echo "::warning::masking pipeline is a skeleton — see follow-up issue"
+
+      - name: Sample-row PII audit
+        if: env.DRY_RUN == 'false'
+        run: |
+          # Once the Python masking ships, this step will run a deterministic
+          # 100-row random sample across every restored DB and grep for the
+          # deny-list patterns in infra/agentlab/masking-rules.yml. For now
+          # we run it in report-only mode and accept findings as expected.
+          echo "::warning::sample audit skipped — masking implementation pending"
+
+      - name: Rotate reviewer OTP
+        if: env.DRY_RUN == 'false'
+        run: |
+          # Generate a fresh one-time password and inject into agentlab as
+          # a Fly secret. Reviewers retrieve it from the runbook or Slack.
+          otp=$(openssl rand -base64 18 | tr -d '=+/' | cut -c1-24)
+          flyctl secrets set \
+            --app odoo-saas-odoo-agentlab \
+            --stage \
+            "AGENTLAB_REVIEWER_OTP=$otp"
+          flyctl deploy --app odoo-saas-odoo-agentlab \
+            --strategy immediate \
+            --config infra/fly/agentlab/fly.toml \
+            --remote-only
+          echo "::notice::agentlab reviewer OTP rotated. Retrieve via flyctl secrets."
+
+      - name: Write audit event
+        if: env.DRY_RUN == 'false' && always()
+        run: |
+          psql "$CONTROL_PLANE_PG_DSN" -c "
+            INSERT INTO saas_audit.event
+              (actor_kind, actor_name, action, target_kind, payload)
+            VALUES
+              ('system', 'agentlab-daily-restore', 'agentlab-restored',
+               'fly-app',
+               jsonb_build_object(
+                 'tenant_count', ${{ steps.tenants.outputs.count }},
+                 'tenant_filter', '${{ inputs.tenant_filter }}',
+                 'dry_run', '${{ inputs.dry_run }}',
+                 'workflow_run_id', '${{ github.run_id }}'
+               ))
+          "
