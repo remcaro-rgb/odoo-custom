@@ -69,28 +69,52 @@ def test_classify_name_hints_override_ttype(column, expected):
 
 
 # --------------------------------------------------------------------------
-# classify_column — Odoo ttype is authoritative when no name hint
+# classify_column — ttype + physical type together (the real shape:
+# information_schema always supplies a data_type)
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("ttype,expected", [
-    ("many2one", "foreign_key"),
-    ("one2many", "foreign_key"),
-    ("many2many", "foreign_key"),
-    ("selection", "selection"),
-    ("boolean", "boolean"),
-    ("date", "date"),
-    ("datetime", "date"),
-    ("integer", "foreign_key"),
-    ("char", "string"),
-    ("text", "text"),
-    ("html", "text"),
+@pytest.mark.parametrize("ttype,data_type,expected", [
+    # FK-ish ttypes are stored as integer columns → passthrough.
+    ("many2one", "integer", "foreign_key"),
+    ("one2many", "integer", "foreign_key"),
+    ("many2many", "integer", "foreign_key"),
+    # selection is a varchar column carrying a constrained enum.
+    ("selection", "character varying", "selection"),
+    # physical type decides these regardless of ttype.
+    ("boolean", "boolean", "boolean"),
+    ("date", "date", "date"),
+    ("datetime", "timestamp without time zone", "date"),
+    ("integer", "integer", "foreign_key"),
+    # text columns: ttype refines char vs text/html.
+    ("char", "character varying", "string"),
+    ("text", "text", "text"),
+    ("html", "text", "text"),
 ])
-def test_classify_by_ttype(ttype, expected):
+def test_classify_by_ttype(ttype, data_type, expected):
     got = m.classify_column(
         "res_partner", "some_field",
-        odoo_ttype=ttype, data_type=None, char_max_len=None,
+        odoo_ttype=ttype, data_type=data_type, char_max_len=None,
     )
     assert got == expected
+
+
+def test_classify_boolean_column_named_email_is_boolean():
+    # base_partner_merge_automatic_wizard.group_by_email — a boolean
+    # toggle whose name contains 'email'. It crashed the real restore
+    # because the name hint forced a text email strategy onto a boolean
+    # column. Physical type must win.
+    assert m.classify_column(
+        "base_partner_merge_automatic_wizard", "group_by_email",
+        odoo_ttype="boolean", data_type="boolean", char_max_len=None,
+    ) == "boolean"
+
+
+def test_classify_integer_column_named_phone_is_passthrough():
+    # An integer 'phone_count' must not get the text phone strategy.
+    assert m.classify_column(
+        "some_table", "phone_count",
+        odoo_ttype="integer", data_type="integer", char_max_len=None,
+    ) == "foreign_key"
 
 
 def test_classify_monetary_ttype_with_money_name():
@@ -129,10 +153,10 @@ def test_classify_bytea_beats_name_hint():
     ) == "binary"
 
 
-def test_classify_binary_ttype_without_data_type():
+def test_classify_binary_ttype():
     assert m.classify_column(
         "ir_attachment", "datas",
-        odoo_ttype="binary", data_type=None, char_max_len=None,
+        odoo_ttype="binary", data_type="bytea", char_max_len=None,
     ) == "binary"
 
 
@@ -183,13 +207,19 @@ def test_classify_fallback_integer_is_foreign_key():
     ) == "foreign_key"
 
 
-def test_classify_fallback_unknown_type_is_redacted():
-    # Conservative default: anything unrecognized goes through the text
-    # (redact) path rather than being left in the clear.
+def test_classify_unknown_physical_type_is_unsupported():
+    # An exotic Postgres type with no masking strategy (uuid, arrays,
+    # inet, ...). It must NOT be handed a text strategy — that would
+    # crash the UPDATE. Classified _unsupported → passthrough + a
+    # logged warning so a human can review it.
     assert m.classify_column(
         "raw_table", "weird", odoo_ttype=None,
         data_type="some_exotic_type", char_max_len=None,
-    ) == "text"
+    ) == "_unsupported"
+
+
+def test_strategy_sql_unsupported_is_passthrough():
+    assert m.strategy_sql("_unsupported", '"x"', {}) is None
 
 
 # --------------------------------------------------------------------------

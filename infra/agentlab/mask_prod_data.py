@@ -120,73 +120,78 @@ def classify_column(
     Returns one of: email, phone, nit, cedula, iban, payment_card,
     monetary, text, string, date, boolean, selection, foreign_key,
     binary, json.
+
+    Classification order matters. The Postgres *physical* type is a hard
+    constraint and is decided FIRST: a column whose physical type cannot
+    accept a text literal (boolean, integer, date, bytea, json, ...) is
+    classified purely by that type — column-name hints and Odoo ttype
+    only get consulted once we know the column is genuinely text. This
+    is what stops a boolean column named `group_by_email`, or an integer
+    `phone_count`, from being handed a text-producing strategy.
     """
     col = column.lower()
     dt = (data_type or "").lower()
 
-    # 0. Hard physical-type constraints come FIRST — these Postgres
-    #    column types cannot accept a text literal, so no text-producing
-    #    strategy may ever apply, regardless of column name or Odoo
-    #    ttype. (A bytea column named `email` is still bytea.)
+    # ---- Step 0: physical type. Non-text physical types are decided
+    #      here and here only — no text strategy can touch them. ----
     if dt == "bytea":
         return "binary"
     if dt in ("json", "jsonb"):
         return "json"
-
-    # 1. Column-name hints win outright — an `email` column is an email
-    #    address whether Odoo calls it char or the table is non-Odoo.
-    for needles, semantic in _NAME_HINTS:
-        if any(n in col for n in needles):
-            return semantic
-
-    # 2. Odoo ttype is authoritative when present.
-    if odoo_ttype:
-        if odoo_ttype in ("many2one", "one2many", "many2many"):
-            return "foreign_key"
-        if odoo_ttype == "selection":
-            return "selection"
-        if odoo_ttype == "boolean":
-            return "boolean"
-        if odoo_ttype in ("date", "datetime"):
-            return "date"
-        if odoo_ttype == "integer":
-            # Integers are passthrough — but an integer literally named
-            # like an ID document was already caught by _NAME_HINTS above.
-            return "foreign_key"
-        if odoo_ttype in ("monetary", "float"):
-            return "monetary" if _looks_monetary(col) else "foreign_key"
-        if odoo_ttype in ("text", "html"):
-            return "text"
-        if odoo_ttype == "char":
-            return "string"
-        if odoo_ttype == "binary":
-            return "binary"
-        if odoo_ttype == "json":
-            return "json"
-        # reference and any other ttype on a text-typed column — redact
-        # via the long-string path.
-        return "text"
-
-    # 3. No Odoo metadata — fall back to information_schema data type.
-    #    (`dt` was computed at the top of the function.)
     if dt == "boolean":
         return "boolean"
     if dt in ("date", "timestamp without time zone",
               "timestamp with time zone", "time without time zone"):
         return "date"
     if dt in ("integer", "bigint", "smallint"):
+        # Passthrough. An integer can't take any of our text-producing
+        # strategies (cedula/nit included). Odoo stores cédula/NIT as
+        # char, so an integer column is realistically an id/count/FK.
         return "foreign_key"
     if dt in ("numeric", "double precision", "real"):
-        return "monetary" if _looks_monetary(col) else "foreign_key"
+        # Numeric IS compatible with the monetary noise strategy, so
+        # name + ttype may still refine it; otherwise passthrough.
+        if _looks_monetary(col) or odoo_ttype == "monetary":
+            return "monetary"
+        return "foreign_key"
+
+    _TEXTUAL = ("character varying", "character", "text", "citext")
+    if dt and dt not in _TEXTUAL:
+        # An exotic physical type we don't have a strategy for (uuid,
+        # arrays, inet, tsvector, ...). Passthrough rather than crash
+        # the whole restore; the caller logs this so it's reviewable.
+        return "_unsupported"
+
+    # ---- The column is genuinely text from here on. ----
+
+    # Step 1: column-name hints — an `email` text column is an email
+    # address whether Odoo calls it char or the table is non-Odoo.
+    for needles, semantic in _NAME_HINTS:
+        if any(n in col for n in needles):
+            return semantic
+
+    # Step 2: Odoo ttype.
+    if odoo_ttype:
+        if odoo_ttype in ("many2one", "one2many", "many2many"):
+            return "foreign_key"
+        if odoo_ttype == "selection":
+            return "selection"
+        if odoo_ttype in ("text", "html"):
+            return "text"
+        if odoo_ttype == "char":
+            return "string"
+        # binary/json ttype but a textual physical column, or
+        # reference/other — redact via the long-string path.
+        return "text"
+
+    # Step 3: no Odoo metadata — size-based split on the text column.
     if dt == "text":
         return "text"
-    if dt in ("character varying", "character"):
-        # Long varchars are free text; short ones get hashed.
-        if char_max_len is not None and char_max_len >= 50:
-            return "text"
-        return "string"
-    # Unknown type — be conservative, redact it.
-    return "text"
+    # character varying / character / citext: long ones are free text,
+    # short ones get hashed.
+    if char_max_len is not None and char_max_len >= 50:
+        return "text"
+    return "string"
 
 
 def _looks_monetary(col_lower: str) -> bool:
@@ -201,7 +206,8 @@ def strategy_sql(semantic_type: str, col_ident: str, rules: dict) -> str | None:
     The expressions are all NULL-preserving: a NULL input stays NULL so
     NOT NULL-ness and FK validity are unaffected.
     """
-    if semantic_type in ("date", "boolean", "selection", "foreign_key"):
+    if semantic_type in ("date", "boolean", "selection", "foreign_key",
+                         "_unsupported"):
         return None
 
     if semantic_type == "binary":
@@ -391,6 +397,14 @@ def mask_database(
                     data_type=data_type,
                     char_max_len=char_len,
                 )
+                if semantic == "_unsupported":
+                    # An exotic physical type with no masking strategy —
+                    # left untouched but surfaced so a human can review
+                    # whether that column could carry PII.
+                    log("mask.column.unsupported_type",
+                        table=table, column=column, data_type=data_type)
+                    passthrough_cols += 1
+                    continue
                 expr = strategy_sql(semantic, _quote_ident(column), rules)
                 if expr is None:
                     passthrough_cols += 1
