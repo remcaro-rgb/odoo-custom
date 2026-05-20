@@ -156,14 +156,11 @@ jobs:
             echo "STAGING_PG_DSN=${staging_local}" >> "$GITHUB_ENV"
           fi
 
-      - name: Wake agentlab machines
-        if: env.DRY_RUN == 'false'
-        run: |
-          # auto_stop_machines=true in fly.toml means the app may be idle.
-          # Start at least one machine before we restore into it.
-          flyctl machines list --app odoo-saas-odoo-agentlab --json \
-            | jq -r '.[] | select(.state == "stopped") | .id' \
-            | xargs -r -n1 flyctl machines start --app odoo-saas-odoo-agentlab
+      # NOTE: the agentlab Odoo app is deliberately NOT started here.
+      # Restore + masking talk to Postgres directly; a running Odoo app
+      # would hold connection-pool connections to the very tenant DBs the
+      # restore is about to DROP. The OTP-rotation step's `flyctl deploy`
+      # brings the app up fresh at the end.
 
       - name: Discover tenants
         id: tenants
@@ -203,9 +200,13 @@ jobs:
               --dbname="${STAGING_PG_DSN%/*}/$tenant" \
               --file="$tmpdump"
 
-            # Drop + recreate the agentlab tenant DB
+            # Drop + recreate the agentlab tenant DB. WITH (FORCE)
+            # (PG13+) terminates any lingering connections — a stray
+            # psql, a pgbouncer pool, or the agentlab Odoo app if it
+            # was woken out of band — so the DROP can't fail with
+            # "database is being accessed by other users".
             agentlab_admin_dsn="${AGENTLAB_DSN%/*}/postgres"
-            psql "$agentlab_admin_dsn" -c "DROP DATABASE IF EXISTS \"$tenant\";"
+            psql "$agentlab_admin_dsn" -c "DROP DATABASE IF EXISTS \"$tenant\" WITH (FORCE);"
             psql "$agentlab_admin_dsn" -c "CREATE DATABASE \"$tenant\";"
 
             # Restore
