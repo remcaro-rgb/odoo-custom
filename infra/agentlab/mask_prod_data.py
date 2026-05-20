@@ -442,6 +442,30 @@ def mask_database(
         log("mask.columns.discovered", count=len(columns),
             odoo_fields=len(ttypes), unique_columns=len(unique_cols))
 
+        # Every per-column mutation runs inside its own SAVEPOINT. A
+        # column that fails (an unforeseen type/constraint clash) is
+        # rolled back to the savepoint and recorded — the rest of the
+        # database is still masked, and the run reports EVERY bad column
+        # at once instead of aborting on the first. If any column failed
+        # the whole transaction is rolled back at the end (no
+        # partially-masked data is ever committed) and the caller fails.
+        failures: list[dict[str, Any]] = []
+
+        def _run(cur, sql: str, params=None, *, table: str, column: str,
+                 phase: str) -> bool:
+            cur.execute("SAVEPOINT col_sp")
+            try:
+                cur.execute(sql, params)
+            except psycopg2.Error as exc:
+                cur.execute("ROLLBACK TO SAVEPOINT col_sp")
+                failures.append({
+                    "table": table, "column": column, "phase": phase,
+                    "error": str(exc).strip().splitlines()[0],
+                })
+                return False
+            cur.execute("RELEASE SAVEPOINT col_sp")
+            return True
+
         with conn.cursor() as cur:
             for table, column, data_type, char_len in columns:
                 if is_allowed(table, column, allowlist):
@@ -472,11 +496,13 @@ def mask_database(
                     passthrough_cols += 1
                     continue
                 expr = clamp_expr_to_column(expr, data_type, char_len)
-                cur.execute(
+                ok = _run(
+                    cur,
                     f"UPDATE {_quote_ident(table)} "
-                    f"SET {_quote_ident(column)} = {expr}"
+                    f"SET {_quote_ident(column)} = {expr}",
+                    table=table, column=column, phase="type-strategy",
                 )
-                masked_cols += 1
+                masked_cols += 1 if ok else 0
 
             # Deny-list safety net: regexp_replace each pattern over every
             # non-allowlisted text/char column. Mostly redundant after the
@@ -498,14 +524,28 @@ def mask_database(
                 for _name, rx in deny_patterns:
                     # psycopg2 parameterizes the regex literal; the column
                     # and table identifiers are quoted, not parameterized.
-                    cur.execute(
+                    ok = _run(
+                        cur,
                         f"UPDATE {_quote_ident(table)} "
                         f"SET {qcol} = regexp_replace("
                         f"  {qcol}::text, %s, '[REDACTED]', 'g') "
                         f"WHERE {qcol} ~ %s",
                         (rx.pattern, rx.pattern),
+                        table=table, column=column, phase="deny-list",
                     )
-                    deny_scrubbed += cur.rowcount if cur.rowcount > 0 else 0
+                    if ok:
+                        deny_scrubbed += cur.rowcount if cur.rowcount > 0 else 0
+
+        if failures:
+            # Don't commit a partially-masked database. Report every
+            # failing column so they can all be fixed in one pass.
+            conn.rollback()
+            for f in failures:
+                log("mask.column.failed", **f)
+            raise RuntimeError(
+                f"{len(failures)} column(s) failed masking in this database; "
+                f"transaction rolled back"
+            )
 
         conn.commit()
     except Exception:
@@ -563,6 +603,10 @@ def sample_audit(
         conn.close()
     if violations:
         log("mask.audit.violations", count=len(violations))
+        for v in violations:
+            log("mask.audit.violation",
+                table=v["table"], column=v["column"],
+                patterns=v["patterns"], excerpt=v["excerpt"])
     else:
         log("mask.audit.clean")
     return violations
@@ -638,6 +682,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     total_violations: list[dict[str, Any]] = []
+    failed_databases: list[str] = []
     for dbname in databases:
         db_dsn = _db_dsn(admin_dsn, dbname)
         started = time.time()
@@ -647,9 +692,12 @@ def main(argv: list[str] | None = None) -> int:
                 db_dsn, allowlist, rules,
                 deny_patterns=deny_patterns, log=log,
             )
-        except psycopg2.Error as exc:
+        except (psycopg2.Error, RuntimeError) as exc:
+            # Keep going so a single run surfaces every failing column
+            # across every database, instead of one bug per re-run.
             log("mask.error", db=dbname, msg=f"masking failed: {exc}")
-            return 1
+            failed_databases.append(dbname)
+            continue
         violations = sample_audit(
             db_dsn, deny_patterns,
             sample_size=args.sample_size, log=log,
@@ -657,6 +705,11 @@ def main(argv: list[str] | None = None) -> int:
         total_violations.extend(violations)
         log("mask.database.end", db=dbname,
             duration_s=round(time.time() - started, 1), **metrics)
+
+    if failed_databases:
+        log("mask.fail", msg="masking failed for one or more databases",
+            databases=failed_databases)
+        return 1
 
     if total_violations:
         log("mask.fail", msg="sample audit found surviving PII",
