@@ -18,8 +18,8 @@ from pathlib import Path
 import click
 
 from . import __version__
-from .config import load_config
 from .bootstrap import bootstrap
+from .config import load_config
 
 DEFAULT_CONFIG = Path(__file__).parent.parent / "config.yml"
 

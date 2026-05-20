@@ -1,0 +1,35 @@
+# ruff config — Phase 2 lint baseline for custom-addons + agents/.
+#
+# Scope: SaaS addons we maintain (saas_*, saas_tenant_gate, etc.) and the
+# agent runtime. Legacy/club_*/account_*/jorels-addons/ are linted in
+# advisory-only mode by .github/workflows/ci.yml (job: lint-addons-legacy).
+#
+# Idioms tolerated:
+#   - F401 in __init__.py — Odoo addons use side-effect imports to register
+#     models/views/tests with the framework; ruff cannot distinguish.
+#   - E501 (line length) — Odoo XML-id and translation strings are long.
+#   - B008 (mutable default arg) — Odoo recordsets and api decorators
+#     pass empty domain lists `[]` as defaults idiomatically.
+
+line-length = 200
+
+[lint]
+select = ["E", "F", "I", "W", "B", "UP"]
+ignore = ["E501", "B008"]
+
+[lint.per-file-ignores]
+# Side-effect imports for Odoo's module/test discovery.
+"**/__init__.py" = ["F401"]
+# Odoo manifest convention: file consists of a single top-level dict
+# literal. Ruff flags this as a useless expression (B018); it's the
+# idiomatic shape Odoo's module loader expects.
+"**/__manifest__.py" = ["B018"]
+# Test files: B017 (broad-exception in assertRaises) is acceptable;
+# many Odoo `UserError` paths re-raise via the framework.
+"**/tests/*.py" = ["B017"]
+# Adapters wrapping system CLIs (git, fly, railway) intentionally use
+# `subprocess.run(["<cli>", ...])`. Risk reviewed in code; CI runner image
+# controls PATH. S607 (partial executable path) and S603 (untrusted args)
+# can't be expressed in a way that satisfies both ruff and readability.
+"agents/agents/adapters/repo_*.py" = ["S603", "S607"]
+"agents/agents/adapters/compute_*.py" = ["S603", "S607"]

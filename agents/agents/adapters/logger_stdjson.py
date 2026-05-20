@@ -9,8 +9,9 @@ from __future__ import annotations
 import json
 import sys
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Any, Iterator
+from typing import Any
 
 from ..config import Config
 from ..ports import Logger
@@ -28,7 +29,7 @@ class StdJsonLogger:
         self._bound = bound or {}
 
     @classmethod
-    def from_config(cls, config: Config) -> "StdJsonLogger":
+    def from_config(cls, config: Config) -> StdJsonLogger:
         return cls()
 
     def _emit(self, level: str, msg: str, fields: dict[str, Any]) -> None:
@@ -77,7 +78,7 @@ class StdJsonLogger:
             duration_ms = int((time.perf_counter() - start) * 1000)
             self._emit("info", f"{name}.end", {**fields, "duration_ms": duration_ms})
 
-    def bind(self, **fields: Any) -> "StdJsonLogger":
+    def bind(self, **fields: Any) -> StdJsonLogger:
         return StdJsonLogger({**self._bound, **fields})
 
 

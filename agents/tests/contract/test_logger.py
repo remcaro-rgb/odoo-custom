@@ -9,8 +9,6 @@ Any Logger adapter must:
 from __future__ import annotations
 
 import json
-import os
-from io import StringIO
 
 import pytest
 

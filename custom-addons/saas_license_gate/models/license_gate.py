@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """License gate — runtime verdict + enforcement hooks.
 
 Lifecycle
@@ -51,7 +50,6 @@ import hmac
 import json
 import logging
 import os
-import secrets
 import time
 import uuid
 from urllib import request as urlrequest
@@ -61,7 +59,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from odoo import api, fields, models
+from odoo import api, models
 
 _logger = logging.getLogger(__name__)
 
@@ -127,7 +125,7 @@ class SaasLicenseGate(models.AbstractModel):
 
         signature_hdr = 'sha256=' + hmac.new(
             secret.encode('utf-8'),
-            f'{ts}.'.encode('utf-8') + body,
+            f'{ts}.'.encode() + body,
             hashlib.sha256,
         ).hexdigest()
 
@@ -241,7 +239,7 @@ class SaasLicenseGate(models.AbstractModel):
         # Try /etc/machine-id first.
         candidate = ''
         try:
-            with open('/etc/machine-id', 'r', encoding='utf-8') as f:
+            with open('/etc/machine-id', encoding='utf-8') as f:
                 candidate = f.read().strip()
         except (OSError, ValueError):
             candidate = ''

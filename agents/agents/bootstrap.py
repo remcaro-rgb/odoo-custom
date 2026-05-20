@@ -11,7 +11,6 @@ production-safety lock from the portable-runtime spec §12.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
 
 from .config import Config
 from .ports import (

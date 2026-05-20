@@ -69,7 +69,7 @@ class SaasFilestoreBackupNowController(http.Controller):
         try:
             payload = json.loads(body or b'{}')
         except json.JSONDecodeError as exc:
-            return self._reject(400, 'bad-json: %s' % exc)
+            return self._reject(400, f'bad-json: {exc}')
 
         db_name = (payload.get('db_name') or '').strip()
         if not DB_NAME_PATTERN.match(db_name):
@@ -87,7 +87,7 @@ class SaasFilestoreBackupNowController(http.Controller):
                 'saas_filestore_backup_now: registry load failed db=%s err=%s',
                 db_name, exc,
             )
-            return self._reject(404, 'db-not-found: %s' % exc)
+            return self._reject(404, f'db-not-found: {exc}')
 
         try:
             with registry.cursor() as cr:
@@ -104,7 +104,7 @@ class SaasFilestoreBackupNowController(http.Controller):
             _logger.exception(
                 'saas_filestore_backup_now: run_backup failed db=%s', db_name,
             )
-            return self._reject(500, 'run-backup-failed: %s' % str(exc)[:500])
+            return self._reject(500, f'run-backup-failed: {str(exc)[:500]}')
 
         _logger.info(
             'saas_filestore_backup_now: db=%s result=%s', db_name, result,

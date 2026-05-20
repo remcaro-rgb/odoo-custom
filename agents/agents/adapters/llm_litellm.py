@@ -47,8 +47,8 @@ class LiteLLMAdapter:
         self._litellm = litellm
 
     @classmethod
-    def from_config(cls, config: Config) -> "LiteLLMAdapter":
-        from .secrets_envvar import EnvVarSecretStore   # bootstrap order: ok
+    def from_config(cls, config: Config) -> LiteLLMAdapter:
+        from .secrets_envvar import EnvVarSecretStore  # bootstrap order: ok
         secrets = EnvVarSecretStore()
         litellm_cfg = config.extras.get("litellm", {})
         api_key_name = litellm_cfg.get("api_key_secret", "ANTHROPIC_API_KEY")
