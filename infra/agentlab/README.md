@@ -9,7 +9,7 @@ See: `docs/superpowers/specs/2026-05-16-agentlab-environment-design.md`.
 
 - `mask-allowlist.yml` — columns explicitly safe to leave **unmasked**. Everything else is masked by default.
 - `sensitive-topics.yml` — topic patterns that route to the support inbox instead of GitHub. Owned by `security-leads`.
-- `mask-prod-data.sh` — the masking pipeline. Reads `mask-allowlist.yml`; applies redaction rules; validates with a sample audit.
+- `mask_prod_data.py` — the masking pipeline. Reads `mask-allowlist.yml` + `masking-rules.yml`; classifies each column (Odoo `ir_model_fields` ttype, falling back to `information_schema`); applies set-based SQL masking; runs the deny-list pass; validates with a sample audit. Pure helpers unit-tested in `tests/test_masking.py`.
 - `masking-rules.yml` — per-column-type masking strategies (hash, redact, fake-replace).
 
 ## Ownership

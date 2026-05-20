@@ -52,8 +52,8 @@ jobs:
           python-version: '3.12'
       - name: Install ruff
         run: pip install ruff==0.7.4
-      - name: ruff check (maintained addons + agent runtime)
-        # Scoped to addons we own. Legacy/jorels code is third-party or
+      - name: ruff check (maintained addons + agent runtime + infra scripts)
+        # Scoped to code we own. Legacy/jorels code is third-party or
         # predates this lint gate; linted advisory-only by `lint-addons-legacy`
         # below.
         run: |
@@ -62,7 +62,8 @@ jobs:
             custom-addons/saas_provisioning_gateway \
             custom-addons/saas_filestore_backup \
             custom-addons/saas_license_gate \
-            agents/
+            agents/ \
+            infra/agentlab/
 
   lint-addons-legacy:
     name: Lint legacy + jorels addons (advisory)
@@ -129,6 +130,24 @@ jobs:
             --skip B101,B603,B607,B310,B108 \
             --severity-level medium \
             --confidence-level medium
+
+  masking-unit-tests:
+    name: Agentlab masking unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test deps
+        # pyyaml only — the pure helpers under test import lazily and need
+        # no psycopg2. Keeping the install minimal also proves the
+        # no-DB-driver import path works.
+        run: pip install 'pytest==8.3.3' 'pyyaml==6.0.2'
+      - name: pytest infra/agentlab/tests
+        run: pytest infra/agentlab/tests/ -q
 
   # ---------- Build validation (every PR + every push) ----------
 

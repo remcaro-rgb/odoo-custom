@@ -7,8 +7,9 @@
 #   1. Wakes the agentlab Fly app (auto_stop is on).
 #   2. Pulls a fresh pg_dump from each staging tenant.
 #   3. Restores into the agentlab Postgres (drop + create db per tenant).
-#   4. Applies infra/agentlab/mask-prod-data.sh.
-#   5. Runs the sample-row PII audit (asserts no leaks).
+#   4. Runs infra/agentlab/mask_prod_data.py — type-based masking +
+#      deny-list pass + sample-row PII audit (the audit gates the run:
+#      surviving PII fails the workflow before redeploy).
 #   6. Rotates the agentlab reviewer one-time password.
 #   7. Writes a saas_audit.event row.
 #
@@ -119,25 +120,37 @@ jobs:
             echo "::endgroup::"
           done < /tmp/tenants.txt
 
-      - name: Apply masking pipeline
-        if: env.DRY_RUN == 'false'
-        run: |
-          # mask-prod-data.sh is a SKELETON today (TODO sections); it will
-          # exit warning-only without applying changes. Tracked as a Phase 5b
-          # follow-up to ship the Python implementation in its own PR with
-          # unit-tested per-column strategies.
-          bash infra/agentlab/mask-prod-data.sh \
-            | tee /tmp/masking.log
-          echo "::warning::masking pipeline is a skeleton — see follow-up issue"
+      - name: Set up Python for masking
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      - name: Sample-row PII audit
+      - name: Install masking dependencies
+        run: pip install 'psycopg2-binary==2.9.10' 'pyyaml==6.0.2'
+
+      - name: Apply masking pipeline + sample-row PII audit
         if: env.DRY_RUN == 'false'
         run: |
-          # Once the Python masking ships, this step will run a deterministic
-          # 100-row random sample across every restored DB and grep for the
-          # deny-list patterns in infra/agentlab/masking-rules.yml. For now
-          # we run it in report-only mode and accept findings as expected.
-          echo "::warning::sample audit skipped — masking implementation pending"
+          # mask_prod_data.py applies type-based masking + the deny-list
+          # pass to every database in the agentlab cluster, then samples
+          # rows and asserts no PII pattern survives. It exits:
+          #   0  masked + audit clean
+          #   1  config/connection error
+          #   2  sample audit found surviving PII  → this step (and the
+          #      whole restore) fails, and agentlab is NOT redeployed with
+          #      unmasked data.
+          python3 infra/agentlab/mask_prod_data.py \
+            --allowlist infra/agentlab/mask-allowlist.yml \
+            --rules infra/agentlab/masking-rules.yml \
+            | tee /tmp/masking.log
+
+      - name: Masking dry-run check
+        if: env.DRY_RUN == 'true'
+        run: |
+          # In dry-run we only confirm the masker connects and classifies;
+          # no UPDATEs are applied.
+          python3 infra/agentlab/mask_prod_data.py --dry-run \
+            | tee /tmp/masking-dryrun.log
 
       - name: Rotate reviewer OTP
         if: env.DRY_RUN == 'false'

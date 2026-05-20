@@ -1,6 +1,6 @@
 # Masking rules — per-type strategy for masked columns.
 #
-# Applied by mask-prod-data.sh after a snapshot is restored to agentlab.
+# Applied by mask_prod_data.py after a snapshot is restored to agentlab.
 # Every column NOT in mask-allowlist.yml is masked according to its type
 # using these rules.
 

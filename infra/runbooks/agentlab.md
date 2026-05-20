@@ -28,13 +28,19 @@ Spec: [`docs/superpowers/specs/2026-05-16-agentlab-environment-design.md`](../..
   writes an audit event.
 - This runbook.
 
+### Shipped (Phase 5b follow-up)
+
+- **Python masking pipeline.** `infra/agentlab/mask_prod_data.py`
+  classifies every column (Odoo `ir_model_fields.ttype`, falling back
+  to `information_schema`), applies set-based SQL masking per the
+  strategies in `masking-rules.yml`, runs the deny-list regexp pass,
+  then samples rows and **fails the workflow** if any PII pattern
+  survives. The daily-restore workflow no longer runs warn-only — a
+  failed audit blocks the agentlab redeploy. Pure helpers are
+  unit-tested in `infra/agentlab/tests/test_masking.py`.
+
 ### Deferred (Phase 5b follow-ups, separate PRs)
 
-- **Python masking pipeline.** `infra/agentlab/mask-prod-data.sh` is
-  still a skeleton with TODO sections. The workflow runs it in
-  warn-only mode today. Ship the Python implementation with unit
-  tests for each per-column strategy before pointing the workflow at
-  real production data.
 - **Better Stack log drain wiring.** The agentlab app should ship logs
   with `tenant=agentlab` tagging; needs `BETTERSTACK_LOGS_TOKEN`
   (deferral item from the Phases 2–11 analysis).
