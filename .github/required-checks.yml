@@ -33,6 +33,8 @@ main:
   - Bandit security scan (custom addons)
   - saas_tenant_gate HttpCase suite
   - Addon upgrade matrix
+  # Agentlab masking pipeline tests (added 2026-05-20 after PR #10's run).
+  - Agentlab masking unit tests
 
   # NOT included (paths-filtered workflows that only trigger on relevant
   # file changes; would never report a status on unrelated PRs):
@@ -63,3 +65,4 @@ agent_spec_pattern:
   - Bandit security scan (custom addons)
   - saas_tenant_gate HttpCase suite
   - Addon upgrade matrix
+  - Agentlab masking unit tests
