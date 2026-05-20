@@ -118,9 +118,20 @@ def classify_column(
     information_schema and are the fallback classifier.
 
     Returns one of: email, phone, nit, cedula, iban, payment_card,
-    monetary, text, string, date, boolean, selection, foreign_key.
+    monetary, text, string, date, boolean, selection, foreign_key,
+    binary, json.
     """
     col = column.lower()
+    dt = (data_type or "").lower()
+
+    # 0. Hard physical-type constraints come FIRST — these Postgres
+    #    column types cannot accept a text literal, so no text-producing
+    #    strategy may ever apply, regardless of column name or Odoo
+    #    ttype. (A bytea column named `email` is still bytea.)
+    if dt == "bytea":
+        return "binary"
+    if dt in ("json", "jsonb"):
+        return "json"
 
     # 1. Column-name hints win outright — an `email` column is an email
     #    address whether Odoo calls it char or the table is non-Odoo.
@@ -148,11 +159,16 @@ def classify_column(
             return "text"
         if odoo_ttype == "char":
             return "string"
-        # binary, reference, etc. — redact via the long-string path.
+        if odoo_ttype == "binary":
+            return "binary"
+        if odoo_ttype == "json":
+            return "json"
+        # reference and any other ttype on a text-typed column — redact
+        # via the long-string path.
         return "text"
 
     # 3. No Odoo metadata — fall back to information_schema data type.
-    dt = (data_type or "").lower()
+    #    (`dt` was computed at the top of the function.)
     if dt == "boolean":
         return "boolean"
     if dt in ("date", "timestamp without time zone",
@@ -187,6 +203,17 @@ def strategy_sql(semantic_type: str, col_ident: str, rules: dict) -> str | None:
     """
     if semantic_type in ("date", "boolean", "selection", "foreign_key"):
         return None
+
+    if semantic_type == "binary":
+        # bytea columns (QR codes, scanned images, attachments) — a text
+        # literal can't be assigned, so empty them. Could hold PII (a
+        # scanned ID), so we don't passthrough. NULL-preserving.
+        return f"CASE WHEN {col_ident} IS NULL THEN NULL ELSE ''::bytea END"
+
+    if semantic_type == "json":
+        # json / jsonb columns — replace with an empty object. The bare
+        # '{}' literal coerces to whichever of json/jsonb the column is.
+        return f"CASE WHEN {col_ident} IS NULL THEN NULL ELSE '{{}}' END"
 
     if semantic_type == "email":
         return (f"CASE WHEN {col_ident} IS NULL THEN NULL ELSE "

@@ -109,6 +109,49 @@ def test_classify_float_ttype_without_money_name_is_passthrough():
 
 
 # --------------------------------------------------------------------------
+# classify_column — physical type (bytea/json) overrides everything
+# --------------------------------------------------------------------------
+
+def test_classify_bytea_is_binary_via_data_type():
+    # auth_totp_wizard.qrcode — the column that crashed the first real run.
+    assert m.classify_column(
+        "auth_totp_wizard", "qrcode",
+        odoo_ttype="binary", data_type="bytea", char_max_len=None,
+    ) == "binary"
+
+
+def test_classify_bytea_beats_name_hint():
+    # A bytea column literally named 'email' must still be binary — a
+    # text-producing email strategy would crash on the bytea column.
+    assert m.classify_column(
+        "weird_table", "email_blob",
+        odoo_ttype=None, data_type="bytea", char_max_len=None,
+    ) == "binary"
+
+
+def test_classify_binary_ttype_without_data_type():
+    assert m.classify_column(
+        "ir_attachment", "datas",
+        odoo_ttype="binary", data_type=None, char_max_len=None,
+    ) == "binary"
+
+
+@pytest.mark.parametrize("dtype", ["json", "jsonb"])
+def test_classify_json_via_data_type(dtype):
+    assert m.classify_column(
+        "some_table", "config",
+        odoo_ttype=None, data_type=dtype, char_max_len=None,
+    ) == "json"
+
+
+def test_classify_json_ttype():
+    assert m.classify_column(
+        "res_config", "settings",
+        odoo_ttype="json", data_type="jsonb", char_max_len=None,
+    ) == "json"
+
+
+# --------------------------------------------------------------------------
 # classify_column — information_schema fallback (non-Odoo tables)
 # --------------------------------------------------------------------------
 
@@ -198,6 +241,23 @@ def test_strategy_sql_iban_and_card_redact():
     for st in ("iban", "payment_card"):
         sql = m.strategy_sql(st, '"x"', {})
         assert "[REDACTED]" in sql
+
+
+def test_strategy_sql_binary_empties_to_bytea():
+    sql = m.strategy_sql("binary", '"qrcode"', {})
+    assert sql is not None
+    assert "::bytea" in sql
+    # NULL-preserving so a NOT NULL bytea column stays valid.
+    assert '"qrcode" IS NULL THEN NULL' in sql
+    # must NOT inject a text literal that a bytea column would reject
+    assert "[REDACTED" not in sql
+
+
+def test_strategy_sql_json_empties_to_object():
+    sql = m.strategy_sql("json", '"settings"', {})
+    assert sql is not None
+    assert "{}" in sql
+    assert '"settings" IS NULL THEN NULL' in sql
 
 
 def test_strategy_sql_unknown_raises():
