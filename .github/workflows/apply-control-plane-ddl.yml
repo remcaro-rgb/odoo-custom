@@ -1,0 +1,124 @@
+# apply-control-plane-ddl
+#
+# One-shot (manually dispatched) workflow that applies the committed
+# control-plane SQL schema files to the control-plane Postgres.
+#
+# The SQL files under infra/sql/ are the source-of-truth DDL; this
+# workflow is how they get applied without anyone needing the
+# CONTROL_PLANE_PG_DSN value on their laptop. Every file uses
+# CREATE ... IF NOT EXISTS / ADD COLUMN IF NOT EXISTS / DROP TRIGGER
+# IF EXISTS, so re-running is safe and idempotent.
+#
+# Trigger:
+#   gh workflow run apply-control-plane-ddl.yml -R GoliattCo/odoo-custom
+# Optionally target one file:
+#   gh workflow run apply-control-plane-ddl.yml -R GoliattCo/odoo-custom -f only=saas-audit-event-schema.sql
+
+name: apply-control-plane-ddl
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Apply just one file (basename under infra/sql/); blank = all'
+        required: false
+      dry_run:
+        description: 'Print the SQL and run psql in --no-op check mode'
+        default: 'false'
+        type: choice
+        options: ['true', 'false']
+
+concurrency:
+  group: apply-control-plane-ddl
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    name: Apply infra/sql DDL to control-plane Postgres
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+      ONLY: ${{ inputs.only }}
+      DRY_RUN: ${{ inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Preflight
+        run: |
+          set -euo pipefail
+          if [ -z "${PG_DSN:-}" ]; then
+            echo "::error::CONTROL_PLANE_PG_DSN secret is not set." >&2
+            exit 1
+          fi
+          # psql ships on the GitHub-hosted ubuntu runner via postgresql-client.
+          psql --version
+
+      - name: Connectivity check
+        run: |
+          set -euo pipefail
+          # Fail fast with a clear message if the DSN can't connect, rather
+          # than letting the first DDL statement produce a cryptic error.
+          psql "$PG_DSN" -tAc "SELECT 'connected as ' || current_user || ' to ' || current_database();"
+
+      - name: Apply DDL files
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          # Deterministic order: audit-event schema before the migration
+          # schema (the latter's runbook cross-references the former, and
+          # there's no hard FK between them, but ordering keeps logs tidy).
+          files=(
+            infra/sql/saas-audit-event-schema.sql
+            infra/sql/saas-tenant-migration-schema.sql
+          )
+          applied=0
+          for f in "${files[@]}"; do
+            base=$(basename "$f")
+            if [ -n "${ONLY:-}" ] && [ "$base" != "$ONLY" ]; then
+              echo "::notice::skipping $base (only=$ONLY)"
+              continue
+            fi
+            if [ ! -f "$f" ]; then
+              echo "::error::expected SQL file missing: $f" >&2
+              exit 1
+            fi
+            echo "::group::$base"
+            if [ "${DRY_RUN:-false}" = "true" ]; then
+              echo "--- DRY RUN: would apply $f ---"
+              # ON_ERROR_STOP + a rolled-back transaction = parse/plan check
+              # without persisting anything. Built with printf rather than a
+              # heredoc so the SQL terminator doesn't have to dedent out of
+              # this YAML block scalar.
+              printf 'BEGIN;\n\\i %s\nROLLBACK;\n' "$f" \
+                | psql "$PG_DSN" --set=ON_ERROR_STOP=1
+              echo "--- DRY RUN ok: $base parses + plans cleanly ---"
+            else
+              psql "$PG_DSN" --set=ON_ERROR_STOP=1 -f "$f"
+              echo "applied: $base"
+            fi
+            applied=$((applied + 1))
+            echo "::endgroup::"
+          done
+          echo "::notice::DDL run complete — $applied file(s) processed (dry_run=${DRY_RUN:-false})"
+
+      - name: Verify objects exist
+        if: inputs.dry_run != 'true'
+        run: |
+          set -euo pipefail
+          echo "=== saas_audit.event ==="
+          psql "$PG_DSN" -c "\d+ saas_audit.event" || \
+            echo "::warning::saas_audit.event not found (was that file skipped?)"
+          echo "=== saas_tenant_migration_job ==="
+          psql "$PG_DSN" -c "\d+ saas_tenant_migration_job" || \
+            echo "::warning::saas_tenant_migration_job not found (was that file skipped?)"
+          echo "=== append-only triggers ==="
+          psql "$PG_DSN" -tAc "
+            SELECT trigger_name FROM information_schema.triggers
+            WHERE event_object_schema = 'saas_audit'
+            ORDER BY trigger_name;"
