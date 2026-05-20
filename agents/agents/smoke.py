@@ -36,7 +36,10 @@ def _smoke_llm(runtime: Any) -> None:
         max_tokens=10, temperature=0.0,
     )
     assert "PONG" in resp.content.upper(), f"Expected PONG, got: {resp.content}"
-    print(f"LLM OK: {resp.model} · {resp.tokens_in}→{resp.tokens_out} tokens · ${resp.cost_usd:.4f}")
+    print(
+        f"LLM OK: {resp.model} · {resp.tokens_in}→{resp.tokens_out} tokens "
+        f"· ${resp.cost_usd:.4f}"
+    )
 
 
 def _smoke_repo(runtime: Any) -> None:

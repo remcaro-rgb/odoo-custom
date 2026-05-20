@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """pre_init_hook — refuse to install on an unlicensed image.
 
 Runs once at module install time. If the image isn't carrying the
@@ -45,9 +44,9 @@ def pre_init_check(env):
     if not os.path.isfile(_PUBKEY_PATH):
         raise RuntimeError(
             'saas_license_gate refuses to install: '
-            'no signing public key found at %s. The image was built '
+            f'no signing public key found at {_PUBKEY_PATH}. The image was built '
             'without infra/keys/license-signing-pubkey.pem — this is a '
-            'packaging error, not a customer-side problem.' % _PUBKEY_PATH
+            'packaging error, not a customer-side problem.'
         )
     _logger.info(
         'saas_license_gate: pre_init_hook OK — license_id=%s authority=%s',

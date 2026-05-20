@@ -10,7 +10,6 @@ spec: intake, classifier, repro, drafter, refiner, dup_detector, commenter.
 
 from __future__ import annotations
 
-
 _DESIGN_SPEC = "docs/superpowers/specs/2026-05-16-spec-generator-agent-design.md"
 
 

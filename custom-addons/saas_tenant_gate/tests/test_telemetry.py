@@ -1,10 +1,8 @@
 import hashlib
 import hmac
-import json
 import time
 
 from odoo.tests import HttpCase, tagged
-
 
 TELEMETRY_PATH = '/saas/telemetry'
 
@@ -39,7 +37,12 @@ class TestTelemetry(HttpCase):
             signature = _sign(self.secret, ts, body)
         if signature != '':
             headers['X-SaaS-Signature'] = signature
-        return self.url_open(TELEMETRY_PATH, data=body, headers=headers, timeout=30)
+        # Endpoint is registered with methods=['POST']; pass method explicitly
+        # so HttpCase.url_open doesn't fall back to GET when body is b''
+        # (empty bytes evaluates falsy in the data-vs-None check).
+        return self.url_open(
+            TELEMETRY_PATH, data=body, headers=headers, timeout=30, method='POST',
+        )
 
     def test_valid_request_returns_payload(self):
         response = self._post()

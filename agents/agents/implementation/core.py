@@ -7,7 +7,6 @@ This stub makes the CLI not crash; replace with the design-spec modules
 
 from __future__ import annotations
 
-
 _DESIGN_SPEC = "docs/superpowers/specs/2026-05-16-implementation-agent-design.md"
 
 

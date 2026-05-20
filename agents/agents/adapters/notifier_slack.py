@@ -37,7 +37,7 @@ class SlackAdapter:
         self._slack = WebClient(token=token)
 
     @classmethod
-    def from_config(cls, config: Config) -> "SlackAdapter":
+    def from_config(cls, config: Config) -> SlackAdapter:
         from .secrets_envvar import EnvVarSecretStore
         secrets = EnvVarSecretStore()
         slack_cfg = config.extras.get("slack", {})

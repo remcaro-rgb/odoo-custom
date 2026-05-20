@@ -1,3 +1,4 @@
+from odoo import api
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase, tagged
 
@@ -71,12 +72,30 @@ class TestSeatCap(TransactionCase):
         self.assertTrue(user_b.id)
 
     def test_rejection_writes_audit_entry(self):
-        """A blocked create must leave an ir.logging row tagged saas_tenant_gate."""
+        """A blocked create must leave an ir.logging row tagged saas_tenant_gate.
+
+        Implementation detail: the audit write uses `self.pool.cursor()` (a
+        separate Postgres transaction) so the row survives the UserError
+        rollback in production. PG's REPEATABLE READ isolation means the
+        test cursor's snapshot cannot see commits from other transactions
+        that started after the test transaction began — so we must query
+        the audit row via a fresh cursor too, mirroring how an external
+        auditor would read it."""
         current = self._count_internal_active()
         self._set_cap(current)
-        Logging = self.env['ir.logging'].sudo()
-        before = Logging.search_count([('name', '=', 'saas_tenant_gate')])
+
+        def _audit_count():
+            # TransactionCase exposes self.registry (and self.env.registry);
+            # there's no self.pool attribute. The registry's cursor() factory
+            # returns a fresh connection from the pool — same effect.
+            with self.env.registry.cursor() as fresh_cr:
+                fresh_env = api.Environment(fresh_cr, self.env.uid, self.env.context)
+                return fresh_env['ir.logging'].sudo().search_count(
+                    [('name', '=', 'saas_tenant_gate')]
+                )
+
+        before = _audit_count()
         with self.assertRaises(UserError):
             self.Users.create(self._make_user_vals('saas_test_audit@example.com'))
-        after = Logging.search_count([('name', '=', 'saas_tenant_gate')])
+        after = _audit_count()
         self.assertEqual(after, before + 1)

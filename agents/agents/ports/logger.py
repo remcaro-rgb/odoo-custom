@@ -6,8 +6,9 @@ Other adapters: Loki, Better Stack, Datadog.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Any, Iterator, Protocol
+from typing import Any, Protocol
 
 
 class Logger(Protocol):
@@ -21,6 +22,6 @@ class Logger(Protocol):
         """Start a span — duration is logged on exit. Use as a context manager."""
         ...
 
-    def bind(self, **fields: Any) -> "Logger":
+    def bind(self, **fields: Any) -> Logger:
         """Return a new logger with the given fields attached to every event."""
         ...

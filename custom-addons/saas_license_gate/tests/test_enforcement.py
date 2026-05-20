@@ -11,7 +11,6 @@ from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase, tagged
 
-
 _CFG_STATUS = 'saas.license.status'
 _CFG_CHECKED_AT = 'saas.license.checked_at'
 
