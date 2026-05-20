@@ -135,7 +135,7 @@ jobs:
     steps:
       - run: |
           psql "$PG_DSN" -c "
-            INSERT INTO saas.audit.event
+            INSERT INTO saas_audit.event
               (actor_kind, actor_name, action, target_kind, target_id, sha, wave, reason, payload)
             VALUES
               ('human', '${{ github.actor }}', 'rollback-prod', 'wave', '${{ inputs.wave }}',

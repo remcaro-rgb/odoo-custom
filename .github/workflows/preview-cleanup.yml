@@ -128,7 +128,7 @@ jobs:
         run: |
           if [ -s /tmp/to_destroy.txt ]; then
               psql "$PG_DSN" -c "
-                INSERT INTO saas.audit.event (actor_kind, actor_name, action, payload)
+                INSERT INTO saas_audit.event (actor_kind, actor_name, action, payload)
                 VALUES ('system', 'preview-cleanup', 'preview-env-destroyed',
                         '$(jq -Rs . </tmp/to_destroy.txt)'::jsonb)
               " || true
