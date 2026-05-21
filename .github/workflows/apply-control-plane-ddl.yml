@@ -9,10 +9,11 @@
 # CREATE ... IF NOT EXISTS / ADD COLUMN IF NOT EXISTS / DROP TRIGGER
 # IF EXISTS, so re-running is safe and idempotent.
 #
+# Only saas-audit-event-schema.sql is applied here — the tenant-migration
+# schema moved to the control-plane repo's Drizzle migrations.
+#
 # Trigger:
 #   gh workflow run apply-control-plane-ddl.yml -R GoliattCo/odoo-custom
-# Optionally target one file:
-#   gh workflow run apply-control-plane-ddl.yml -R GoliattCo/odoo-custom -f only=saas-audit-event-schema.sql
 
 name: apply-control-plane-ddl
 
@@ -70,12 +71,13 @@ jobs:
         run: |
           set -euo pipefail
           shopt -s nullglob
-          # Deterministic order: audit-event schema before the migration
-          # schema (the latter's runbook cross-references the former, and
-          # there's no hard FK between them, but ordering keeps logs tidy).
+          # The tenant-migration schema is now owned by the control-plane
+          # repo's Drizzle migrations (it attaches to the canonical
+          # public.tenants table); only the saas_audit schema — which uses
+          # append-only triggers and is deliberately not Drizzle-managed —
+          # is applied as raw SQL here.
           files=(
             infra/sql/saas-audit-event-schema.sql
-            infra/sql/saas-tenant-migration-schema.sql
           )
           applied=0
           for f in "${files[@]}"; do
@@ -114,9 +116,6 @@ jobs:
           echo "=== saas_audit.event ==="
           psql "$PG_DSN" -c "\d+ saas_audit.event" || \
             echo "::warning::saas_audit.event not found (was that file skipped?)"
-          echo "=== saas_tenant_migration_job ==="
-          psql "$PG_DSN" -c "\d+ saas_tenant_migration_job" || \
-            echo "::warning::saas_tenant_migration_job not found (was that file skipped?)"
           echo "=== append-only triggers ==="
           psql "$PG_DSN" -tAc "
             SELECT trigger_name FROM information_schema.triggers
