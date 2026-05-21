@@ -117,7 +117,7 @@ jobs:
       - name: Restore per tenant in wave
         run: |
           tenants=$(psql "$PG_DSN" -t -A -c "
-            SELECT name FROM saas.tenant WHERE wave = '${{ inputs.wave }}' AND state = 'active'
+            SELECT slug FROM tenants WHERE wave = '${{ inputs.wave }}' AND state = 'active'
           ")
           echo "$tenants" | while read t; do
               echo "::notice::Restoring tenant $t to pre-promotion snapshot"

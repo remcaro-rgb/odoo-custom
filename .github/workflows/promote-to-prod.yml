@@ -7,7 +7,7 @@
 #   - SHA passed Gate 1 + Gate 2
 #   - Soak time elapsed (24h for risk:low|medium, 72h for risk:high)
 #   - Cross-platform parity (Railway + Fly both succeed or both abort)
-#   - Per-tenant migration via saas.tenant.migration.job queue
+#   - Per-tenant migration via the tenant_migration_jobs queue
 #   - Feature-flag flip for the wave
 #   - Manual approval via GitHub Environments
 
@@ -118,8 +118,8 @@ jobs:
           # Query control-plane DB for tenants in the wave that need migration
           # (last_migrated_sha != target). Output as JSON array.
           tenants=$(psql "$PG_DSN" -t -A -c "
-            SELECT json_agg(name)
-            FROM saas.tenant
+            SELECT json_agg(slug)
+            FROM tenants
             WHERE wave = '${{ inputs.wave }}'
               AND last_migrated_sha IS DISTINCT FROM '${{ steps.resolve.outputs.target_sha }}'
               AND state = 'active'
@@ -228,10 +228,9 @@ jobs:
         run: |
           echo "$TENANTS" | jq -r '.[]' | while read tenant; do
               psql "$PG_DSN" -c "
-                INSERT INTO saas.tenant.migration.job (tenant_id, target_sha, status, enqueued_by)
-                SELECT id, '$SHA', 'queued', '${{ github.run_id }}'
-                FROM saas.tenant WHERE name = '$tenant'
-                ON CONFLICT DO NOTHING
+                INSERT INTO tenant_migration_jobs (tenant_id, target_sha, status, enqueued_by)
+                SELECT id, '$SHA', 'queued', 'promote-to-prod-${{ github.run_id }}'
+                FROM tenants WHERE slug = '$tenant'
               "
           done
 
