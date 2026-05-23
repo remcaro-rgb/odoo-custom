@@ -1,5 +1,5 @@
-from odoo.tests.common import TransactionCase
 from odoo.tests import tagged
+from odoo.tests.common import TransactionCase
 
 
 @tagged('club_faq', 'post_install', '-at_install')

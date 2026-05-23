@@ -1,2 +1,1 @@
-from . import club_faq_category
-from . import club_faq_item
+from . import club_faq_category, club_faq_item
