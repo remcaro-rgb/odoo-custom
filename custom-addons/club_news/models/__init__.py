@@ -1,3 +1,1 @@
-from . import club_news_category
-from . import club_news_tag
-from . import club_news_article
+from . import club_news_article, club_news_category, club_news_tag
