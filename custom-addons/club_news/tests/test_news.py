@@ -1,6 +1,7 @@
-from odoo import fields
-from odoo.tests.common import TransactionCase
 from odoo.tests import tagged
+from odoo.tests.common import TransactionCase
+
+from odoo import fields
 
 
 @tagged('club_news', 'post_install', '-at_install')
