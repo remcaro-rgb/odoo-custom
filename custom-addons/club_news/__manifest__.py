@@ -5,6 +5,7 @@
     'description': 'Manage club news articles with categories, tags, featured/pinned flags, and publish lifecycle.',
     'category': 'Club Management',
     'author': 'Manuel Caro',
+    'website': 'https://github.com/GoliattCo/odoo-custom/tree/main/custom-addons/club_news',
     'license': 'LGPL-3',
     'depends': ['club_core', 'mail'],
     'data': [
