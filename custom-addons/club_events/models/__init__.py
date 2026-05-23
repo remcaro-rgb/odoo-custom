@@ -1,2 +1,1 @@
-from . import club_event
-from . import club_event_registration
+from . import club_event, club_event_registration
