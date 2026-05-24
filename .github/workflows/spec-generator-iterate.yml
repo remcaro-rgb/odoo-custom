@@ -76,4 +76,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SPEC_GENERATOR_BOT_APP_ID: ${{ vars.SPEC_GENERATOR_BOT_APP_ID }}
           GH_TOKEN: ${{ steps.bot_token.outputs.token }}
+          # Observability: see spec-generator.yml for the same pair.
+          AXIOM_TOKEN: ${{ secrets.AXIOM_TOKEN }}
+          AXIOM_DATASET: ${{ vars.AXIOM_DATASET }}
         run: python -m agents.spec_generator

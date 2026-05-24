@@ -58,16 +58,22 @@ jobs:
           ROLLOUT_STAGE: ${{ vars.SPEC_GEN_ROLLOUT_STAGE || 'shadow' }}
           SWEEP_DRY_RUN: ${{ inputs.dry_run || 'false' }}
           GH_TOKEN: ${{ steps.bot_token.outputs.token || github.token }}
+          # Observability: forward Axiom credentials so the sweep also pushes
+          # decisions to the dashboard. Unset = stdout-only.
+          AXIOM_TOKEN: ${{ secrets.AXIOM_TOKEN }}
+          AXIOM_DATASET: ${{ vars.AXIOM_DATASET }}
         # SHADOW + dry_run both produce a no-side-effect dry-run. ACT with
         # dry_run=false is the live sweep.
         run: |
           python -c "
           import os
           from agents.spec_generator.sweep import GhCliSweepClient, run_sweep
+          from agents.spec_generator.axiom_sink import maybe_build_axiom_sink
           from agents.implementation.observability import EventLog
           from agents.implementation.rollout import Rollout, RolloutDecision
 
-          log = EventLog(run_id=os.environ.get('GITHUB_RUN_ID'))
+          axiom_sink = maybe_build_axiom_sink()
+          log = EventLog(run_id=os.environ.get('GITHUB_RUN_ID'), sink=axiom_sink)
           rollout = Rollout.from_env(os.environ)
           dry_run = os.environ.get('SWEEP_DRY_RUN', 'false').lower() == 'true'
           # The sweep walks open PRs and either records decisions (dry-run /
@@ -94,4 +100,9 @@ jobs:
                        spec_path=d.spec_path, action=d.action, reason=d.reason)
           log.emit('sweep-summary', confirmed=len(result.confirmed),
                    total=len(result.decisions), act=act)
+          # Flush the Axiom buffer last so all sweep-decision + sweep-summary
+          # records reach the dataset in one batch.
+          axiom = getattr(log._sink, 'axiom', None)
+          if axiom is not None:
+              axiom.flush()
           "
