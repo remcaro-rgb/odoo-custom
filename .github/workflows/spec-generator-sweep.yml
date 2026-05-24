@@ -97,7 +97,8 @@ jobs:
           result = run_sweep(client=client, act=act)
           for d in result.decisions:
               log.emit('sweep-decision', pr=d.pr, branch=d.branch,
-                       spec_path=d.spec_path, action=d.action, reason=d.reason)
+                       spec_path=d.spec_path, action=d.action, reason=d.reason,
+                       elapsed_ms=d.elapsed_ms)
           log.emit('sweep-summary', confirmed=len(result.confirmed),
                    total=len(result.decisions), act=act)
           # Flush the Axiom buffer last so all sweep-decision + sweep-summary
