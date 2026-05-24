@@ -32,6 +32,14 @@ on:
         default: 'true'
         type: choice
         options: ['true', 'false']
+      paste_back_confirmation:
+        description: 'Required when wave=all OR force_promote=true. Type "PROMOTE <wave>" exactly.'
+        required: false
+      force_promote:
+        description: 'Bypass the 7-day rollback quarantine (requires paste_back_confirmation).'
+        default: 'false'
+        type: choice
+        options: ['true', 'false']
 
 concurrency:
   group: promote-to-prod-${{ inputs.wave }}
@@ -48,6 +56,82 @@ jobs:
       target_tenants: ${{ steps.tenants.outputs.target_tenants }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Kill-switch check (AGENTS_ENABLED + AGENT_PROMOTE_ENABLED)
+        env:
+          AGENTS_ENABLED: ${{ vars.AGENTS_ENABLED }}
+          AGENT_PROMOTE_ENABLED: ${{ vars.AGENT_PROMOTE_ENABLED }}
+        run: |
+          # AGENTS_ENABLED is repo-wide (mirrors agent-guardrails.yml).
+          # AGENT_PROMOTE_ENABLED is the prod-promote-specific kill switch and
+          # defaults to "false" until cutover, so an absent value blocks promotes.
+          if [ "${AGENTS_ENABLED:-true}" != "true" ]; then
+              echo "::error::AGENTS_ENABLED is not 'true' — all agent + automation workflows are disabled." >&2
+              exit 1
+          fi
+          if [ "${AGENT_PROMOTE_ENABLED:-false}" != "true" ]; then
+              echo "::error::AGENT_PROMOTE_ENABLED is not 'true' — prod promotes are disabled. Set the repo variable to enable." >&2
+              exit 1
+          fi
+
+      - name: Paste-back confirmation (wave=all or force_promote=true)
+        env:
+          WAVE: ${{ inputs.wave }}
+          FORCE: ${{ inputs.force_promote }}
+          PASTE: ${{ inputs.paste_back_confirmation }}
+          PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+        run: |
+          required="false"
+          [ "$WAVE" = "all" ] && required="true"
+          [ "$FORCE" = "true" ] && required="true"
+          if [ "$required" = "false" ]; then
+              echo "::notice::paste-back not required (wave=$WAVE force_promote=$FORCE)"
+              exit 0
+          fi
+          expected="PROMOTE $WAVE"
+          if [ "$PASTE" != "$expected" ]; then
+              echo "::error::paste_back_confirmation missing or wrong. Expected exactly: '$expected'" >&2
+              # Audit the mismatch as a security_alert so we have a forensic trail
+              # of failed paste-back attempts on emergency promotes.
+              if [ -n "${PG_DSN:-}" ]; then
+                  psql "$PG_DSN" -c "
+                    INSERT INTO saas_audit.event
+                      (actor_kind, actor_name, action, target_kind, target_id, sha, wave, reason, payload)
+                    VALUES
+                      ('human', '${{ github.actor }}', 'promote-to-prod', 'wave', '$WAVE',
+                       NULL, '$WAVE', 'paste_back_mismatch',
+                       jsonb_build_object('outcome', 'security_alert', 'provided', '$PASTE'))
+                  " || true
+              fi
+              exit 1
+          fi
+          echo "::notice::paste-back accepted"
+
+      - name: Rollback quarantine (no open rollback for this wave in last 7d)
+        env:
+          PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+          WAVE: ${{ inputs.wave }}
+          FORCE: ${{ inputs.force_promote }}
+        run: |
+          # A rollback in the past 7 days for this wave usually means an
+          # in-flight incident. Block unless force_promote=true (which already
+          # required a paste_back above).
+          if [ "$FORCE" = "true" ]; then
+              echo "::warning::force_promote=true; rollback-quarantine bypassed."
+              exit 0
+          fi
+          recent=$(psql "$PG_DSN" -t -A -c "
+            SELECT count(*)
+            FROM saas_audit.event
+            WHERE action = 'rollback-prod'
+              AND wave   = '$WAVE'
+              AND created_at > now() - interval '7 days'
+          " 2>/dev/null || echo "0")
+          if [ "${recent:-0}" != "0" ]; then
+              echo "::error::Quarantine: $recent rollback(s) for wave=$WAVE in last 7 days. Resolve the incident or rerun with force_promote=true + paste-back." >&2
+              exit 1
+          fi
+
       - name: Resolve target SHA
         id: resolve
         env:
