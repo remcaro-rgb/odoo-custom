@@ -276,6 +276,37 @@ jobs:
             --verbose \
             --exit-code 1
 
+  # ---------- Trivy filesystem CVE scan (P2.4 — CVE half) ----------
+  # Scans the on-disk filesystem (Python deps, Dockerfile base image,
+  # config files) for HIGH/CRITICAL CVEs with available fixes. Pairs
+  # with bandit (Python source) + gitleaks (secrets); together these
+  # are the secrets+vuln half of Phase 2 P2.4.
+  #
+  # `ignore-unfixed: true` — many Debian-base CVEs have no fixed
+  # version yet; those aren't actionable on a PR. Re-evaluate when the
+  # no-fix backlog becomes manageable. Update by removing the flag and
+  # iterating on `trivyignore` exemptions.
+  trivy-scan:
+    name: Trivy filesystem CVE scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Run trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+          # Skip large vendored / third-party trees that we don't
+          # control. Add to `.trivyignore` for per-CVE exemptions
+          # rather than silencing whole directories here.
+          skip-dirs: legacy,jorels,node_modules,.git
+
   masking-unit-tests:
     name: Agentlab masking unit tests
     runs-on: ubuntu-latest
