@@ -601,140 +601,20 @@ jobs:
               echo "| $tenant | enqueued |" >> "$GITHUB_STEP_SUMMARY"
           done
 
-  run-migrations:
-    name: Migrate tenant
-    needs: [queue-migrations, preflight]
-    # Only run if there are tenants to migrate; matrix on empty list is a no-op
-    # but we skip the whole job for clearer status reporting.
-    if: |
-      always()
-      && needs.queue-migrations.result == 'success'
-      && needs.preflight.outputs.target_tenants != '[]'
-      && needs.preflight.outputs.target_tenants != 'null'
-    strategy:
-      fail-fast: false      # one tenant's failure must not block siblings
-      max-parallel: 5
-      matrix:
-        tenant: ${{ fromJSON(needs.preflight.outputs.target_tenants) }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
-      SHA: ${{ needs.preflight.outputs.target_sha }}
-      DRY_RUN: ${{ inputs.dry_run }}
-      TENANT: ${{ matrix.tenant }}
-      RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
-      RAILWAY_SSH_PRIVATE_KEY: ${{ secrets.RAILWAY_SSH_PRIVATE_KEY }}
-      FLY_SSH_TOKEN: ${{ secrets.FLY_SSH_TOKEN_POSTGRES }}
-      SLACK_WEBHOOK: ${{ secrets.SLACK_DEPLOY_WEBHOOK }}
-    steps:
-      - name: Load tenant context (platform + maintenance window)
-        id: ctx
-        run: |
-          set -euo pipefail
-          if [ "$DRY_RUN" = "true" ]; then
-              echo "platform=fly" >> "$GITHUB_OUTPUT"
-              echo "::notice::[dry-run] using platform=fly for $TENANT"
-              exit 0
-          fi
-          row=$(psql "$PG_DSN" -t -A -F '|' -c "
-            SELECT coalesce(platform, 'fly'),
-                   coalesce(to_char(maintenance_window_start, 'HH24:MI'), ''),
-                   coalesce(to_char(maintenance_window_end,   'HH24:MI'), '')
-            FROM tenants WHERE slug = '$TENANT'
-          ")
-          platform=$(echo "$row" | cut -d'|' -f1)
-          win_start=$(echo "$row" | cut -d'|' -f2)
-          win_end=$(echo "$row" | cut -d'|' -f3)
-          echo "platform=$platform" >> "$GITHUB_OUTPUT"
-          echo "win_start=$win_start" >> "$GITHUB_OUTPUT"
-          echo "win_end=$win_end"     >> "$GITHUB_OUTPUT"
-          if [ -n "$win_start" ] && [ -n "$win_end" ]; then
-              now=$(date -u +%H:%M)
-              # Stays simple — string compare works because all values are HH:MM.
-              if [ "$now" \< "$win_start" ] || [ "$now" \> "$win_end" ]; then
-                  echo "::warning::Outside maintenance window for $TENANT ($win_start–$win_end UTC, now=$now). Deferring."
-                  exit 78        # neutral-skip-style; treated as success by GH
-              fi
-          fi
-
-      - name: Backup snapshot (pgbackrest)
-        if: env.DRY_RUN == 'false'
-        run: |
-          # Cheap insurance: trigger an incremental backup ≤ 4h old so a
-          # post-migration rollback has somewhere to land.
-          flyctl ssh console --app odoo-saas-postgres -C \
-              "gosu postgres pgbackrest --stanza=shared \
-                  --pg1-path=/var/lib/postgresql/data/pgdata \
-                  --log-level-console=info backup --type=incr" \
-              || echo "::warning::Snapshot trigger failed for $TENANT; migration proceeds at operator's risk."
-
-      - name: Run odoo -u all
-        id: migrate
-        env:
-          PLATFORM: ${{ steps.ctx.outputs.platform }}
-        run: |
-          set -euo pipefail
-          if [ "$DRY_RUN" = "true" ]; then
-              echo "::notice::[dry-run] would run 'odoo -u all -d $TENANT' on $PLATFORM"
-              echo "exit_code=0" >> "$GITHUB_OUTPUT"
-              exit 0
-          fi
-          # Each platform's SSH path mirrors the one already proven in
-          # pgbackrest-backup.yml. Capture the last 50 log lines for
-          # forensic context if the migration fails.
-          tmp=$(mktemp)
-          case "$PLATFORM" in
-            railway)
-              mkdir -p "$HOME/.ssh"
-              printf '%s\n' "$RAILWAY_SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
-              chmod 600 "$HOME/.ssh/id_ed25519"
-              ssh-keyscan -H gateway.railway.app >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
-              RAILWAY_TOKEN="$RAILWAY_API_TOKEN" railway ssh --service odoo \
-                  -- "odoo -d $TENANT -u all --stop-after-init --no-http" 2>&1 | tee "$tmp"
-              ;;
-            fly|*)
-              FLY_API_TOKEN="$FLY_SSH_TOKEN" flyctl ssh console --app odoo-saas-odoo -C \
-                  "odoo -d $TENANT -u all --stop-after-init --no-http" 2>&1 | tee "$tmp"
-              ;;
-          esac
-          rc=${PIPESTATUS[0]}
-          tail -50 "$tmp" > /tmp/migration-tail.log
-          echo "exit_code=$rc" >> "$GITHUB_OUTPUT"
-          exit "$rc"
-
-      - name: On success — mark done, bump last_migrated_sha
-        if: env.DRY_RUN == 'false' && steps.migrate.outputs.exit_code == '0'
-        run: |
-          psql "$PG_DSN" -c "
-            UPDATE saas.tenant SET last_migrated_sha = '$SHA'
-            WHERE slug = '$TENANT';
-            UPDATE tenant_migration_jobs
-              SET status = 'done', finished_at = now()
-              WHERE tenant_id = (SELECT id FROM tenants WHERE slug = '$TENANT')
-                AND target_sha = '$SHA';
-          "
-
-      - name: On failure — record + page on-call
-        if: always() && env.DRY_RUN == 'false' && steps.migrate.outcome == 'failure'
-        run: |
-          excerpt=$(tail -50 /tmp/migration-tail.log 2>/dev/null | sed 's/'\''/'\'\''/g' | head -c 2000)
-          psql "$PG_DSN" -c "
-            UPDATE tenant_migration_jobs
-              SET status = 'failed', finished_at = now(), error_excerpt = \$\$$excerpt\$\$
-              WHERE tenant_id = (SELECT id FROM tenants WHERE slug = '$TENANT')
-                AND target_sha = '$SHA';
-          " || true
-          curl -X POST -H 'Content-type: application/json' \
-            --data "{\"text\": \"🚨 promote-to-prod migration FAILED for tenant=$TENANT sha=$SHA — see workflow $GITHUB_RUN_ID\"}" \
-            "$SLACK_WEBHOOK" || true
+  # Note: actual per-tenant migrations are owned by the long-running
+  # `migration-runner` daemon (PR #44, infra/runners/migration_runner/).
+  # It claims jobs from `tenant_migration_jobs` via SELECT FOR UPDATE
+  # SKIP LOCKED, runs `odoo -u all`, handles snapshots, retries, timeouts,
+  # idempotency, and updates `tenants.last_migrated_sha`. This workflow's
+  # responsibility ends at enqueueing — the queue-migrations job above is
+  # the handoff point.
 
   flip-feature-flags:
     name: Flip wave-gated feature flags
-    needs: [run-migrations, preflight]
+    needs: [queue-migrations, preflight]
     if: |
       always()
-      && (needs.run-migrations.result == 'success' || needs.run-migrations.result == 'skipped')
+      && needs.queue-migrations.result == 'success'
     runs-on: ubuntu-latest
     env:
       PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
@@ -863,7 +743,7 @@ jobs:
 
   audit:
     name: Audit log (saas_audit.event)
-    needs: [preflight, smoke, run-migrations, flip-feature-flags, tag-image]
+    needs: [preflight, smoke, queue-migrations, flip-feature-flags, tag-image]
     if: always()
     runs-on: ubuntu-latest
     env:
@@ -872,17 +752,20 @@ jobs:
       - name: Insert promote-to-prod audit row
         run: |
           smoke_outcome="${{ needs.smoke.result }}"
-          mig_outcome="${{ needs.run-migrations.result }}"
+          # Per-tenant migration outcomes live in `tenant_migration_jobs`
+          # (owned by the migration-runner daemon). This row records the
+          # enqueue handoff; the daemon writes its own audit on completion.
+          enq_outcome="${{ needs.queue-migrations.result }}"
           flag_outcome="${{ needs.flip-feature-flags.result }}"
           payload=$(jq -nc \
               --arg platforms     "${{ inputs.platforms }}" \
               --arg dry_run       "${{ inputs.dry_run }}" \
               --arg prod_tag      "${{ needs.tag-image.outputs.prod_tag }}" \
               --arg smoke         "$smoke_outcome" \
-              --arg migrate       "$mig_outcome" \
+              --arg enqueue       "$enq_outcome" \
               --arg flags         "$flag_outcome" \
               --arg run_id        "${{ github.run_id }}" \
-              '{platforms:$platforms,dry_run:$dry_run,prod_tag:$prod_tag,smoke:$smoke,migrate:$migrate,flags:$flags,run_id:$run_id}')
+              '{platforms:$platforms,dry_run:$dry_run,prod_tag:$prod_tag,smoke:$smoke,enqueue:$enqueue,flags:$flags,run_id:$run_id}')
           psql "$PG_DSN" -c "
             INSERT INTO saas_audit.event
               (actor_kind, actor_name, action, target_kind, target_id, sha, wave, reason, payload)

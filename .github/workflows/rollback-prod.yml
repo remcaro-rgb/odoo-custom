@@ -371,40 +371,63 @@ jobs:
       PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
       DRY_RUN: ${{ inputs.dry_run }}
       WAVE: ${{ inputs.wave }}
+      TARGET_SHA: ${{ inputs.target_sha }}
     steps:
       - uses: actions/checkout@v4
-      - name: Restore per tenant in wave
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install migration-runner package
+        if: env.DRY_RUN == 'false'
+        # The daemon's rollback module composes with this workflow per its
+        # docstring: rollback-prod.yml rolls back the IMAGE; rollback.py
+        # rolls back the DATA. Together they restore a tenant to "the
+        # state it was in before migration job X."
+        run: pip install -e infra/runners/migration_runner/
+
+      - name: Restore per tenant in wave (delegates to migration_runner.rollback)
         run: |
           set -euo pipefail
-          tenants=$(psql "$PG_DSN" -t -A -c "
-            SELECT slug FROM tenants WHERE wave = '$WAVE' AND state = 'active'
-          " || echo "")
-          if [ -z "$tenants" ]; then
-              echo "::notice::No active tenants in wave $WAVE; nothing to restore."
-              exit 0
-          fi
           {
             echo "## Tenant restore"
             echo ""
-            echo "| Tenant | Action |"
-            echo "|---|---|"
+            echo "| Tenant | Job ID | Action |"
+            echo "|---|---|---|"
           } >> "$GITHUB_STEP_SUMMARY"
-          # Use `read -r` (SC2162 fix) to avoid backslash mangling.
-          echo "$tenants" | while read -r t; do
-              [ -z "$t" ] && continue
+          # For each tenant in the wave, find the most recent migration
+          # job whose applied_at is AFTER our rollback target_sha was last
+          # applied — that's the job we need to undo. Pass its uuid to
+          # the daemon's rollback module.
+          rows=$(psql "$PG_DSN" -t -A -F '|' -c "
+            SELECT j.id, t.slug
+            FROM tenant_migration_jobs j
+            JOIN tenants t ON t.id = j.tenant_id
+            WHERE t.wave = '$WAVE' AND t.state = 'active'
+              AND j.status = 'done'
+              AND j.applied_at > coalesce(
+                (SELECT max(applied_at) FROM tenant_migration_jobs
+                 WHERE tenant_id = j.tenant_id AND target_sha = '$TARGET_SHA'),
+                '-infinity'::timestamptz
+              )
+            ORDER BY j.applied_at DESC
+          " || echo "")
+          if [ -z "$rows" ]; then
+              echo "::notice::No tenants in $WAVE need data rollback (no forward migrations since $TARGET_SHA)."
+              echo "| — | — | no-op |" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          printf '%s\n' "$rows" | while IFS='|' read -r job_id slug; do
+              [ -z "$job_id" ] && continue
               if [ "$DRY_RUN" = "true" ]; then
-                  echo "::notice::[dry-run] would restore tenant $t to pre-promotion snapshot"
-                  echo "| $t | dry-run skip |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "::notice::[dry-run] would rollback tenant $slug via job $job_id"
+                  echo "| $slug | \`$job_id\` | dry-run skip |" >> "$GITHUB_STEP_SUMMARY"
                   continue
               fi
-              # The shell script handles the per-tenant pgbackrest --target
-              # mechanics + writes its own audit row per-tenant for forensic clarity.
-              if [ -x infra/runbooks/restore-tenant.sh ]; then
-                  infra/runbooks/restore-tenant.sh "$t" --before "${{ github.event.created_at }}"
-                  echo "| $t | restored |" >> "$GITHUB_STEP_SUMMARY"
+              if python -m migration_runner.rollback "$job_id"; then
+                  echo "| $slug | \`$job_id\` | rolled back |" >> "$GITHUB_STEP_SUMMARY"
               else
-                  echo "::error::infra/runbooks/restore-tenant.sh missing — cannot restore $t" >&2
-                  echo "| $t | **FAIL** (runbook missing) |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "::error::migration_runner.rollback failed for $slug job=$job_id" >&2
+                  echo "| $slug | \`$job_id\` | **FAIL** |" >> "$GITHUB_STEP_SUMMARY"
                   exit 1
               fi
           done
