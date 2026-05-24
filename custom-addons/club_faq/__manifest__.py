@@ -5,6 +5,7 @@
     'description': 'FAQ system with categories, Q&A, ordering, and EN/ES multilanguage support.',
     'category': 'Club Management',
     'author': 'Manuel Caro',
+    'maintainers': ['Manuel Caro'],
     'license': 'LGPL-3',
     'depends': ['club_core'],
     'data': [
