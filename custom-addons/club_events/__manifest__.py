@@ -5,6 +5,7 @@
     'description': 'Club events module: internal/external events, member pricing, registration with affiliate linking.',
     'category': 'Club Management',
     'author': 'Manuel Caro',
+    'maintainers': ['Manuel Caro'],
     'license': 'LGPL-3',
     'depends': ['club_core', 'event', 'website_event', 'payment'],
     'data': [
