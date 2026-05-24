@@ -425,7 +425,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 1
+          # 0 = full history. `Detect changed addons` below needs
+          # `git diff base.sha..head.sha`, and fetch-depth: 1 only
+          # brings down the merge commit on a PR event — the base SHA
+          # isn't reachable. Full history adds a few seconds to a
+          # 5–10 min job; negligible.
+          fetch-depth: 0
 
       - uses: docker/setup-buildx-action@v3
       - name: docker build Odoo (for test run)
@@ -535,7 +540,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 1
+          # 0 = full history — `Detect changed addons` below needs
+          # base..head reachable; matches `test-addon` (P2.5).
+          fetch-depth: 0
 
       - uses: docker/setup-buildx-action@v3
       - name: docker build Odoo (for httpcase run)
@@ -700,7 +707,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 2
+          # 0 = full history — same reason as `test-addon` (P2.5):
+          # `Detect changed addons` needs base..head reachable.
+          fetch-depth: 0
 
       - uses: docker/setup-buildx-action@v3
       - name: docker build Odoo (for migration dry-run)
