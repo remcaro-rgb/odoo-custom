@@ -124,15 +124,40 @@ jobs:
               AND last_migrated_sha IS DISTINCT FROM '${{ steps.resolve.outputs.target_sha }}'
               AND state = 'active'
           " || echo "[]")
+          # Empty / NULL → normalize to "[]" so downstream `jq -r '.[]?'` is safe.
+          if [ -z "$tenants" ] || [ "$tenants" = "null" ]; then
+              tenants="[]"
+          fi
           echo "target_tenants=$tenants" >> "$GITHUB_OUTPUT"
           echo "::notice::Target tenants: $tenants"
+
+      - name: Preflight summary
+        env:
+          SHA: ${{ steps.resolve.outputs.target_sha }}
+          TENANTS: ${{ steps.tenants.outputs.target_tenants }}
+        run: |
+          tenant_count=$(echo "$TENANTS" | jq '. | length // 0')
+          {
+            echo "## Preflight"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Wave | \`${{ inputs.wave }}\` |"
+            echo "| Target SHA | \`$SHA\` |"
+            echo "| Platforms | \`${{ inputs.platforms }}\` |"
+            echo "| Dry-run | \`${{ inputs.dry_run }}\` |"
+            echo "| Tenants in wave | $tenant_count |"
+            echo "| Actor | @${{ github.actor }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   approval:
     name: Awaiting prod-deployers approval
     needs: [preflight]
+    # Skipped on dry-run so shadow promotes don't block on a human gate.
+    # On a real promote: N=1 from prod-deployers, or N=2 if wave=all
+    # (the stricter `prod-rollout-strict` environment is configured in repo settings).
+    if: inputs.dry_run == 'false'
     runs-on: ubuntu-latest
-    # Requires N=1 from prod-deployers (N=2 if wave=all — enforced by a stricter
-    # environment 'prod-rollout-strict' configured in repo settings)
     environment: ${{ inputs.wave == 'all' && 'prod-rollout-strict' || 'prod-rollout' }}
     steps:
       - run: echo "Approved for wave=${{ inputs.wave }}, sha=${{ needs.preflight.outputs.target_sha }}"
@@ -140,20 +165,47 @@ jobs:
   tag-image:
     name: Tag prod image
     needs: [approval, preflight]
+    # Run when preflight passes AND approval is either approved or
+    # legitimately skipped (dry-run path). Without this, GH cascades the
+    # `skipped` status from approval and the rest of the workflow stops.
+    if: |
+      always()
+      && needs.preflight.result == 'success'
+      && (needs.approval.result == 'success' || needs.approval.result == 'skipped')
     runs-on: ubuntu-latest
-    if: inputs.dry_run == 'false'
+    outputs:
+      prod_tag: ${{ steps.compute.outputs.prod_tag }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.preflight.outputs.target_sha }}
-      - name: Tag image
+      - name: Compute prod tag
+        id: compute
+        run: |
+          set -euo pipefail
+          tag="prod-$(date -u +%Y.%m.%d)-${{ github.run_number }}"
+          echo "prod_tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "::notice::Prod tag: $tag"
+          {
+            echo "## Image tag"
+            echo ""
+            echo "- SHA: \`${{ needs.preflight.outputs.target_sha }}\`"
+            echo "- Tag: \`$tag\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Push tag to registry
+        if: inputs.dry_run == 'false'
         env:
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
         run: |
-          tag="prod-$(date -u +%Y.%m.%d)-${{ github.run_number }}"
-          echo "::notice::Tagging image as $tag"
-          # Pseudo: docker pull <staging-image-at-sha>; docker tag; docker push
-          # Implementation depends on the registry. Cloudflare R2 / GHCR / Dockerhub.
+          # Tier 3 will replace this stub with `docker pull <image>@<digest>; docker tag; docker push`
+          # against GHCR using the cosign-signed digest from ghcr-publish.yml.
+          echo "::warning::tag-image push is a stub — pending Tier 3 digest-pinning implementation"
+          echo "- Push: **stub** (Tier 3 deliverable)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Dry-run notice
+        if: inputs.dry_run == 'true'
+        run: |
+          echo "::notice::[dry-run] tag '${{ steps.compute.outputs.prod_tag }}' computed but not pushed"
+          echo "- Push: **skipped (dry_run=true)**" >> "$GITHUB_STEP_SUMMARY"
 
   deploy-railway:
     name: Deploy → Railway prod
@@ -171,10 +223,20 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-              echo "::notice::dry_run=true; skipping actual deploy"
+              echo "::notice::[dry-run] would deploy Railway service=${{ secrets.RAILWAY_PROD_ODOO_SERVICE_ID }} sha=${{ needs.preflight.outputs.target_sha }}"
+              {
+                echo "## Deploy → Railway"
+                echo "- Status: **skipped (dry_run=true)**"
+                echo "- Tag: \`${{ needs.tag-image.outputs.prod_tag }}\`"
+              } >> "$GITHUB_STEP_SUMMARY"
               exit 0
           fi
           railway up --service "${{ secrets.RAILWAY_PROD_ODOO_SERVICE_ID }}" --detach
+          {
+            echo "## Deploy → Railway"
+            echo "- Status: **deployed**"
+            echo "- Tag: \`${{ needs.tag-image.outputs.prod_tag }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-fly:
     name: Deploy → Fly prod
@@ -190,12 +252,22 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_PROD_API_TOKEN }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-              echo "::notice::dry_run=true; skipping actual deploy"
+              echo "::notice::[dry-run] would deploy Fly app via infra/fly/odoo-prod/fly.toml sha=${{ needs.preflight.outputs.target_sha }}"
+              {
+                echo "## Deploy → Fly"
+                echo "- Status: **skipped (dry_run=true)**"
+                echo "- Tag: \`${{ needs.tag-image.outputs.prod_tag }}\`"
+              } >> "$GITHUB_STEP_SUMMARY"
               exit 0
           fi
           flyctl deploy --config infra/fly/odoo-prod/fly.toml \
               --dockerfile Dockerfile --remote-only --strategy rolling \
               --wait-timeout 900
+          {
+            echo "## Deploy → Fly"
+            echo "- Status: **deployed**"
+            echo "- Tag: \`${{ needs.tag-image.outputs.prod_tag }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   parity-gate:
     name: Cross-platform parity gate
@@ -208,50 +280,109 @@ jobs:
           fly="${{ needs.deploy-fly.result }}"
           # 'skipped' is OK (user opted out of that platform via inputs.platforms);
           # mismatched success/failure is not.
+          {
+            echo "## Parity gate"
+            echo ""
+            echo "| Platform | Result |"
+            echo "|---|---|"
+            echo "| Railway | \`$railway\` |"
+            echo "| Fly | \`$fly\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
           if [ "$railway" != "$fly" ] && [ "$railway" != "skipped" ] && [ "$fly" != "skipped" ]; then
               echo "::error::Parity gate FAILED. Railway=$railway Fly=$fly" >&2
+              echo "- Verdict: **FAIL**" >> "$GITHUB_STEP_SUMMARY"
               exit 1
           fi
           echo "::notice::Parity OK. Railway=$railway Fly=$fly"
+          echo "- Verdict: **OK**" >> "$GITHUB_STEP_SUMMARY"
 
   queue-migrations:
     name: Enqueue per-tenant migration jobs
     needs: [parity-gate, preflight]
     runs-on: ubuntu-latest
-    if: inputs.dry_run == 'false'
     env:
       PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
       SHA: ${{ needs.preflight.outputs.target_sha }}
       TENANTS: ${{ needs.preflight.outputs.target_tenants }}
+      DRY_RUN: ${{ inputs.dry_run }}
     steps:
       - name: Enqueue jobs
         run: |
-          echo "$TENANTS" | jq -r '.[]' | while read tenant; do
+          set -euo pipefail
+          {
+            echo "## Migration queue — wave=${{ inputs.wave }}"
+            echo ""
+            echo "| Tenant | Action |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # Defensive normalize so `jq` doesn't crash under pipefail if upstream returned nothing.
+          [ -n "${TENANTS:-}" ] || TENANTS="[]"
+          tenant_count=$(echo "$TENANTS" | jq -r '. | length // 0')
+          if [ "$tenant_count" = "0" ]; then
+              echo "| — | no tenants in wave needed migration |" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          echo "$TENANTS" | jq -r '.[]?' | while read -r tenant; do
+              if [ "$DRY_RUN" = "true" ]; then
+                  echo "::notice::[dry-run] would enqueue migration for tenant=$tenant sha=$SHA"
+                  echo "| $tenant | dry-run skip |" >> "$GITHUB_STEP_SUMMARY"
+                  continue
+              fi
               psql "$PG_DSN" -c "
                 INSERT INTO tenant_migration_jobs (tenant_id, target_sha, status, enqueued_by)
                 SELECT id, '$SHA', 'queued', 'promote-to-prod-${{ github.run_id }}'
                 FROM tenants WHERE slug = '$tenant'
               "
+              echo "| $tenant | enqueued |" >> "$GITHUB_STEP_SUMMARY"
           done
 
   smoke:
     name: Post-deploy smoke
     needs: [queue-migrations, preflight]
     runs-on: ubuntu-latest
-    if: inputs.dry_run == 'false'
     steps:
       - uses: actions/checkout@v4
       - name: Probe /web/health per tenant
         env:
           TENANTS: ${{ needs.preflight.outputs.target_tenants }}
+          BASE_DOMAIN: ${{ vars.TENANT_BASE_DOMAIN }}
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          echo "$TENANTS" | jq -r '.[]' | head -3 | while read t; do
-              code=$(curl -s -o /dev/null -w '%{http_code}' "https://${t}.<your-domain>/web/health")
+          set -euo pipefail
+          base="${BASE_DOMAIN:-app.goliatt.co}"
+          {
+            echo "## Smoke probe — wave=${{ inputs.wave }}"
+            echo ""
+            echo "| Tenant | URL | Result |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # Defensive normalize so `jq` doesn't crash under pipefail if upstream returned nothing.
+          [ -n "${TENANTS:-}" ] || TENANTS="[]"
+          tenant_count=$(echo "$TENANTS" | jq -r '. | length // 0')
+          if [ "$tenant_count" = "0" ]; then
+              echo "| — | — | no tenants in wave |" >> "$GITHUB_STEP_SUMMARY"
+              echo "::notice::No tenants in wave; smoke step is a no-op"
+              exit 0
+          fi
+          if [ "$DRY_RUN" = "true" ]; then
+              echo "::notice::dry_run=true; logging would-be probe URLs without sending requests"
+          fi
+          # `set -e` + pipefail in a while-pipe subshell propagates exit codes.
+          echo "$TENANTS" | jq -r '.[]?' | head -3 | while read -r t; do
+              url="https://${t}.${base}/web/health"
+              if [ "$DRY_RUN" = "true" ]; then
+                  echo "::notice::[dry-run] would probe $url"
+                  echo "| $t | $url | dry-run skip |" >> "$GITHUB_STEP_SUMMARY"
+                  continue
+              fi
+              code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$url" || echo "000")
               if [ "$code" != "200" ]; then
-                  echo "::error::Smoke failed for $t (HTTP $code)" >&2
+                  echo "::error::Smoke failed for $t (HTTP $code) — $url" >&2
+                  echo "| $t | $url | FAIL ($code) |" >> "$GITHUB_STEP_SUMMARY"
                   exit 1
               fi
               echo "::notice::Smoke OK for $t"
+              echo "| $t | $url | OK |" >> "$GITHUB_STEP_SUMMARY"
           done
 
   notify:
