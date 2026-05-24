@@ -15,7 +15,7 @@
 # enterprise-v1 digest so the migration runs against the SAME Odoo
 # code the tenants are about to receive. Default points to ghcr —
 # overridable at build time with --build-arg BASE_IMAGE=...
-ARG BASE_IMAGE=ghcr.io/goliattco/odoo-saas:enterprise-v1
+ARG BASE_IMAGE=ghcr.io/goliattco/odoo-saas-odoo:latest
 FROM ${BASE_IMAGE} AS runner
 
 LABEL org.opencontainers.image.title="odoo-saas-migration-runner"

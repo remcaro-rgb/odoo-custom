@@ -80,8 +80,13 @@ jobs:
           fi
           BASE_IMAGE="${{ inputs.base_image }}"
           if [ -z "$BASE_IMAGE" ]; then
-            # Default to the enterprise-v1 tag from this org's ghcr.
-            BASE_IMAGE="ghcr.io/${OWNER}/odoo-saas:enterprise-v1"
+            # Default to the standard odoo-saas-odoo image (the shared
+            # tenant pool's image). Migrating against the SAME image
+            # that's serving traffic is exactly what we want — license-
+            # gate verification is a tenant-facing concern, not a
+            # maintenance-runner one, so we deliberately do NOT use
+            # `odoo-saas-odoo-enterprise` here.
+            BASE_IMAGE="ghcr.io/${OWNER}/odoo-saas-odoo:latest"
           fi
           echo "tags=${TAGS}"          >> "$GITHUB_OUTPUT"
           echo "base_image=${BASE_IMAGE}" >> "$GITHUB_OUTPUT"
