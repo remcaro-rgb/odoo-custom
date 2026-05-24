@@ -511,9 +511,49 @@ jobs:
           echo "::notice::Parity OK. Railway=$railway Fly=$fly"
           echo "- Verdict: **OK**" >> "$GITHUB_STEP_SUMMARY"
 
+  readiness-probe:
+    name: Post-deploy readiness probe
+    needs: [parity-gate, preflight]
+    if: |
+      always()
+      && needs.parity-gate.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DRY_RUN: ${{ inputs.dry_run }}
+      BASE_DOMAIN: ${{ vars.TENANT_BASE_DOMAIN }}
+    steps:
+      - name: Wait for control-plane health
+        run: |
+          set -euo pipefail
+          base="${BASE_DOMAIN:-app.goliatt.co}"
+          # operator.<base> is the per-deploy canary endpoint that proves
+          # at least one Odoo worker has come online with the new image.
+          url="https://operator.${base}/web/health"
+          if [ "$DRY_RUN" = "true" ]; then
+              echo "::notice::[dry-run] would poll $url until ready (≤4m)"
+              echo "## Readiness probe" >> "$GITHUB_STEP_SUMMARY"
+              echo "- Status: **skipped (dry_run=true)**" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          deadline=$(( $(date +%s) + 240 ))
+          while [ "$(date +%s)" -lt "$deadline" ]; do
+              code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$url" || echo "000")
+              if [ "$code" = "200" ]; then
+                  echo "::notice::Ready: $url ($code)"
+                  echo "## Readiness probe" >> "$GITHUB_STEP_SUMMARY"
+                  echo "- Status: **ready** ($url)" >> "$GITHUB_STEP_SUMMARY"
+                  exit 0
+              fi
+              echo "Waiting on $url ($code)…"
+              sleep 5
+          done
+          echo "::error::Readiness probe timed out after 4m on $url" >&2
+          exit 1
+
   queue-migrations:
     name: Enqueue per-tenant migration jobs
-    needs: [parity-gate, preflight]
+    needs: [readiness-probe, preflight]
     runs-on: ubuntu-latest
     env:
       PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
@@ -551,9 +591,181 @@ jobs:
               echo "| $tenant | enqueued |" >> "$GITHUB_STEP_SUMMARY"
           done
 
+  run-migrations:
+    name: Migrate tenant
+    needs: [queue-migrations, preflight]
+    # Only run if there are tenants to migrate; matrix on empty list is a no-op
+    # but we skip the whole job for clearer status reporting.
+    if: |
+      always()
+      && needs.queue-migrations.result == 'success'
+      && needs.preflight.outputs.target_tenants != '[]'
+      && needs.preflight.outputs.target_tenants != 'null'
+    strategy:
+      fail-fast: false      # one tenant's failure must not block siblings
+      max-parallel: 5
+      matrix:
+        tenant: ${{ fromJSON(needs.preflight.outputs.target_tenants) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+      SHA: ${{ needs.preflight.outputs.target_sha }}
+      DRY_RUN: ${{ inputs.dry_run }}
+      TENANT: ${{ matrix.tenant }}
+      RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+      RAILWAY_SSH_PRIVATE_KEY: ${{ secrets.RAILWAY_SSH_PRIVATE_KEY }}
+      FLY_SSH_TOKEN: ${{ secrets.FLY_SSH_TOKEN_POSTGRES }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_DEPLOY_WEBHOOK }}
+    steps:
+      - name: Load tenant context (platform + maintenance window)
+        id: ctx
+        run: |
+          set -euo pipefail
+          if [ "$DRY_RUN" = "true" ]; then
+              echo "platform=fly" >> "$GITHUB_OUTPUT"
+              echo "::notice::[dry-run] using platform=fly for $TENANT"
+              exit 0
+          fi
+          row=$(psql "$PG_DSN" -t -A -F '|' -c "
+            SELECT coalesce(platform, 'fly'),
+                   coalesce(to_char(maintenance_window_start, 'HH24:MI'), ''),
+                   coalesce(to_char(maintenance_window_end,   'HH24:MI'), '')
+            FROM tenants WHERE slug = '$TENANT'
+          ")
+          platform=$(echo "$row" | cut -d'|' -f1)
+          win_start=$(echo "$row" | cut -d'|' -f2)
+          win_end=$(echo "$row" | cut -d'|' -f3)
+          echo "platform=$platform" >> "$GITHUB_OUTPUT"
+          echo "win_start=$win_start" >> "$GITHUB_OUTPUT"
+          echo "win_end=$win_end"     >> "$GITHUB_OUTPUT"
+          if [ -n "$win_start" ] && [ -n "$win_end" ]; then
+              now=$(date -u +%H:%M)
+              # Stays simple — string compare works because all values are HH:MM.
+              if [ "$now" \< "$win_start" ] || [ "$now" \> "$win_end" ]; then
+                  echo "::warning::Outside maintenance window for $TENANT ($win_start–$win_end UTC, now=$now). Deferring."
+                  exit 78        # neutral-skip-style; treated as success by GH
+              fi
+          fi
+
+      - name: Backup snapshot (pgbackrest)
+        if: env.DRY_RUN == 'false'
+        run: |
+          # Cheap insurance: trigger an incremental backup ≤ 4h old so a
+          # post-migration rollback has somewhere to land.
+          flyctl ssh console --app odoo-saas-postgres -C \
+              "gosu postgres pgbackrest --stanza=shared \
+                  --pg1-path=/var/lib/postgresql/data/pgdata \
+                  --log-level-console=info backup --type=incr" \
+              || echo "::warning::Snapshot trigger failed for $TENANT; migration proceeds at operator's risk."
+
+      - name: Run odoo -u all
+        id: migrate
+        env:
+          PLATFORM: ${{ steps.ctx.outputs.platform }}
+        run: |
+          set -euo pipefail
+          if [ "$DRY_RUN" = "true" ]; then
+              echo "::notice::[dry-run] would run 'odoo -u all -d $TENANT' on $PLATFORM"
+              echo "exit_code=0" >> "$GITHUB_OUTPUT"
+              exit 0
+          fi
+          # Each platform's SSH path mirrors the one already proven in
+          # pgbackrest-backup.yml. Capture the last 50 log lines for
+          # forensic context if the migration fails.
+          tmp=$(mktemp)
+          case "$PLATFORM" in
+            railway)
+              mkdir -p "$HOME/.ssh"
+              printf '%s\n' "$RAILWAY_SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+              chmod 600 "$HOME/.ssh/id_ed25519"
+              ssh-keyscan -H gateway.railway.app >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
+              RAILWAY_TOKEN="$RAILWAY_API_TOKEN" railway ssh --service odoo \
+                  -- "odoo -d $TENANT -u all --stop-after-init --no-http" 2>&1 | tee "$tmp"
+              ;;
+            fly|*)
+              FLY_API_TOKEN="$FLY_SSH_TOKEN" flyctl ssh console --app odoo-saas-odoo -C \
+                  "odoo -d $TENANT -u all --stop-after-init --no-http" 2>&1 | tee "$tmp"
+              ;;
+          esac
+          rc=${PIPESTATUS[0]}
+          tail -50 "$tmp" > /tmp/migration-tail.log
+          echo "exit_code=$rc" >> "$GITHUB_OUTPUT"
+          exit "$rc"
+
+      - name: On success — mark done, bump last_migrated_sha
+        if: env.DRY_RUN == 'false' && steps.migrate.outputs.exit_code == '0'
+        run: |
+          psql "$PG_DSN" -c "
+            UPDATE saas.tenant SET last_migrated_sha = '$SHA'
+            WHERE slug = '$TENANT';
+            UPDATE tenant_migration_jobs
+              SET status = 'done', finished_at = now()
+              WHERE tenant_id = (SELECT id FROM tenants WHERE slug = '$TENANT')
+                AND target_sha = '$SHA';
+          "
+
+      - name: On failure — record + page on-call
+        if: always() && env.DRY_RUN == 'false' && steps.migrate.outcome == 'failure'
+        run: |
+          excerpt=$(tail -50 /tmp/migration-tail.log 2>/dev/null | sed 's/'\''/'\'\''/g' | head -c 2000)
+          psql "$PG_DSN" -c "
+            UPDATE tenant_migration_jobs
+              SET status = 'failed', finished_at = now(), error_excerpt = \$\$$excerpt\$\$
+              WHERE tenant_id = (SELECT id FROM tenants WHERE slug = '$TENANT')
+                AND target_sha = '$SHA';
+          " || true
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\": \"🚨 promote-to-prod migration FAILED for tenant=$TENANT sha=$SHA — see workflow $GITHUB_RUN_ID\"}" \
+            "$SLACK_WEBHOOK" || true
+
+  flip-feature-flags:
+    name: Flip wave-gated feature flags
+    needs: [run-migrations, preflight]
+    if: |
+      always()
+      && (needs.run-migrations.result == 'success' || needs.run-migrations.result == 'skipped')
+    runs-on: ubuntu-latest
+    env:
+      PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+      DRY_RUN: ${{ inputs.dry_run }}
+      WAVE: ${{ inputs.wave }}
+    steps:
+      - name: Toggle flags scoped to wave
+        run: |
+          set -euo pipefail
+          # The `saas_feature_flag` table may not exist yet (per design §7
+          # line 343). If it doesn't, soft-warn and exit — the rest of the
+          # promote isn't blocked by a missing flag layer.
+          table_exists=$(psql "$PG_DSN" -t -A -c "
+            SELECT to_regclass('public.saas_feature_flag') IS NOT NULL
+          " 2>/dev/null || echo "f")
+          if [ "$table_exists" != "t" ]; then
+              echo "::warning::saas_feature_flag table absent; skipping flag flip. See design §7."
+              echo "## Feature flags" >> "$GITHUB_STEP_SUMMARY"
+              echo "- Status: **skipped (table absent)**" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          if [ "$DRY_RUN" = "true" ]; then
+              flipped=$(psql "$PG_DSN" -t -A -c "
+                SELECT count(*) FROM saas_feature_flag
+                WHERE wave = '$WAVE' AND enabled IS NOT TRUE
+              ")
+              echo "::notice::[dry-run] would flip $flipped flag(s) for wave=$WAVE"
+              echo "## Feature flags" >> "$GITHUB_STEP_SUMMARY"
+              echo "- Status: **skipped (dry_run=true)** — would flip ${flipped} flag(s)" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          psql "$PG_DSN" -c "
+            UPDATE saas_feature_flag SET enabled = TRUE, flipped_at = now()
+            WHERE wave = '$WAVE' AND enabled IS NOT TRUE
+          "
+          echo "## Feature flags" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: **flipped** for wave=$WAVE" >> "$GITHUB_STEP_SUMMARY"
+
   smoke:
     name: Post-deploy smoke
-    needs: [queue-migrations, preflight]
+    needs: [flip-feature-flags, preflight]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -600,9 +812,79 @@ jobs:
               echo "| $t | $url | OK |" >> "$GITHUB_STEP_SUMMARY"
           done
 
+      - name: Login probe on sampled tenant
+        env:
+          TENANTS: ${{ needs.preflight.outputs.target_tenants }}
+          BASE_DOMAIN: ${{ vars.TENANT_BASE_DOMAIN }}
+          SMOKE_USER: ${{ secrets.SMOKE_TENANT_USER }}
+          SMOKE_PASS: ${{ secrets.SMOKE_TENANT_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          [ -n "${TENANTS:-}" ] || TENANTS="[]"
+          first=$(echo "$TENANTS" | jq -r '.[0]? // empty')
+          if [ -z "$first" ]; then
+              echo "::notice::No tenant to sample for login probe"
+              exit 0
+          fi
+          base="${BASE_DOMAIN:-app.goliatt.co}"
+          url="https://${first}.${base}/web/session/authenticate"
+          if [ "$DRY_RUN" = "true" ]; then
+              echo "::notice::[dry-run] would POST $url with internal smoke account"
+              echo "- Login probe: skipped (dry_run=true)" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          if [ -z "${SMOKE_USER:-}" ] || [ -z "${SMOKE_PASS:-}" ]; then
+              echo "::warning::SMOKE_TENANT_USER/PASSWORD secrets unset; skipping login probe."
+              exit 0
+          fi
+          body=$(jq -n --arg db "$first" --arg u "$SMOKE_USER" --arg p "$SMOKE_PASS" \
+              '{jsonrpc:"2.0",method:"call",params:{db:$db,login:$u,password:$p}}')
+          rc=$(curl -s -o /tmp/login-probe.json -w '%{http_code}' --max-time 15 \
+              -H 'Content-Type: application/json' --data "$body" "$url")
+          uid=$(jq -r '.result.uid // empty' /tmp/login-probe.json 2>/dev/null)
+          if [ "$rc" != "200" ] || [ -z "$uid" ]; then
+              echo "::error::Login probe failed on $first (http=$rc uid=$uid)" >&2
+              echo "- Login probe: **FAIL** (http=$rc uid=$uid)" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+          fi
+          echo "::notice::Login probe OK on $first (uid=$uid)"
+          echo "- Login probe: **OK** (sampled $first, uid=$uid)" >> "$GITHUB_STEP_SUMMARY"
+
+  audit:
+    name: Audit log (saas_audit.event)
+    needs: [preflight, smoke, run-migrations, flip-feature-flags, tag-image]
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+    steps:
+      - name: Insert promote-to-prod audit row
+        run: |
+          smoke_outcome="${{ needs.smoke.result }}"
+          mig_outcome="${{ needs.run-migrations.result }}"
+          flag_outcome="${{ needs.flip-feature-flags.result }}"
+          payload=$(jq -nc \
+              --arg platforms     "${{ inputs.platforms }}" \
+              --arg dry_run       "${{ inputs.dry_run }}" \
+              --arg prod_tag      "${{ needs.tag-image.outputs.prod_tag }}" \
+              --arg smoke         "$smoke_outcome" \
+              --arg migrate       "$mig_outcome" \
+              --arg flags         "$flag_outcome" \
+              --arg run_id        "${{ github.run_id }}" \
+              '{platforms:$platforms,dry_run:$dry_run,prod_tag:$prod_tag,smoke:$smoke,migrate:$migrate,flags:$flags,run_id:$run_id}')
+          psql "$PG_DSN" -c "
+            INSERT INTO saas_audit.event
+              (actor_kind, actor_name, action, target_kind, target_id, sha, wave, reason, payload)
+            VALUES
+              ('human', '${{ github.actor }}', 'promote-to-prod', 'wave', '${{ inputs.wave }}',
+               '${{ needs.preflight.outputs.target_sha }}', '${{ inputs.wave }}',
+               '$smoke_outcome', '$payload'::jsonb)
+          " || echo "::warning::Audit insert failed; check CONTROL_PLANE_PG_DSN."
+
   notify:
     name: Notify Slack
-    needs: [preflight, smoke]
+    needs: [preflight, smoke, audit]
     if: always()
     runs-on: ubuntu-latest
     steps:
