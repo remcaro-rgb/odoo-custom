@@ -131,6 +131,151 @@ jobs:
             --severity-level medium \
             --confidence-level medium
 
+  # ---------- Lint XML (P2.3) ----------
+  # `xmllint --noout` on every `.xml` under `custom-addons/` that the
+  # PR (or the push range on main) changed. Catches malformed views,
+  # data files, and security XML before the Docker build does — today
+  # an unbalanced tag escapes into the build job's `odoo --init`, which
+  # crashes 5–10 min later with a cryptic parse error.
+  lint-xml:
+    name: Lint custom-addons XML (xmllint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 2 commits is enough for `git diff HEAD~1..HEAD` on a push;
+          # on a PR we use base.sha vs head.sha and that's already in
+          # the fetched range thanks to actions/checkout's PR-aware
+          # fetch.
+          fetch-depth: 2
+      - name: Install xmllint
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
+      - name: Find changed XML
+        id: changed
+        run: |
+          # Build base..head for the diff window:
+          #  - pull_request → base.sha .. head.sha (the PR's actual range)
+          #  - push to main → before .. sha (the new commit's diff)
+          base="${{ github.event.pull_request.base.sha || github.event.before }}"
+          head="${{ github.event.pull_request.head.sha || github.sha }}"
+          # First push to a branch has before = 000...; fall back to HEAD~1.
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            base="HEAD~1"
+          fi
+          git diff --name-only --diff-filter=ACMR "$base" "$head" -- 'custom-addons/**/*.xml' \
+            > /tmp/changed_xml.txt
+          count=$(wc -l < /tmp/changed_xml.txt | tr -d ' ')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "Changed XML files:"
+          cat /tmp/changed_xml.txt || true
+      - name: xmllint each
+        if: steps.changed.outputs.count != '0'
+        run: |
+          # Stop on the first malformed file (don't mask later passes).
+          # `--noout` suppresses the well-formed echo; `--nonet` blocks
+          # external DTD/network fetches.
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            echo "::group::$f"
+            xmllint --noout --nonet "$f"
+            echo "::endgroup::"
+          done < /tmp/changed_xml.txt
+
+  # ---------- Lint Odoo __manifest__.py (P2.2) ----------
+  # For every manifest the PR/push range changed: `ast.literal_eval` it
+  # (catches Python syntax errors + dynamic-expression manifests Odoo
+  # will refuse) + assert presence of the required keys. Today a missing
+  # `name` / `version` only surfaces when Odoo tries to load the module
+  # at install time.
+  lint-odoo-manifest:
+    name: Lint Odoo manifests (ast + required keys)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Find changed __manifest__.py
+        id: changed
+        run: |
+          base="${{ github.event.pull_request.base.sha || github.event.before }}"
+          head="${{ github.event.pull_request.head.sha || github.sha }}"
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            base="HEAD~1"
+          fi
+          git diff --name-only --diff-filter=ACMR "$base" "$head" \
+            -- 'custom-addons/**/__manifest__.py' > /tmp/changed_manifests.txt
+          count=$(wc -l < /tmp/changed_manifests.txt | tr -d ' ')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "Changed manifests:"
+          cat /tmp/changed_manifests.txt || true
+      - name: Check each manifest
+        if: steps.changed.outputs.count != '0'
+        run: |
+          python3 << 'PY'
+          import ast
+          import sys
+          from pathlib import Path
+          with open('/tmp/changed_manifests.txt') as fh:
+              files = [line.strip() for line in fh if line.strip()]
+          REQUIRED = {'name', 'version', 'license', 'depends', 'installable'}
+          errors = []
+          for path in files:
+              raw = Path(path).read_text(encoding='utf-8')
+              try:
+                  manifest = ast.literal_eval(raw)
+              except (ValueError, SyntaxError) as exc:
+                  errors.append(f"{path}: cannot ast.literal_eval ({type(exc).__name__}: {exc})")
+                  continue
+              if not isinstance(manifest, dict):
+                  errors.append(f"{path}: top-level is not a dict ({type(manifest).__name__})")
+                  continue
+              missing = REQUIRED - set(manifest.keys())
+              if missing:
+                  errors.append(f"{path}: missing required keys: {sorted(missing)}")
+              version = str(manifest.get('version', ''))
+              if not version or not version[0].isdigit():
+                  errors.append(f"{path}: version must start with a digit (got {version!r})")
+          if errors:
+              for err in errors:
+                  print(f"::error::{err}", file=sys.stderr)
+              raise SystemExit(1)
+          print(f"OK — {len(files)} manifest(s) checked")
+          PY
+
+  # ---------- Gitleaks secrets scan (P2.4 — secrets half) ----------
+  # Scans the PR diff for accidentally-committed secrets (tokens, API
+  # keys, cloud credentials). Direct binary install — `gitleaks-action`
+  # requires a paid org license for some uses; the standalone binary
+  # is OSS and has no license gate. `--redact` ensures any matched
+  # value is replaced with `REDACTED` in the workflow log, so we
+  # don't echo the leaked value to a public CI log.
+  gitleaks-scan:
+    name: Gitleaks (PR diff secrets scan)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # gitleaks reads the full PR history
+      - name: Install gitleaks
+        run: |
+          ver="8.21.2"
+          curl -sSfL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${ver}/gitleaks_${ver}_linux_x64.tar.gz" \
+            | sudo tar -xzC /usr/local/bin gitleaks
+          gitleaks version
+      - name: Scan PR diff
+        run: |
+          gitleaks detect \
+            --source . \
+            --log-opts "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" \
+            --redact \
+            --verbose \
+            --exit-code 1
+
   masking-unit-tests:
     name: Agentlab masking unit tests
     runs-on: ubuntu-latest
