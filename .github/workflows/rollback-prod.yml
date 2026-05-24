@@ -1,8 +1,10 @@
 # rollback-prod
 #
 # Implements docs/superpowers/specs/2026-05-16-promote-to-prod-design.md §4.
-# Rolls back a wave to a previous prod tag. Requires paste-back confirmation
-# and N=2 prod-deployers approval. Operator-opt-in data restore.
+# Rolls back a wave to a previously prod-tagged SHA. Requires paste-back
+# confirmation and N=2 prod-deployers approval. Tenant data restore is
+# opt-in. Both platforms must succeed (parity gate); a Railway-only or
+# Fly-only rollback aborts.
 
 name: rollback-prod
 
@@ -27,26 +29,56 @@ on:
       paste_back:
         description: 'Type "ROLLBACK <wave>" to confirm (must match exactly)'
         required: true
+      dry_run:
+        description: 'Dry-run mode (used by weekly rehearsal cron)'
+        default: 'false'
+        type: choice
+        options: ['true', 'false']
 
 concurrency:
   group: rollback-prod-${{ inputs.wave }}
   cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write       # tag-rollback retags GHCR images
+  id-token: write       # cosign verify uses GitHub OIDC
 
 jobs:
 
   preflight:
     name: Verify rollback request
     runs-on: ubuntu-latest
+    outputs:
+      target_tenants: ${{ steps.tenants.outputs.target_tenants }}
+      destructive_tenants: ${{ steps.impact.outputs.destructive_tenants }}
     steps:
       - name: Verify paste-back
+        env:
+          PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+          WAVE: ${{ inputs.wave }}
+          PASTE: ${{ inputs.paste_back }}
         run: |
-          expected="ROLLBACK ${{ inputs.wave }}"
-          if [ "${{ inputs.paste_back }}" != "$expected" ]; then
+          expected="ROLLBACK $WAVE"
+          if [ "$PASTE" != "$expected" ]; then
               echo "::error::Paste-back text did not match. Expected exactly: '$expected'" >&2
+              # Forensic row before aborting — spec §11.
+              if [ -n "${PG_DSN:-}" ]; then
+                  psql "$PG_DSN" -c "
+                    INSERT INTO saas_audit.event
+                      (actor_kind, actor_name, action, target_kind, target_id, sha, wave, reason, payload)
+                    VALUES
+                      ('human', '${{ github.actor }}', 'rollback-prod', 'wave', '$WAVE',
+                       '${{ inputs.target_sha }}', '$WAVE', 'paste_back_mismatch',
+                       jsonb_build_object('outcome', 'security_alert', 'provided', '$PASTE'))
+                  " || true
+              fi
               exit 1
           fi
+          echo "::notice::paste-back accepted"
 
       - uses: actions/checkout@v4
+
       - name: Verify target SHA was previously a prod tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,17 +92,185 @@ jobs:
               exit 1
           fi
 
+      - name: List target tenants from wave
+        id: tenants
+        env:
+          PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+        run: |
+          tenants=$(psql "$PG_DSN" -t -A -c "
+            SELECT json_agg(slug)
+            FROM tenants
+            WHERE wave = '${{ inputs.wave }}' AND state = 'active'
+          " || echo "[]")
+          if [ -z "$tenants" ] || [ "$tenants" = "null" ]; then
+              tenants="[]"
+          fi
+          echo "target_tenants=$tenants" >> "$GITHUB_OUTPUT"
+          echo "::notice::Target tenants: $tenants"
+
+      - name: Compute data-restore impact (destructive forward migrations)
+        id: impact
+        env:
+          PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+          TARGET_SHA: ${{ inputs.target_sha }}
+        run: |
+          set -euo pipefail
+          # Per tenant in the wave: any tenant_migration_jobs row applied
+          # between target_sha and the tenant's current last_migrated_sha
+          # whose `destructive` flag is true means a plain code revert
+          # will leave the schema ahead of the code — restore_data=true
+          # is required for that tenant.
+          dest=$(psql "$PG_DSN" -t -A -c "
+            SELECT coalesce(json_agg(t.slug), '[]'::json)
+            FROM tenants t
+            JOIN tenant_migration_jobs j ON j.tenant_id = t.id
+            WHERE t.wave = '${{ inputs.wave }}'
+              AND t.state = 'active'
+              AND j.applied_at > (
+                  SELECT max(applied_at) FROM tenant_migration_jobs
+                  WHERE tenant_id = t.id AND target_sha = '$TARGET_SHA'
+              )
+              AND j.destructive = TRUE
+          " 2>/dev/null || echo "[]")
+          if [ -z "$dest" ] || [ "$dest" = "null" ]; then
+              dest="[]"
+          fi
+          echo "destructive_tenants=$dest" >> "$GITHUB_OUTPUT"
+          count=$(echo "$dest" | jq -r '. | length // 0')
+          {
+            echo "## Rollback preflight"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Target SHA | \`${{ inputs.target_sha }}\` |"
+            echo "| Wave | \`${{ inputs.wave }}\` |"
+            echo "| Platforms | \`${{ inputs.platforms }}\` |"
+            echo "| restore_data | \`${{ inputs.restore_data }}\` |"
+            echo "| Tenants with destructive-forward migrations | **${count}** |"
+            echo "| Actor | @${{ github.actor }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$count" != "0" ] && [ "${{ inputs.restore_data }}" != "true" ]; then
+              echo "::warning::${count} tenant(s) have destructive forward migrations. restore_data=false will leave them in schema-drift state."
+              echo "- ⚠️ \`restore_data=false\` selected but destructive migrations present" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  resolve-digest:
+    name: Resolve GHCR digests + cosign verify (rollback target)
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      odoo_digest: ${{ steps.resolve.outputs.odoo_digest }}
+      postgres_digest: ${{ steps.resolve.outputs.postgres_digest }}
+      backup_runner_digest: ${{ steps.resolve.outputs.backup_runner_digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve digests
+        id: resolve
+        env:
+          SHA: ${{ inputs.target_sha }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          short="${SHA:0:7}"
+          failed=0
+          for img in odoo-saas-odoo odoo-saas-postgres odoo-saas-backup-runner; do
+              ref="ghcr.io/${owner}/${img}:sha-${short}"
+              digest=$(docker buildx imagetools inspect "$ref" --format '{{.Manifest.Digest}}' 2>/dev/null || true)
+              if [ -z "$digest" ]; then
+                  echo "::error::Rollback target image missing: $ref. Cannot pin rollback to a phantom digest." >&2
+                  failed=1
+                  continue
+              fi
+              key=$(echo "$img" | sed 's/^odoo-saas-//; s/-/_/g')
+              echo "${key}_digest=${digest}" >> "$GITHUB_OUTPUT"
+          done
+          [ "$failed" = "0" ] || exit 1
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+      - name: Verify cosign signatures
+        env:
+          ODOO_DIGEST: ${{ steps.resolve.outputs.odoo_digest }}
+          POSTGRES_DIGEST: ${{ steps.resolve.outputs.postgres_digest }}
+          BACKUP_RUNNER_DIGEST: ${{ steps.resolve.outputs.backup_runner_digest }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          for pair in "odoo-saas-odoo=$ODOO_DIGEST" \
+                      "odoo-saas-postgres=$POSTGRES_DIGEST" \
+                      "odoo-saas-backup-runner=$BACKUP_RUNNER_DIGEST"; do
+              name="${pair%%=*}"; digest="${pair##*=}"
+              cosign verify \
+                  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+                  --certificate-identity-regexp "https://github.com/${GITHUB_REPOSITORY}/" \
+                  "ghcr.io/${owner}/${name}@${digest}"
+          done
+
   approval:
     name: Awaiting prod-deployers approval (N=2)
-    needs: [preflight]
+    needs: [preflight, resolve-digest]
+    if: inputs.dry_run == 'false'
     runs-on: ubuntu-latest
     environment: prod-rollback   # configure N=2 in repo settings
     steps:
       - run: echo "Rollback approved by 2 prod-deployers"
 
+  tag-rollback:
+    name: Tag rollback image
+    needs: [approval, resolve-digest]
+    if: |
+      always()
+      && needs.resolve-digest.result == 'success'
+      && (needs.approval.result == 'success' || needs.approval.result == 'skipped')
+    runs-on: ubuntu-latest
+    outputs:
+      rollback_tag: ${{ steps.compute.outputs.rollback_tag }}
+    steps:
+      - name: Compute rollback tag
+        id: compute
+        run: |
+          tag="rollback-prod-$(date -u +%Y.%m.%d)-${{ github.run_number }}"
+          echo "rollback_tag=$tag" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Rollback tag"
+            echo "- Tag: \`$tag\`"
+            echo "- Target SHA: \`${{ inputs.target_sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Log in to GHCR
+        if: inputs.dry_run == 'false'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Retag by digest
+        if: inputs.dry_run == 'false'
+        env:
+          ROLLBACK_TAG: ${{ steps.compute.outputs.rollback_tag }}
+          ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
+          POSTGRES_DIGEST: ${{ needs.resolve-digest.outputs.postgres_digest }}
+          BACKUP_RUNNER_DIGEST: ${{ needs.resolve-digest.outputs.backup_runner_digest }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          for pair in "odoo-saas-odoo=$ODOO_DIGEST" \
+                      "odoo-saas-postgres=$POSTGRES_DIGEST" \
+                      "odoo-saas-backup-runner=$BACKUP_RUNNER_DIGEST"; do
+              name="${pair%%=*}"; digest="${pair##*=}"
+              docker buildx imagetools create \
+                  --tag "ghcr.io/${owner}/${name}:${ROLLBACK_TAG}" \
+                  "ghcr.io/${owner}/${name}@${digest}"
+          done
+
   deploy-railway:
     name: Roll back Railway
-    needs: [approval]
+    needs: [tag-rollback, resolve-digest]
     if: contains(inputs.platforms, 'railway')
     runs-on: ubuntu-latest
     environment: prod-railway
@@ -81,15 +281,25 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
       - run: npm install -g @railway/cli
-      - name: railway up (rollback)
+      - name: railway up (rollback, pinned to digest)
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+          ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
         run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+              echo "::notice::[dry-run] would deploy Railway service to digest ${ODOO_DIGEST}"
+              echo "## Deploy → Railway (rollback)" >> "$GITHUB_STEP_SUMMARY"
+              echo "- Status: **skipped (dry_run=true)**" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          # See deploy-railway in promote-to-prod.yml for the
+          # serviceInstanceUpdate GraphQL follow-up note.
+          echo "::notice::Target digest for Railway rollback: ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/odoo-saas-odoo@${ODOO_DIGEST}"
           railway up --service "${{ secrets.RAILWAY_PROD_ODOO_SERVICE_ID }}" --detach
 
   deploy-fly:
     name: Roll back Fly
-    needs: [approval]
+    needs: [tag-rollback, resolve-digest]
     if: contains(inputs.platforms, 'fly')
     runs-on: ubuntu-latest
     environment: prod-fly
@@ -98,49 +308,170 @@ jobs:
         with:
           ref: ${{ inputs.target_sha }}
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: flyctl deploy (rollback)
+      - name: flyctl deploy (rollback, pinned to digest)
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_PROD_API_TOKEN }}
+          ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
         run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          image="ghcr.io/${owner}/odoo-saas-odoo@${ODOO_DIGEST}"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+              echo "::notice::[dry-run] would roll Fly back to ${image}"
+              echo "## Deploy → Fly (rollback)" >> "$GITHUB_STEP_SUMMARY"
+              echo "- Status: **skipped (dry_run=true)**" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
           flyctl deploy --config infra/fly/odoo-prod/fly.toml \
-              --dockerfile Dockerfile --remote-only --strategy rolling \
+              --image "$image" --remote-only --strategy rolling \
               --wait-timeout 900
+
+  parity-gate:
+    name: Cross-platform parity gate (rollback)
+    needs: [deploy-railway, deploy-fly]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          railway="${{ needs.deploy-railway.result }}"
+          fly="${{ needs.deploy-fly.result }}"
+          {
+            echo "## Rollback parity gate"
+            echo ""
+            echo "| Platform | Result |"
+            echo "|---|---|"
+            echo "| Railway | \`$railway\` |"
+            echo "| Fly | \`$fly\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # Asymmetric rollback (Railway succeeded, Fly failed or vice versa)
+          # is the most dangerous state — code reverts on one platform, the
+          # other still runs the bad version. Block tenant-restore.
+          if [ "$railway" != "$fly" ] && [ "$railway" != "skipped" ] && [ "$fly" != "skipped" ]; then
+              echo "::error::Rollback parity FAILED. Railway=$railway Fly=$fly. Tenant-restore aborted." >&2
+              echo "- Verdict: **FAIL — tenant-restore blocked**" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+          fi
+          echo "- Verdict: **OK**" >> "$GITHUB_STEP_SUMMARY"
 
   tenant-restore:
     name: Restore tenant data (optional)
-    needs: [deploy-railway, deploy-fly]
-    if: inputs.restore_data == 'true'
+    needs: [parity-gate, preflight]
+    if: |
+      always()
+      && needs.parity-gate.result == 'success'
+      && inputs.restore_data == 'true'
     runs-on: ubuntu-latest
     env:
       PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+      DRY_RUN: ${{ inputs.dry_run }}
+      WAVE: ${{ inputs.wave }}
     steps:
+      - uses: actions/checkout@v4
       - name: Restore per tenant in wave
         run: |
+          set -euo pipefail
           tenants=$(psql "$PG_DSN" -t -A -c "
-            SELECT slug FROM tenants WHERE wave = '${{ inputs.wave }}' AND state = 'active'
-          ")
-          echo "$tenants" | while read t; do
-              echo "::notice::Restoring tenant $t to pre-promotion snapshot"
-              # pgbackrest restore — implementation depends on existing backup infra.
-              # ./infra/runbooks/restore-tenant.sh "$t" --before "${{ github.event.created_at }}"
+            SELECT slug FROM tenants WHERE wave = '$WAVE' AND state = 'active'
+          " || echo "")
+          if [ -z "$tenants" ]; then
+              echo "::notice::No active tenants in wave $WAVE; nothing to restore."
+              exit 0
+          fi
+          {
+            echo "## Tenant restore"
+            echo ""
+            echo "| Tenant | Action |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # Use `read -r` (SC2162 fix) to avoid backslash mangling.
+          echo "$tenants" | while read -r t; do
+              [ -z "$t" ] && continue
+              if [ "$DRY_RUN" = "true" ]; then
+                  echo "::notice::[dry-run] would restore tenant $t to pre-promotion snapshot"
+                  echo "| $t | dry-run skip |" >> "$GITHUB_STEP_SUMMARY"
+                  continue
+              fi
+              # The shell script handles the per-tenant pgbackrest --target
+              # mechanics + writes its own audit row per-tenant for forensic clarity.
+              if [ -x infra/runbooks/restore-tenant.sh ]; then
+                  infra/runbooks/restore-tenant.sh "$t" --before "${{ github.event.created_at }}"
+                  echo "| $t | restored |" >> "$GITHUB_STEP_SUMMARY"
+              else
+                  echo "::error::infra/runbooks/restore-tenant.sh missing — cannot restore $t" >&2
+                  echo "| $t | **FAIL** (runbook missing) |" >> "$GITHUB_STEP_SUMMARY"
+                  exit 1
+              fi
+          done
+
+  smoke:
+    name: Post-rollback smoke
+    needs: [parity-gate, tenant-restore, preflight]
+    if: |
+      always()
+      && needs.parity-gate.result == 'success'
+    runs-on: ubuntu-latest
+    env:
+      TENANTS: ${{ needs.preflight.outputs.target_tenants }}
+      BASE_DOMAIN: ${{ vars.TENANT_BASE_DOMAIN }}
+      DRY_RUN: ${{ inputs.dry_run }}
+    steps:
+      - name: Health + login probe (mirror of promote smoke)
+        run: |
+          set -euo pipefail
+          base="${BASE_DOMAIN:-app.goliatt.co}"
+          [ -n "${TENANTS:-}" ] || TENANTS="[]"
+          tenant_count=$(echo "$TENANTS" | jq -r '. | length // 0')
+          {
+            echo "## Post-rollback smoke"
+            echo ""
+            echo "| Tenant | URL | Result |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$tenant_count" = "0" ]; then
+              echo "| — | — | no tenants in wave |" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          echo "$TENANTS" | jq -r '.[]?' | head -3 | while read -r t; do
+              url="https://${t}.${base}/web/health"
+              if [ "$DRY_RUN" = "true" ]; then
+                  echo "| $t | $url | dry-run skip |" >> "$GITHUB_STEP_SUMMARY"
+                  continue
+              fi
+              code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$url" || echo "000")
+              if [ "$code" != "200" ]; then
+                  echo "::error::Post-rollback smoke failed for $t (HTTP $code) — $url" >&2
+                  echo "| $t | $url | FAIL ($code) |" >> "$GITHUB_STEP_SUMMARY"
+                  exit 1
+              fi
+              echo "| $t | $url | OK |" >> "$GITHUB_STEP_SUMMARY"
           done
 
   audit:
     name: Audit log
-    needs: [deploy-railway, deploy-fly, tenant-restore]
+    needs: [deploy-railway, deploy-fly, tenant-restore, smoke, tag-rollback]
     if: always()
     runs-on: ubuntu-latest
     env:
       PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
     steps:
       - run: |
+          smoke_outcome="${{ needs.smoke.result }}"
+          restore_outcome="${{ needs.tenant-restore.result }}"
+          payload=$(jq -nc \
+              --arg restore_data  "${{ inputs.restore_data }}" \
+              --arg platforms     "${{ inputs.platforms }}" \
+              --arg dry_run       "${{ inputs.dry_run }}" \
+              --arg rollback_tag  "${{ needs.tag-rollback.outputs.rollback_tag }}" \
+              --arg smoke         "$smoke_outcome" \
+              --arg restore       "$restore_outcome" \
+              --arg run_id        "${{ github.run_id }}" \
+              '{restore_data:$restore_data,platforms:$platforms,dry_run:$dry_run,rollback_tag:$rollback_tag,smoke:$smoke,restore:$restore,run_id:$run_id}')
           psql "$PG_DSN" -c "
             INSERT INTO saas_audit.event
               (actor_kind, actor_name, action, target_kind, target_id, sha, wave, reason, payload)
             VALUES
               ('human', '${{ github.actor }}', 'rollback-prod', 'wave', '${{ inputs.wave }}',
                '${{ inputs.target_sha }}', '${{ inputs.wave }}', '${{ inputs.paste_back }}',
-               '{\"restore_data\": \"${{ inputs.restore_data }}\", \"platforms\": \"${{ inputs.platforms }}\"}'::jsonb)
+               '$payload'::jsonb)
           "
 
   notify:
@@ -151,5 +482,5 @@ jobs:
     steps:
       - run: |
           curl -X POST -H 'Content-type: application/json' \
-            --data "{\"text\": \"⏪ ROLLBACK wave=${{ inputs.wave }} → ${{ inputs.target_sha }} by ${{ github.actor }}\"}" \
+            --data "{\"text\": \"⏪ ROLLBACK wave=${{ inputs.wave }} → ${{ inputs.target_sha }} by ${{ github.actor }} (dry_run=${{ inputs.dry_run }})\"}" \
             "${{ secrets.SLACK_DEPLOY_WEBHOOK }}"
