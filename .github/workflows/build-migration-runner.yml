@@ -1,0 +1,151 @@
+# Phase 4 (Tier 2) — build + publish the tenant-migration-runner image.
+#
+# The runner extends the project's enterprise-v1 Odoo image so it can
+# invoke `odoo -u all` as a subprocess (plan §5: "bundle Odoo in the
+# runner image"). Published to:
+#   ghcr.io/<owner>/odoo-saas-migration-runner
+#
+# Trigger paths:
+#   - push to main when the runner Dockerfile or Python package changes
+#   - workflow_dispatch with optional BASE_IMAGE override (pin to a
+#     specific Odoo digest when promoting a canary)
+#
+# Tags applied (mirrors ghcr-publish.yml):
+#   sha-<7chars>     immutable; recommended for Fly secret pinning
+#   latest           moving; follows main
+#
+# Cosign-signed (keyless OIDC), same chain of trust as the standard
+# images. The migration-runner's saas_license_gate companion does NOT
+# verify this signature (license gate is for tenant Odoo only), but
+# the signature still serves the supply-chain audit.
+#
+# Required secrets / permissions:
+#   GITHUB_TOKEN (built-in) — used to push to ghcr.io under the org.
+#   No new secrets.
+
+name: Build migration-runner image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/runners/migration_runner/**'
+      - '.github/workflows/build-migration-runner.yml'
+  workflow_dispatch:
+    inputs:
+      base_image:
+        description: 'BASE_IMAGE override (default: ghcr.io/goliattco/odoo-saas:enterprise-v1)'
+        required: false
+        default: ''
+
+concurrency:
+  group: build-migration-runner
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write   # required for cosign keyless OIDC signing
+
+jobs:
+  build:
+    name: Build + push migration-runner
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Compute tags + BASE_IMAGE
+        id: meta
+        run: |
+          set -euo pipefail
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          IMAGE="ghcr.io/${OWNER}/odoo-saas-migration-runner"
+          SHORT_SHA="${GITHUB_SHA::7}"
+          TAGS="${IMAGE}:sha-${SHORT_SHA}"
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            TAGS="${TAGS},${IMAGE}:latest"
+          fi
+          BASE_IMAGE="${{ inputs.base_image }}"
+          if [ -z "$BASE_IMAGE" ]; then
+            # Default to the enterprise-v1 tag from this org's ghcr.
+            BASE_IMAGE="ghcr.io/${OWNER}/odoo-saas:enterprise-v1"
+          fi
+          echo "tags=${TAGS}"          >> "$GITHUB_OUTPUT"
+          echo "base_image=${BASE_IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}"        >> "$GITHUB_OUTPUT"
+          echo "::notice::Building ${TAGS} FROM ${BASE_IMAGE}"
+
+      - name: Build + push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./infra/runners/migration_runner/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            BASE_IMAGE=${{ steps.meta.outputs.base_image }}
+          cache-from: type=gha,scope=migration-runner
+          cache-to: type=gha,scope=migration-runner,mode=max
+          provenance: false
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign image (keyless via GitHub OIDC)
+        env:
+          COSIGN_EXPERIMENTAL: '1'
+          DIGEST: ${{ steps.build.outputs.digest }}
+          IMAGE: ${{ steps.meta.outputs.image }}
+        run: |
+          set -euo pipefail
+          cosign sign --yes "${IMAGE}@${DIGEST}"
+
+      - name: Smoke — image runs `python -m migration_runner --help`
+        env:
+          IMAGE: ${{ steps.meta.outputs.image }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          # The runner has no --help (it's a daemon), but importing the
+          # package proves the wheel + deps installed correctly inside
+          # the image. CONTROL_PLANE_PG_DSN unset → main() exits 1 with
+          # a clear error message, which is exactly what we want to
+          # verify here (the image runs at all + the entrypoint wires
+          # correctly).
+          docker pull "${IMAGE}@${DIGEST}"
+          set +e
+          docker run --rm "${IMAGE}@${DIGEST}" 2>&1 | tee /tmp/smoke.log
+          rc=${PIPESTATUS[0]}
+          set -e
+          if [ "$rc" != "1" ]; then
+            echo "::error::expected exit 1 (no CONTROL_PLANE_PG_DSN); got $rc" >&2
+            exit 1
+          fi
+          grep -q "CONTROL_PLANE_PG_DSN unset" /tmp/smoke.log
+
+      - name: Summary
+        env:
+          IMAGE: ${{ steps.meta.outputs.image }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          {
+            echo "## migration-runner published"
+            echo ""
+            echo "- **Image:** \`${IMAGE}\`"
+            echo "- **Digest:** \`${DIGEST}\`"
+            echo "- **Pin in Fly:** \`flyctl deploy --image ${IMAGE}@${DIGEST} --app odoo-saas-migration-runner\`"
+          } >> "$GITHUB_STEP_SUMMARY"
