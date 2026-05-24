@@ -33,9 +33,18 @@ RUN pip install --no-cache-dir --break-system-packages \
         "croniter>=2.0,<3.0" \
         "psycopg[binary]>=3.1,<4.0"
 
-# Copy only what the runner needs.
-COPY infra/runners/migration_runner /opt/migration_runner
-RUN pip install --no-cache-dir --break-system-packages /opt/migration_runner
+# Lay out a clean install root with the SDK convention:
+#   /opt/migration_runner_build/
+#     ├── pyproject.toml
+#     └── migration_runner/        <- the actual package source
+# COPY'ing the source dir directly to /opt/migration_runner would put
+# the .py files at the install root WITHOUT a `migration_runner/` parent;
+# setuptools `packages.find(include=["migration_runner*"])` then matches
+# nothing and pip installs an empty package — `python -m migration_runner`
+# fails with `No module named migration_runner`.
+COPY infra/runners/migration_runner /opt/migration_runner_build/migration_runner
+RUN cp /opt/migration_runner_build/migration_runner/pyproject.toml /opt/migration_runner_build/pyproject.toml \
+ && pip install --no-cache-dir --break-system-packages /opt/migration_runner_build
 
 # Switch back to the non-privileged user inherited from the base image.
 USER odoo
