@@ -9,8 +9,11 @@
 # CREATE ... IF NOT EXISTS / ADD COLUMN IF NOT EXISTS / DROP TRIGGER
 # IF EXISTS, so re-running is safe and idempotent.
 #
-# Only saas-audit-event-schema.sql is applied here — the tenant-migration
-# schema moved to the control-plane repo's Drizzle migrations.
+# Files applied here:
+#   - saas-audit-event-schema.sql (append-only audit triggers).
+#   - 2026-05-24-spec-generator-runs.sql (Spec Generator state table).
+# The tenant-migration schema moved to the control-plane repo's Drizzle
+# migrations (it attaches to public.tenants).
 #
 # Trigger:
 #   gh workflow run apply-control-plane-ddl.yml -R GoliattCo/odoo-custom
@@ -78,6 +81,7 @@ jobs:
           # is applied as raw SQL here.
           files=(
             infra/sql/saas-audit-event-schema.sql
+            infra/sql/2026-05-24-spec-generator-runs.sql
           )
           applied=0
           for f in "${files[@]}"; do
