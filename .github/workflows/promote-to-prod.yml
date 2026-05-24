@@ -306,15 +306,25 @@ jobs:
                   --certificate-identity-regexp "https://github.com/${GITHUB_REPOSITORY}/" \
                   "$ref"
               echo "::endgroup::"
+              # Tier 7: also verify SLSA provenance attestation. Blocks
+              # images that were signed but skipped the attest step (e.g.
+              # someone built outside ghcr-publish.yml then signed by hand).
+              echo "::group::cosign verify-attestation ${name}"
+              cosign verify-attestation \
+                  --type slsaprovenance \
+                  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+                  --certificate-identity-regexp "https://github.com/${GITHUB_REPOSITORY}/" \
+                  "$ref" >/dev/null
+              echo "::endgroup::"
           done
           {
-            echo "## Image digests + cosign"
+            echo "## Image digests + cosign + provenance"
             echo ""
-            echo "| Image | Digest | Signed |"
-            echo "|---|---|---|"
-            echo "| odoo-saas-odoo | \`${ODOO_DIGEST:0:19}…\` | ✓ |"
-            echo "| odoo-saas-postgres | \`${POSTGRES_DIGEST:0:19}…\` | ✓ |"
-            echo "| odoo-saas-backup-runner | \`${BACKUP_RUNNER_DIGEST:0:19}…\` | ✓ |"
+            echo "| Image | Digest | Signed | Attested |"
+            echo "|---|---|---|---|"
+            echo "| odoo-saas-odoo | \`${ODOO_DIGEST:0:19}…\` | ✓ | ✓ |"
+            echo "| odoo-saas-postgres | \`${POSTGRES_DIGEST:0:19}…\` | ✓ | ✓ |"
+            echo "| odoo-saas-backup-runner | \`${BACKUP_RUNNER_DIGEST:0:19}…\` | ✓ | ✓ |"
           } >> "$GITHUB_STEP_SUMMARY"
 
   approval:

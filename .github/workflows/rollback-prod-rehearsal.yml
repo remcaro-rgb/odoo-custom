@@ -1,0 +1,87 @@
+# rollback-prod-rehearsal
+#
+# Implements `/tmp/plan-promote-to-prod.md` Tier 7 spec open question #1:
+# weekly dry-run rollback against the agentlab tenant pool. Keeps the
+# rollback path warm so a real incident isn't the first time we exercise
+# it. Failures page on-call.
+#
+# The rehearsal dispatches `rollback-prod.yml` with `dry_run=true`,
+# `wave=canary` (which is the agentlab tenant pool's wave in current
+# topology — adjust if that changes), and the most recent prod-tagged
+# SHA as the target.
+
+name: rollback-prod-rehearsal
+
+on:
+  schedule:
+    - cron: '0 12 * * 0'   # Sundays 12:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write           # gh workflow run
+
+jobs:
+  rehearse:
+    name: Dispatch dry-run rollback against canary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_DEPLOY_WEBHOOK }}
+    steps:
+      - name: Resolve most recent prod tag
+        id: resolve
+        run: |
+          set -euo pipefail
+          # Most recent prod-YYYY.MM.DD-N git tag → its SHA. Skip
+          # rollback-prod-* tags (those are previous rollbacks, not
+          # promotion endpoints).
+          tag=$(gh api "repos/${{ github.repository }}/git/refs/tags" --paginate \
+              --jq '.[].ref' \
+              | sed 's|refs/tags/||' \
+              | grep -E '^prod-[0-9]{4}\.[0-9]{2}\.[0-9]{2}-[0-9]+$' \
+              | sort -r | head -1 || true)
+          if [ -z "$tag" ]; then
+              echo "::warning::No prod-* tag found in repo. Rehearsal skipped — no rollback target."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+          fi
+          sha=$(gh api "repos/${{ github.repository }}/git/refs/tags/$tag" --jq '.object.sha')
+          # Tag refs may point at annotated tag objects, not commits — peel.
+          obj_type=$(gh api "repos/${{ github.repository }}/git/refs/tags/$tag" --jq '.object.type')
+          if [ "$obj_type" = "tag" ]; then
+              sha=$(gh api "repos/${{ github.repository }}/git/tags/$sha" --jq '.object.sha')
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "::notice::Rehearsal target: $tag → $sha"
+
+      - name: Dispatch rollback-prod.yml dry-run
+        if: steps.resolve.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          gh workflow run rollback-prod.yml \
+              -f target_sha="${{ steps.resolve.outputs.sha }}" \
+              -f wave=canary \
+              -f platforms=railway,fly \
+              -f restore_data=false \
+              -f paste_back="ROLLBACK canary" \
+              -f dry_run=true
+          {
+            echo "## Weekly rollback rehearsal"
+            echo ""
+            echo "- Dispatched: \`rollback-prod.yml\`"
+            echo "- Target: \`${{ steps.resolve.outputs.tag }}\` (\`${{ steps.resolve.outputs.sha }}\`)"
+            echo "- Mode: \`dry_run=true wave=canary\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Page on-call if dispatch failed
+        if: failure()
+        run: |
+          if [ -n "${SLACK_WEBHOOK:-}" ]; then
+              curl -X POST -H 'Content-type: application/json' \
+                  --data '{"text": "🔁 rollback-prod-rehearsal FAILED to dispatch. Investigate before next Sunday."}' \
+                  "$SLACK_WEBHOOK" || true
+          fi

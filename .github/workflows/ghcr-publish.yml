@@ -155,6 +155,46 @@ jobs:
           # the transparency-log entry automatically).
           cosign sign --yes "${IMAGE}@${DIGEST}"
 
+      # Tier 7: SLSA-3 provenance attestation. promote-to-prod's
+      # resolve-digest job runs `cosign verify-attestation` against the
+      # same OIDC identity, blocking promotes of images that don't have
+      # a provenance trail back to *this* workflow.
+      - name: Generate + attest SLSA provenance
+        env:
+          COSIGN_EXPERIMENTAL: '1'
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          IMAGE="ghcr.io/${OWNER}/${{ matrix.image.name }}"
+          predicate=$(jq -n \
+              --arg builder      "https://github.com/${GITHUB_REPOSITORY}/.github/workflows/ghcr-publish.yml@${GITHUB_REF}" \
+              --arg buildType    "https://github.com/actions/runner@v2" \
+              --arg invocationId "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+              --arg sourceUri    "git+https://github.com/${GITHUB_REPOSITORY}@${GITHUB_REF}" \
+              --arg sourceSha    "${GITHUB_SHA}" \
+              --arg startedOn    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              '{
+                buildType: $buildType,
+                builder:   {id: $builder},
+                invocation: {
+                  configSource: {uri: $sourceUri, digest: {sha1: $sourceSha},
+                                 entryPoint: ".github/workflows/ghcr-publish.yml"},
+                  parameters: {},
+                  environment: {invocationId: $invocationId}
+                },
+                metadata: {
+                  buildStartedOn: $startedOn,
+                  completeness:   {parameters: true, environment: false, materials: true},
+                  reproducible:   false
+                },
+                materials: [{uri: $sourceUri, digest: {sha1: $sourceSha}}]
+              }')
+          echo "$predicate" > /tmp/slsa-predicate.json
+          cosign attest --yes \
+              --predicate /tmp/slsa-predicate.json \
+              --type slsaprovenance \
+              "${IMAGE}@${DIGEST}"
+
   # Phase 4.1: enterprise self-host image. Same Odoo Dockerfile as the
   # standard image, but COPY'd in with the rotated production pubkey
   # via --build-arg LICENSE_PUBKEY_FILE=infra/keys/license-signing-pubkey.pem.
@@ -242,6 +282,42 @@ jobs:
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
           IMAGE="ghcr.io/${OWNER}/odoo-saas-odoo-enterprise"
           cosign sign --yes "${IMAGE}@${DIGEST}"
+
+      - name: Generate + attest SLSA provenance
+        env:
+          COSIGN_EXPERIMENTAL: '1'
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          IMAGE="ghcr.io/${OWNER}/odoo-saas-odoo-enterprise"
+          predicate=$(jq -n \
+              --arg builder      "https://github.com/${GITHUB_REPOSITORY}/.github/workflows/ghcr-publish.yml@${GITHUB_REF}" \
+              --arg buildType    "https://github.com/actions/runner@v2" \
+              --arg invocationId "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+              --arg sourceUri    "git+https://github.com/${GITHUB_REPOSITORY}@${GITHUB_REF}" \
+              --arg sourceSha    "${GITHUB_SHA}" \
+              --arg startedOn    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              '{
+                buildType: $buildType,
+                builder:   {id: $builder},
+                invocation: {
+                  configSource: {uri: $sourceUri, digest: {sha1: $sourceSha},
+                                 entryPoint: ".github/workflows/ghcr-publish.yml"},
+                  parameters: {variant: "enterprise"},
+                  environment: {invocationId: $invocationId}
+                },
+                metadata: {
+                  buildStartedOn: $startedOn,
+                  completeness:   {parameters: true, environment: false, materials: true},
+                  reproducible:   false
+                },
+                materials: [{uri: $sourceUri, digest: {sha1: $sourceSha}}]
+              }')
+          echo "$predicate" > /tmp/slsa-predicate-enterprise.json
+          cosign attest --yes \
+              --predicate /tmp/slsa-predicate-enterprise.json \
+              --type slsaprovenance \
+              "${IMAGE}@${DIGEST}"
 
       - name: Emit digest for operator
         env:

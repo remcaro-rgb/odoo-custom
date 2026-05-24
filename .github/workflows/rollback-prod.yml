@@ -206,10 +206,17 @@ jobs:
                       "odoo-saas-postgres=$POSTGRES_DIGEST" \
                       "odoo-saas-backup-runner=$BACKUP_RUNNER_DIGEST"; do
               name="${pair%%=*}"; digest="${pair##*=}"
+              ref="ghcr.io/${owner}/${name}@${digest}"
               cosign verify \
                   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
                   --certificate-identity-regexp "https://github.com/${GITHUB_REPOSITORY}/" \
-                  "ghcr.io/${owner}/${name}@${digest}"
+                  "$ref"
+              # Tier 7: SLSA provenance attestation must also verify.
+              cosign verify-attestation \
+                  --type slsaprovenance \
+                  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+                  --certificate-identity-regexp "https://github.com/${GITHUB_REPOSITORY}/" \
+                  "$ref" >/dev/null
           done
 
   approval:
