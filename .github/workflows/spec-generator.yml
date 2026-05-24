@@ -83,4 +83,9 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SPEC_GENERATOR_BOT_APP_ID: ${{ vars.SPEC_GENERATOR_BOT_APP_ID }}
           GH_TOKEN: ${{ steps.bot_token.outputs.token }}
+          # Observability: when both are set, EventLog also POSTs records to
+          # Axiom at end-of-run. Unset = stdout-only (still captured in
+          # GitHub Actions logs).
+          AXIOM_TOKEN: ${{ secrets.AXIOM_TOKEN }}
+          AXIOM_DATASET: ${{ vars.AXIOM_DATASET }}
         run: python -m agents.spec_generator
