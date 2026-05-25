@@ -83,6 +83,7 @@ jobs:
             infra/sql/saas-audit-event-schema.sql
             infra/sql/2026-05-24-spec-generator-runs.sql
             infra/sql/2026-05-24-spec-gen-embeddings.sql
+            infra/sql/2026-05-25-spec-gen-embeddings-probe.sql
           )
           applied=0
           for f in "${files[@]}"; do
