@@ -424,12 +424,12 @@ jobs:
       - run: npm install -g @railway/cli
       - name: railway up (prod, pinned to digest)
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
           ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
           PROD_TAG: ${{ needs.tag-image.outputs.prod_tag }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-              echo "::notice::[dry-run] would deploy Railway service=${{ secrets.RAILWAY_PROD_ODOO_SERVICE_ID }} image=ghcr.io/<owner>/odoo-saas-odoo@${ODOO_DIGEST}"
+              echo "::notice::[dry-run] would deploy Railway service=${{ secrets.RAILWAY_ODOO_SERVICE_ID }} image=ghcr.io/<owner>/odoo-saas-odoo@${ODOO_DIGEST}"
               {
                 echo "## Deploy → Railway"
                 echo "- Status: **skipped (dry_run=true)**"
@@ -446,7 +446,7 @@ jobs:
           # in place of `railway up`. For now, emit the digest we should
           # be pinning to so the deploy is at least auditable.
           echo "::notice::Target digest for Railway: ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/odoo-saas-odoo@${ODOO_DIGEST}"
-          railway up --service "${{ secrets.RAILWAY_PROD_ODOO_SERVICE_ID }}" --detach
+          railway up --service "${{ secrets.RAILWAY_ODOO_SERVICE_ID }}" --environment "${{ secrets.RAILWAY_PROD_ENVIRONMENT_ID }}" --detach
           {
             echo "## Deploy → Railway"
             echo "- Status: **deployed**"
@@ -465,7 +465,7 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: flyctl deploy (pinned to digest)
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_PROD_API_TOKEN }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
           PROD_TAG: ${{ needs.tag-image.outputs.prod_tag }}
         run: |
@@ -484,7 +484,7 @@ jobs:
           # --image bypasses the local Dockerfile and pins the deploy to
           # the exact signed digest from resolve-digest. The fly.toml is
           # still read for service config (memory, regions, etc.).
-          flyctl deploy --config infra/fly/odoo-prod/fly.toml \
+          flyctl deploy --config infra/fly/odoo/fly.toml \
               --image "$image" --remote-only --strategy rolling \
               --wait-timeout 900
           {

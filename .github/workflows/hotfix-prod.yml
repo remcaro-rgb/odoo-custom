@@ -306,14 +306,14 @@ jobs:
       - run: npm install -g @railway/cli
       - name: railway up (hotfix, pinned to digest)
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
           ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
               echo "::notice::[dry-run] would deploy Railway hotfix to digest ${ODOO_DIGEST}"
               exit 0
           fi
-          railway up --service "${{ secrets.RAILWAY_PROD_ODOO_SERVICE_ID }}" --detach
+          railway up --service "${{ secrets.RAILWAY_ODOO_SERVICE_ID }}" --environment "${{ secrets.RAILWAY_PROD_ENVIRONMENT_ID }}" --detach
 
   deploy-fly:
     name: Deploy hotfix → Fly
@@ -327,7 +327,7 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: flyctl deploy (hotfix, pinned to digest)
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_PROD_API_TOKEN }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"
@@ -336,7 +336,7 @@ jobs:
               echo "::notice::[dry-run] would deploy Fly hotfix with --image ${image}"
               exit 0
           fi
-          flyctl deploy --config infra/fly/odoo-prod/fly.toml \
+          flyctl deploy --config infra/fly/odoo/fly.toml \
               --image "$image" --remote-only --strategy rolling --wait-timeout 900
 
   parity-gate:
