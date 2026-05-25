@@ -172,6 +172,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SHA: ${{ steps.resolve.outputs.target_sha }}
           DRY_RUN: ${{ inputs.dry_run }}
+          FORCE: ${{ inputs.force_promote }}
         run: |
           set -euo pipefail
           # Soak is a real-world-risk gate (let the SHA bake on staging
@@ -184,6 +185,16 @@ jobs:
               echo "::notice::[dry-run] soak time check skipped"
               echo "## Soak" >> "$GITHUB_STEP_SUMMARY"
               echo "- Status: **skipped (dry_run=true)**" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+          # force_promote also bypasses soak, mirroring the rollback-
+          # quarantine bypass above. paste-back was already enforced in
+          # the earlier step when force_promote=true, so reaching here
+          # means an operator explicitly accepted the soak-bypass risk.
+          if [ "$FORCE" = "true" ]; then
+              echo "::warning::force_promote=true; soak check bypassed."
+              echo "## Soak" >> "$GITHUB_STEP_SUMMARY"
+              echo "- Status: **bypassed (force_promote=true)**" >> "$GITHUB_STEP_SUMMARY"
               exit 0
           fi
           # Check risk label on the merged PR
