@@ -470,13 +470,76 @@ jobs:
           # in place of `railway up`. For now, emit the digest we should
           # be pinning to so the deploy is at least auditable.
           echo "::notice::Target digest for Railway: ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/odoo-saas-odoo@${ODOO_DIGEST}"
+          # `railway up`'s HTTP client has a 30s timeout on the upload-ack
+          # which often fires before Railway finishes processing a large
+          # source bundle, even though the deploy itself succeeds async.
+          # Treat CLI exit as advisory and rely on the GraphQL poll below
+          # for true success/fail.
+          set +e
           railway up --service "${{ secrets.RAILWAY_ODOO_SERVICE_ID }}" --environment "${{ secrets.RAILWAY_PROD_ENVIRONMENT_ID }}" --detach
-          {
-            echo "## Deploy → Railway"
-            echo "- Status: **deployed**"
-            echo "- Tag: \`${PROD_TAG}\`"
-            echo "- Digest (logged, pin pending GraphQL wiring): \`${ODOO_DIGEST}\`"
-          } >> "$GITHUB_STEP_SUMMARY"
+          cli_rc=$?
+          set -e
+          if [ $cli_rc -ne 0 ]; then
+              echo "::warning::railway up CLI returned $cli_rc (often a timeout); verifying via GraphQL"
+          fi
+
+      - name: Poll Railway deploy status (GraphQL)
+        if: inputs.dry_run == 'false'
+        env:
+          RAILWAY_PROD_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+          SVC: ${{ secrets.RAILWAY_ODOO_SERVICE_ID }}
+          ENV: ${{ secrets.RAILWAY_PROD_ENVIRONMENT_ID }}
+          PROD_TAG: ${{ needs.tag-image.outputs.prod_tag }}
+          ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
+        run: |
+          set -euo pipefail
+          # Poll for up to 12 minutes. Railway's deploy phases:
+          # QUEUED → BUILDING → DEPLOYING → SUCCESS  (or FAILED/CRASHED)
+          # The CLI's `--detach` short-circuits after upload-ack; here we
+          # wait for the asynchronous result.
+          deadline=$(( $(date +%s) + 720 ))
+          last_status=""
+          query='{ projectToken { project { environments { edges { node { id serviceInstances { edges { node { serviceId latestDeployment { id status createdAt } } } } } } } } } }'
+          payload=$(jq -nc --arg q "$query" '{query:$q}')
+          jq_filter='.data.projectToken.project.environments.edges[]?.node
+              | select(.id == $env)
+              | .serviceInstances.edges[]?.node
+              | select(.serviceId == $svc)
+              | .latestDeployment.status'
+          while [ $(date +%s) -lt $deadline ]; do
+              resp=$(curl -fsS -X POST https://backboard.railway.app/graphql/v2 \
+                  -H "Project-Access-Token: $RAILWAY_PROD_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  --data "$payload" 2>/dev/null) || resp=""
+              status=$(echo "$resp" | jq -r --arg env "$ENV" --arg svc "$SVC" \
+                  "$jq_filter" 2>/dev/null || echo "")
+              if [ -n "$status" ] && [ "$status" != "$last_status" ]; then
+                  echo "::notice::Railway deploy status: $status"
+                  last_status="$status"
+              fi
+              case "$status" in
+                  SUCCESS)
+                      {
+                        echo "## Deploy → Railway"
+                        echo "- Status: **deployed (verified via GraphQL)**"
+                        echo "- Tag: \`${PROD_TAG}\`"
+                        echo "- Digest (logged, pin pending GraphQL wiring): \`${ODOO_DIGEST}\`"
+                      } >> "$GITHUB_STEP_SUMMARY"
+                      exit 0
+                      ;;
+                  FAILED|CRASHED|REMOVED)
+                      echo "::error::Railway deploy ended in status=$status"
+                      {
+                        echo "## Deploy → Railway"
+                        echo "- Status: **FAILED (status=$status)**"
+                      } >> "$GITHUB_STEP_SUMMARY"
+                      exit 1
+                      ;;
+              esac
+              sleep 15
+          done
+          echo "::error::Railway deploy poll timed out after 12m (last status: $last_status)"
+          exit 1
 
   deploy-fly:
     name: Deploy → Fly prod
@@ -487,6 +550,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Login to GHCR for image pull
+        if: inputs.dry_run == 'false'
+        # Fly's `--image` path fetches the image via Fly's API, which
+        # needs registry auth for private GHCR. The runner's GITHUB_TOKEN
+        # already has read:packages for this repo's own packages, so
+        # `docker login` makes the auth available to flyctl, which
+        # forwards it to Fly. No new secret required.
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io \
+              -u "${{ github.actor }}" --password-stdin
       - name: flyctl deploy (pinned to digest)
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
