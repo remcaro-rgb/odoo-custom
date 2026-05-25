@@ -448,7 +448,7 @@ jobs:
       - run: npm install -g @railway/cli
       - name: railway up (prod, pinned to digest)
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
           ODOO_DIGEST: ${{ needs.resolve-digest.outputs.odoo_digest }}
           PROD_TAG: ${{ needs.tag-image.outputs.prod_tag }}
         run: |
