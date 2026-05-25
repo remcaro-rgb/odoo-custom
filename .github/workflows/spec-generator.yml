@@ -55,7 +55,14 @@ jobs:
         # a single ref bump flips both agents in lockstep (they import the
         # same `agents.implementation` submodules — opencode_client, rollout,
         # observability, notifier).
-        run: pip install "git+https://github.com/remcaro-rgb/Odoo-saas-agents.git@${{ vars.AGENT_REF || 'main' }}"
+        # psycopg[binary] ships a self-contained wheel — no libpq headers
+        # on the runner. Required for Tier 3 state writes
+        # (`PostgresRunStore`) and Tier 5 dup detection
+        # (`PgvectorKnowledgeBase`). Without it both downgrade silently
+        # to no-op fallbacks.
+        run: |
+          pip install "git+https://github.com/remcaro-rgb/Odoo-saas-agents.git@${{ vars.AGENT_REF || 'main' }}"
+          pip install "psycopg[binary]>=3.2"
 
       - name: Mint a token for the spec-generator-bot GitHub App
         id: bot_token

@@ -41,7 +41,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install the Spec Generator
-        run: pip install "git+https://github.com/remcaro-rgb/Odoo-saas-agents.git@${{ vars.AGENT_REF || 'main' }}"
+        # See spec-generator.yml for the psycopg rationale — sweep also uses
+        # run_store to record phase=intent_confirmed on auto-confirm.
+        run: |
+          pip install "git+https://github.com/remcaro-rgb/Odoo-saas-agents.git@${{ vars.AGENT_REF || 'main' }}"
+          pip install "psycopg[binary]>=3.2"
 
       - name: Mint a token for the spec-generator-bot GitHub App
         id: bot_token

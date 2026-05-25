@@ -46,7 +46,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install the Spec Generator
-        run: pip install "git+https://github.com/remcaro-rgb/Odoo-saas-agents.git@${{ vars.AGENT_REF || 'main' }}"
+        # See spec-generator.yml for the psycopg rationale (Tier 3 RunStore
+        # + Tier 5 KB both need it; without it they silently degrade).
+        run: |
+          pip install "git+https://github.com/remcaro-rgb/Odoo-saas-agents.git@${{ vars.AGENT_REF || 'main' }}"
+          pip install "psycopg[binary]>=3.2"
 
       - name: Mint a token for the spec-generator-bot GitHub App
         id: bot_token
