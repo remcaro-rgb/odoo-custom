@@ -63,8 +63,8 @@ class FakeStore:
     def transition_to_skipped(self, _cur, job_id: str) -> None:
         self._record('transition_to_skipped', job_id)
 
-    def transition_to_blocked(self, _cur, job_id: str) -> None:
-        self._record('transition_to_blocked', job_id)
+    def transition_to_blocked(self, _cur, job_id: str, blocked_until=None) -> None:
+        self._record('transition_to_blocked', job_id, blocked_until)
 
     def finalize_done(self, _cur, job_id, tenant_id, target_sha) -> None:
         self._record('finalize_done', job_id, tenant_id, target_sha)
@@ -166,7 +166,15 @@ class TestRunOnceBlocked:
             runner = Runner(store, snapshot_fn=_fake_snapshot, sleep_fn=lambda _s: None)
             result = runner.run_once()
         assert result.status == 'blocked'
-        assert ('transition_to_blocked', ('job-uuid',)) in store.calls
+        # Proper hot-loop fix: transition_to_blocked now takes a
+        # `blocked_until` arg = next eligible firing. For cron='0 2 * * *'
+        # at 12:00 UTC, the next firing is 02:00 the NEXT day = 14h ahead.
+        blocked_calls = [c for c in store.calls if c[0] == 'transition_to_blocked']
+        assert len(blocked_calls) == 1
+        _, args = blocked_calls[0]
+        job_id, blocked_until = args
+        assert job_id == 'job-uuid'
+        assert blocked_until == datetime(2026, 5, 24, 2, 0, tzinfo=timezone.utc)
 
 
 class TestRunOnceHappyPath:

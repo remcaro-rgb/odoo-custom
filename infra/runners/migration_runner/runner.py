@@ -122,11 +122,15 @@ class Runner:
     def run_forever(self) -> None:
         """Loop until SIGTERM. Block between iterations on POLL_INTERVAL
         when the queue is empty OR the only available work is a row we
-        just observed as blocked — claim_next_job re-selects
-        `status='blocked'` rows, so without a sleep here the daemon
-        hot-loops on a window-blocked job at ~70 ops/sec. Proper fix
-        would add a `blocked_until` column and filter the claim query;
-        this is the minimum-viable patch."""
+        just observed as blocked.
+
+        The proper hot-loop fix is the `blocked_until` column on
+        tenant_migration_jobs (added in control-plane PR #13); the
+        claim_next_job filter then makes blocked rows invisible until
+        their next eligible firing. The sleep here is defense-in-depth:
+        if a row's blocked_until has elapsed in the same tick the
+        runner just blocked it (NULL back-compat), the sleep prevents
+        a one-off spin. POLL_INTERVAL_SECONDS = 15s by default."""
         logger.info('runner started host=%s', self._runner_host)
         while True:
             try:
@@ -150,10 +154,22 @@ class Runner:
 
         # Window check.
         evaluator = self._window_factory(job)
-        if not evaluator.is_open(utcnow()):
+        now = utcnow()
+        if not evaluator.is_open(now):
+            # Compute next eligible firing so claim_next_job can skip
+            # this row until it elapses — kills the hot-loop at the
+            # SQL layer. The runner.py-side sleep added by PR #94 is
+            # kept as defense-in-depth: claim_next_job still costs an
+            # SQL round-trip even with the filter, so we don't want
+            # the daemon to spin if the queue magically refilled.
+            blocked_until = evaluator.next_open(now)
             with self._store.cursor() as cur:
-                self._store.transition_to_blocked(cur, job.id)
-            logger.info('job %s blocked — outside maintenance window', job.id)
+                self._store.transition_to_blocked(cur, job.id, blocked_until)
+            logger.info(
+                'job %s blocked — outside maintenance window; next open %s',
+                job.id,
+                blocked_until.isoformat(),
+            )
             return RunResult(job_id=job.id, status='blocked')
 
         # Snapshot.

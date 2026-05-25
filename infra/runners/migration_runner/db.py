@@ -108,7 +108,13 @@ class JobStore:
     # ── Queue ops ────────────────────────────────────────────────────
 
     def claim_next_job(self, cur: Any) -> Optional[JobRow]:
-        """Atomic claim of the oldest queued/blocked row.
+        """Atomic claim of the oldest eligible queued/blocked row.
+
+        A 'blocked' row is eligible only when its `blocked_until` has
+        elapsed (or is NULL — back-compat for rows touched only by the
+        MVP sleep-on-blocked patch from PR #94). The partial index
+        `tenant_migration_jobs_blocked_until_idx` keeps the predicate
+        cheap.
 
         Single transaction:
           SELECT ... FOR UPDATE SKIP LOCKED;
@@ -125,7 +131,11 @@ class JobStore:
                    COALESCE(j.migration_dry_run, false)
             FROM tenant_migration_jobs j
             JOIN tenants t ON t.id = j.tenant_id
-            WHERE j.status IN ('queued','blocked')
+            WHERE (
+                    j.status = 'queued'
+                 OR (j.status = 'blocked'
+                     AND COALESCE(j.blocked_until, '-infinity'::timestamptz) <= now())
+                  )
               AND COALESCE(t.wave, 'canary') != 'paused'
               AND j.enqueued_at <= now()
             ORDER BY j.enqueued_at ASC, j.id ASC
@@ -163,20 +173,29 @@ class JobStore:
             migration_dry_run=bool(row[12]),
         )
 
-    def transition_to_blocked(self, cur: Any, job_id: str) -> None:
+    def transition_to_blocked(
+        self, cur: Any, job_id: str, blocked_until: Optional[datetime] = None
+    ) -> None:
         """Outside-window observation — clear started_at/heartbeat and
         return the row to the queue with `status='blocked'`. No
-        retry_count bump."""
+        retry_count bump.
+
+        `blocked_until` is the next eligible firing time computed by
+        the runner from the tenant's window. claim_next_job filters
+        blocked rows by this column so the daemon won't re-claim until
+        it has elapsed. NULL means "recheck on next poll" (back-compat
+        for callers that haven't been updated to the new contract)."""
         cur.execute(
             """
             UPDATE tenant_migration_jobs
             SET status = 'blocked',
                 started_at = NULL,
                 heartbeat_at = NULL,
-                finished_at = NULL
+                finished_at = NULL,
+                blocked_until = %s
             WHERE id = %s
             """,
-            (job_id,),
+            (blocked_until, job_id),
         )
 
     def transition_to_skipped(self, cur: Any, job_id: str) -> None:

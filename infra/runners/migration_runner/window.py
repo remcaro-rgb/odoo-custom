@@ -93,3 +93,37 @@ class WindowEvaluator:
         # prev_firing_local is tz-aware (matches local_now).
         delta = local_now - prev_firing_local
         return delta >= timedelta(0) and delta <= self.TOLERANCE
+
+    def next_open(self, now: datetime) -> datetime:
+        """Return the next UTC datetime when is_open(now) would become
+        True.
+
+        Used by the runner to set `tenant_migration_jobs.blocked_until`
+        when transitioning a job to 'blocked'. The daemon's
+        claim_next_job filters
+            (status='blocked' AND blocked_until <= now())
+        so a blocked job stays invisible to the daemon until the
+        returned time has elapsed.
+
+        Returned time is:
+        - now() if the global override is set (open now).
+        - override_until if that's in the future and earlier than the
+          next cron firing.
+        - next cron firing in the tenant's tz (converted back to UTC).
+
+        Caller is responsible for storing this as UTC.
+        """
+        # If we'd already be open, the "next open" is right now — the
+        # caller can choose to short-circuit and not park the job.
+        if self.is_open(now):
+            return now
+        candidates: list[datetime] = []
+        if self.override_until is not None and self.override_until > now:
+            candidates.append(self.override_until)
+        # Next cron firing in the tenant's tz, converted to UTC.
+        local_now = now.astimezone(ZoneInfo(self.tz))
+        it = croniter(self.cron, local_now)
+        next_firing_local = it.get_next(datetime)
+        candidates.append(next_firing_local.astimezone(timezone.utc))
+        # Earliest opener wins.
+        return min(candidates)

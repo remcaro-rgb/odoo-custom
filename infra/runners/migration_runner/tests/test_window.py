@@ -83,3 +83,40 @@ class TestOverride:
         # Tier 4's global override flag (feature flag in control plane).
         e = WindowEvaluator(cron='0 2 * * *', tz='America/Bogota', global_override=True)
         assert e.is_open(_utc(2026, 5, 23, 23, 0)) is True
+
+
+class TestNextOpen:
+    """next_open() — drives `tenant_migration_jobs.blocked_until` in
+    the proper hot-loop fix."""
+
+    def test_returns_now_when_already_open(self) -> None:
+        # 02:30 Bogota = 07:30 UTC, cron='0 2 * * *' fires at 02:00
+        # Bogota = 07:00 UTC — we're inside the 1h tolerance.
+        e = WindowEvaluator(cron='0 2 * * *', tz='America/Bogota')
+        now = _utc(2026, 5, 23, 7, 30)
+        assert e.is_open(now) is True
+        assert e.next_open(now) == now
+
+    def test_returns_next_cron_firing_when_closed(self) -> None:
+        # 18:00 Bogota = 23:00 UTC. Next firing is 02:00 Bogota on
+        # 2026-05-24 = 07:00 UTC.
+        e = WindowEvaluator(cron='0 2 * * *', tz='America/Bogota')
+        now = _utc(2026, 5, 23, 23, 0)
+        assert e.is_open(now) is False
+        assert e.next_open(now) == _utc(2026, 5, 24, 7, 0)
+
+    def test_falls_through_to_cron_when_override_past(self) -> None:
+        # Expired override; next_open uses cron only.
+        e = WindowEvaluator(
+            cron='0 2 * * *',
+            tz='America/Bogota',
+            override_until=_utc(2026, 5, 22, 0, 0),
+        )
+        now = _utc(2026, 5, 23, 23, 0)
+        assert e.next_open(now) == _utc(2026, 5, 24, 7, 0)
+
+    def test_global_override_returns_now(self) -> None:
+        # global_override = is_open is always True, so next_open is now.
+        e = WindowEvaluator(cron='0 2 * * *', tz='America/Bogota', global_override=True)
+        now = _utc(2026, 5, 23, 23, 0)
+        assert e.next_open(now) == now

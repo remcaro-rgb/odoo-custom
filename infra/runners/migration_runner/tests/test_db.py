@@ -165,3 +165,48 @@ class TestHeartbeat:
         store, cur, _ = _make_store(fetch_rows=[('cancelled',)])
         with store.cursor() as c:
             assert store.record_heartbeat(c, 'job-1') == 'cancelled'
+
+
+class TestTransitionToBlocked:
+    """Proper hot-loop fix: claim_next_job filters blocked rows by
+    `blocked_until <= now()`; transition_to_blocked writes that column."""
+
+    def test_writes_blocked_until_when_provided(self) -> None:
+        from datetime import datetime, timezone
+
+        store, cur, _ = _make_store(fetch_rows=[])
+        next_open = datetime(2026, 5, 24, 7, 0, tzinfo=timezone.utc)
+        with store.cursor() as c:
+            store.transition_to_blocked(c, 'job-1', next_open)
+        sql, params = cur.executed[0]
+        assert "status = 'blocked'" in sql
+        assert 'blocked_until = %s' in sql
+        # Bound params: (blocked_until, job_id) in that order.
+        assert params == (next_open, 'job-1')
+
+    def test_writes_null_when_omitted(self) -> None:
+        # Back-compat: callers that don't compute next-open get NULL,
+        # which the claim filter treats as "recheck on next poll".
+        store, cur, _ = _make_store(fetch_rows=[])
+        with store.cursor() as c:
+            store.transition_to_blocked(c, 'job-1')
+        _sql, params = cur.executed[0]
+        assert params == (None, 'job-1')
+
+
+class TestClaimNextJob:
+    """Verify the SQL filter shape — does NOT execute against Postgres,
+    just asserts the predicate that PR #94's hot-loop fix needs."""
+
+    def test_filter_includes_queued_and_blocked_with_elapsed_until(self) -> None:
+        store, cur, _ = _make_store(fetch_rows=[])  # empty fetch -> None
+        with store.cursor() as c:
+            assert store.claim_next_job(c) is None
+        sql = cur.executed[0][0]
+        # The new predicate must include both branches:
+        assert "j.status = 'queued'" in sql
+        assert "j.status = 'blocked'" in sql
+        # Blocked rows are gated by blocked_until comparison.
+        assert 'blocked_until' in sql
+        # Back-compat: NULL means "recheck on next poll".
+        assert 'COALESCE(j.blocked_until,' in sql
