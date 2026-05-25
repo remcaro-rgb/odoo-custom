@@ -88,4 +88,7 @@ jobs:
           # one place so the iterate flow stays symmetric with draft.
           AGENTLAB_SHIM_URL: ${{ secrets.AGENTLAB_SHIM_URL }}
           AGENTLAB_SHIM_TOKEN: ${{ secrets.AGENTLAB_SHIM_TOKEN }}
+          # Tier 5 dup detection — same symmetry note as Tier 4.
+          EMBEDDINGS_SHIM_URL: ${{ secrets.EMBEDDINGS_SHIM_URL }}
+          EMBEDDINGS_SHIM_TOKEN: ${{ secrets.EMBEDDINGS_SHIM_TOKEN }}
         run: python -m agents.spec_generator

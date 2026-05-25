@@ -97,4 +97,10 @@ jobs:
           # fall back to human triage (the pre-Tier-4 safe posture).
           AGENTLAB_SHIM_URL: ${{ secrets.AGENTLAB_SHIM_URL }}
           AGENTLAB_SHIM_TOKEN: ${{ secrets.AGENTLAB_SHIM_TOKEN }}
+          # Tier 5 dup detection: when both are set the feature flow runs
+          # an embedding lookup against the pgvector index before drafting
+          # and tags possible-duplicate PRs accordingly. Unset = no dup
+          # check (the pre-Tier-5 safe posture).
+          EMBEDDINGS_SHIM_URL: ${{ secrets.EMBEDDINGS_SHIM_URL }}
+          EMBEDDINGS_SHIM_TOKEN: ${{ secrets.EMBEDDINGS_SHIM_TOKEN }}
         run: python -m agents.spec_generator
