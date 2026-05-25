@@ -53,8 +53,13 @@ jobs:
           DATA_PLANE_REPO: ${{ github.repository }}
           WORKSPACE_ROOT: ${{ github.workspace }}
           AGENTS_ENABLED: ${{ vars.AGENTS_ENABLED }}
-          # OPENAI_API_KEY drives the embeddings; CONTROL_PLANE_PG_DSN is
-          # the same DSN the Tier 3 state writer uses.
+          # Tier 5 embeddings: when EMBEDDINGS_SHIM_URL + TOKEN are set
+          # the agent uses the self-hosted Fly shim
+          # (`odoo-saas-embeddings-shim.fly.dev`). OPENAI_API_KEY is a
+          # paid fallback if you ever want to swap providers — leave it
+          # unset to enforce shim-only.
+          EMBEDDINGS_SHIM_URL: ${{ secrets.EMBEDDINGS_SHIM_URL }}
+          EMBEDDINGS_SHIM_TOKEN: ${{ secrets.EMBEDDINGS_SHIM_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           CONTROL_PLANE_PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
