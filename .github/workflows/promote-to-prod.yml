@@ -150,6 +150,15 @@ jobs:
             sha=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?branch=main&status=success&per_page=1" \
                 | jq -r '.workflow_runs[0].head_sha')
           fi
+          # Expand to full 40-char SHA. actions/checkout@v4 in downstream
+          # jobs treats `ref:` as a branch/tag pattern when given a short
+          # SHA, which makes the fetch fail. Resolve once here so every
+          # downstream job gets the canonical 40-char form.
+          sha=$(gh api "repos/${{ github.repository }}/commits/$sha" --jq '.sha')
+          if [ "${#sha}" -ne 40 ]; then
+              echo "::error::Failed to resolve to a 40-char SHA (got: '$sha')." >&2
+              exit 1
+          fi
           echo "target_sha=$sha" >> "$GITHUB_OUTPUT"
           echo "::notice::Target SHA: $sha"
 
@@ -159,9 +168,17 @@ jobs:
           SHA: ${{ steps.resolve.outputs.target_sha }}
         run: |
           set -euo pipefail
-          # ci.yml's final job is cross-platform-gate
+          # ci.yml's final job is cross-platform-gate. A SHA can accumulate
+          # multiple check-runs by this name when later workflows (e.g. a
+          # prior failed promote-to-prod re-running its own parity-gate
+          # step) attach more results to the same commit. Take the most
+          # recent — that's the one we actually need to gate on, and
+          # comparing the bare jq stream of N values to "success" would
+          # spuriously fail on N≥2 even when all are successes.
           state=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
-              | jq -r '.check_runs[] | select(.name == "Cross-platform parity gate") | .conclusion')
+              | jq -r '[.check_runs[] | select(.name == "Cross-platform parity gate")]
+                       | sort_by(.completed_at) | last
+                       | (.conclusion // "missing")')
           if [ "$state" != "success" ]; then
               echo "::error::SHA $SHA did not pass Gate 1+2 (cross-platform-gate=$state)." >&2
               exit 1
@@ -376,6 +393,15 @@ jobs:
       && needs.resolve-digest.result == 'success'
       && (needs.approval.result == 'success' || needs.approval.result == 'skipped')
     runs-on: ubuntu-latest
+    # Job-level permission elevation (workflow-default is contents:read).
+    # `Push git tag pointing at the promoted SHA` runs `git push origin
+    # refs/tags/...` against the repo; without this the push fails with
+    # HTTP 403. Scoped narrowly to this job — the rest of the workflow
+    # keeps the read-only default.
+    permissions:
+      contents: write
+      packages: write       # buildx imagetools create writes new GHCR tags
+      id-token: write       # not used here but matches workflow header
     outputs:
       prod_tag: ${{ steps.compute.outputs.prod_tag }}
     steps:
