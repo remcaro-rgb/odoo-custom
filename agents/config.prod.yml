@@ -1,0 +1,24 @@
+# Production overrides for the slack_intake Fly app.
+#
+# Loaded automatically when AGENTS_ENV=prod (set in
+# infra/fly/slack-intake/fly.toml [env] block). The values here deep-merge
+# on top of config.yml — anything not specified inherits from the base.
+#
+# Why this file exists (rather than env-var overrides):
+#   agents/config.py's _apply_env_overrides splits AGENTS_<X>_<Y>_... on
+#   single underscores. That can't represent keys with their own
+#   underscores like `slack_intake` and `allowed_channels`. Until config.py
+#   grows a richer env-var syntax, prod-specific structured values land
+#   here.
+
+agents:
+  slack_intake:
+    # Phase B starts in shadow mode — bot files issues but does NOT relay
+    # GH comments back to Slack. Flip to false at the end of the 1-week
+    # soak (see docs/runbooks/slack-intake-rollout.md).
+    shadow_mode: true
+    # Channels where /intake is allowed. Phase B starts with one test
+    # channel; Phase C widens to a single team channel; Phase D rolls
+    # workspace-wide via ["*"].
+    allowed_channels:
+      - C0B6A815JN6

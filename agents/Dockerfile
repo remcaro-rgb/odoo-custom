@@ -43,6 +43,12 @@ RUN pip install --no-cache-dir /wheels/*.whl \
 # Default config (operator overrides via mounted volume / env)
 COPY config.example.yml /app/config.yml
 
+# Per-environment overrides: load_config picks the right file when
+# AGENTS_ENV is set (e.g., AGENTS_ENV=prod -> config.prod.yml). The
+# Fly app for slack-intake sets AGENTS_ENV=prod; other deployments
+# without the env var still use the base config.yml unchanged.
+COPY config.prod.yml /app/config.prod.yml
+
 # Non-root runtime
 RUN useradd --no-create-home --uid 1000 agents \
  && chown -R agents:agents /app
