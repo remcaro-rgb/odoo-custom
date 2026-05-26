@@ -383,29 +383,21 @@ jobs:
       TARGET_SHA: ${{ inputs.target_sha }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install migration-runner runtime deps
+      - name: Install flyctl
         if: env.DRY_RUN == 'false'
-        # The migration_runner package uses a flat layout
-        # (__init__.py + .py files alongside pyproject.toml). The
-        # Dockerfile-based build reshapes the layout into
-        # /opt/migration_runner_build/migration_runner/* before
-        # `pip install -e .`, but reshaping in the runner is overkill.
-        # Instead we pip-install the deps directly and put the package
-        # parent on PYTHONPATH for the `python -m ...` invocation
-        # below. Matches what the daemon image runs at /app.
-        run: pip install 'croniter>=2.0' 'psycopg[binary]>=3.1'
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Restore per tenant in wave (delegates to migration_runner.rollback)
+      - name: Restore per tenant in wave (SSH-delegates to migration-runner)
         env:
-          PYTHONPATH: infra/runners
-          # The job-level env exposes the DSN as `PG_DSN` for the psql
-          # query above; the rollback CLI reads `CONTROL_PLANE_PG_DSN`
-          # (matches the secret's canonical name and the daemon's
-          # runtime env), so expose it under that name too.
-          CONTROL_PLANE_PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
+          # rollback.py shells out to `pgbackrest` and connects to the
+          # internal Postgres over Fly's wireguard mesh. Neither is
+          # available on the GH-hosted runner — pgbackrest is only
+          # installed in the migration-runner image; the Postgres
+          # internal hostname is only routable from Fly's network.
+          # So we delegate execution by SSHing into the runner machine
+          # and invoking the CLI there. The migration-runner-scoped
+          # Fly token is in FLY_MIGRATION_RUNNER_TOKEN.
+          FLY_API_TOKEN: ${{ secrets.FLY_MIGRATION_RUNNER_TOKEN }}
         run: |
           set -euo pipefail
           {
@@ -447,8 +439,12 @@ jobs:
               fi
               # CLI signature: `python -m migration_runner.rollback <job_id> <previous_sha>`
               # Defined in infra/runners/migration_runner/rollback.py (cli()).
-              if ROLLBACK_ACTOR="${{ github.actor }}" \
-                 python -m migration_runner.rollback "$job_id" "$TARGET_SHA"; then
+              # Executed inside the runner machine where pgbackrest +
+              # internal Postgres connectivity actually exist. The
+              # ROLLBACK_ACTOR env propagates the operator's GH login
+              # into the audit row written by the CLI's finalize step.
+              if flyctl ssh console -a odoo-saas-migration-runner \
+                     --command "sh -c 'ROLLBACK_ACTOR=${{ github.actor }} python -m migration_runner.rollback $job_id $TARGET_SHA'"; then
                   echo "| $slug | \`$job_id\` | rolled back |" >> "$GITHUB_STEP_SUMMARY"
               else
                   echo "::error::migration_runner.rollback failed for $slug job=$job_id" >&2
