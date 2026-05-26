@@ -16,10 +16,14 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
 
 echo "Deploying $APP from $REPO_ROOT (rolling strategy) …"
-flyctl deploy \
+# Build context = agents/ (where the Dockerfile + its COPY-relative files
+# all live). Pass it as the positional arg; --config + --dockerfile are
+# addressed from the cwd (= repo root).
+cd "$REPO_ROOT"
+flyctl deploy agents \
   --app "$APP" \
-  --config "$HERE/fly.toml" \
-  --dockerfile "$REPO_ROOT/agents/Dockerfile" \
+  --config "infra/fly/slack-intake/fly.toml" \
+  --dockerfile "agents/Dockerfile" \
   --remote-only \
   --strategy rolling
 

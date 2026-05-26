@@ -82,11 +82,13 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy
-        working-directory: infra/fly/slack-intake
         run: |
-          flyctl deploy \
+          # Build context = agents/ (where the Dockerfile + its COPY-relative
+          # files all live). Config + dockerfile addressed from the repo root.
+          flyctl deploy agents \
             --app odoo-saas-slack-intake \
-            --config fly.toml \
+            --config infra/fly/slack-intake/fly.toml \
+            --dockerfile agents/Dockerfile \
             --remote-only \
             --strategy rolling
 
