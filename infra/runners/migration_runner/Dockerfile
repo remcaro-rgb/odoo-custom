@@ -97,7 +97,14 @@ RUN useradd --no-create-home -u 1000 odoo \
 # known-good version for reproducibility.
 ENV FLYCTL_INSTALL=/opt/flyctl
 ENV PATH=$FLYCTL_INSTALL/bin:$PATH
-RUN curl -L https://fly.io/install.sh | sh -s 0.3.197
+# fly.io/install.sh's version arg only accepts release-tag forms it
+# can find in github.com/superfly/flyctl/releases — `0.3.197` is
+# rejected (not a real release at the time of build) and any other
+# specific pin risks similar failure when the release is later
+# pruned/renamed. Track latest stable; flyctl is mature and we don't
+# depend on a specific feature beyond `ssh console --command`, which
+# has been stable for years.
+RUN curl -L https://fly.io/install.sh | sh
 
 # --- migration_runner package ---
 # psycopg binary wheel + croniter as runtime deps for the runner itself.
