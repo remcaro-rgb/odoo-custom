@@ -386,15 +386,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install migration-runner package
+      - name: Install migration-runner runtime deps
         if: env.DRY_RUN == 'false'
-        # The daemon's rollback module composes with this workflow per its
-        # docstring: rollback-prod.yml rolls back the IMAGE; rollback.py
-        # rolls back the DATA. Together they restore a tenant to "the
-        # state it was in before migration job X."
-        run: pip install -e infra/runners/migration_runner/
+        # The migration_runner package uses a flat layout
+        # (__init__.py + .py files alongside pyproject.toml). The
+        # Dockerfile-based build reshapes the layout into
+        # /opt/migration_runner_build/migration_runner/* before
+        # `pip install -e .`, but reshaping in the runner is overkill.
+        # Instead we pip-install the deps directly and put the package
+        # parent on PYTHONPATH for the `python -m ...` invocation
+        # below. Matches what the daemon image runs at /app.
+        run: pip install 'croniter>=2.0' 'psycopg[binary]>=3.1'
 
       - name: Restore per tenant in wave (delegates to migration_runner.rollback)
+        env:
+          PYTHONPATH: infra/runners
         run: |
           set -euo pipefail
           {
