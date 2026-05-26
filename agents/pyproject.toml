@@ -79,6 +79,13 @@ agents = "agents.cli:main"
 where = ["."]
 include = ["agents*"]
 
+# Non-Python files that must travel with the wheel. Without this section
+# the Block Kit templates the slack_intake agent loads at runtime are
+# absent from the installed package and the FastAPI handler raises
+# FileNotFoundError on the first /intake invocation.
+[tool.setuptools.package-data]
+agents = ["templates/*.json"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
