@@ -26,10 +26,12 @@ from .events_slack_webhook import DispatchResult
 class GitHubWebhookEventBus:
     """EventBus for inbound GitHub webhooks."""
 
-    def __init__(self, *, webhook_secret: str) -> None:
+    def __init__(self, *, webhook_secret: str, logger: Any = None) -> None:
         self._secret = webhook_secret.encode("utf-8")
         self._subs: dict[str, list[Callable[[Event], Any]]] = {}
         self._next_sub_id = 0
+        # See SlackWebhookEventBus for the rationale on the optional logger.
+        self._logger = logger
 
     @classmethod
     def from_config(cls, config: Config) -> GitHubWebhookEventBus:
@@ -41,6 +43,10 @@ class GitHubWebhookEventBus:
                 cfg.get("webhook_secret_name", "GITHUB_WEBHOOK_SECRET")
             ),
         )
+
+    def set_logger(self, logger: Any) -> None:
+        """Attach a runtime Logger so handler exceptions land as structured logs."""
+        self._logger = logger
 
     # ---- EventBus protocol ----
 
@@ -55,9 +61,45 @@ class GitHubWebhookEventBus:
         return Subscription(id=sub_id, event_type=event_type)
 
     def publish(self, event_type: str, payload: dict[str, Any]) -> None:
+        """Deliver an event; handler exceptions caught (GitHub retries on 5xx).
+
+        Letting a handler exception propagate would turn into a 500 to
+        GitHub, which retries the delivery — potentially up to 8 times
+        with exponential backoff. That burns webhook budget on a bug
+        we already know about. Catch and log instead.
+        """
         event = Event(type=event_type, actor="github", payload=payload)
         for handler in self._subs.get(event_type, []):
-            handler(event)
+            try:
+                handler(event)
+            except Exception as exc:  # noqa: BLE001 — bus must absorb handler errors
+                self._report_handler_error(event_type, handler, exc)
+
+    def _report_handler_error(
+        self,
+        event_type: str,
+        handler: Callable[[Event], Any],
+        exc: BaseException,
+    ) -> None:
+        import traceback
+        handler_name = getattr(handler, "__qualname__", repr(handler))
+        if self._logger is not None:
+            self._logger.error(
+                "events_github_webhook.handler_exception",
+                event_type=event_type,
+                handler=handler_name,
+                error_type=type(exc).__name__,
+                error=str(exc),
+                traceback=traceback.format_exc(),
+            )
+            return
+        import sys
+        print(
+            f"events_github_webhook.handler_exception event_type={event_type} "
+            f"handler={handler_name} error={type(exc).__name__}: {exc}",
+            file=sys.stderr,
+        )
+        traceback.print_exc(file=sys.stderr)
 
     # ---- HTTP entry point ----
 

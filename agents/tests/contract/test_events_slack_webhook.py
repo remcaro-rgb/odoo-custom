@@ -7,6 +7,8 @@ import hmac
 import json
 import time
 
+import pytest
+
 from agents.adapters.events_slack_webhook import SlackWebhookEventBus
 
 SIGNING_SECRET = "test_signing_secret"  # noqa: S105 — test fixture, not a real secret
@@ -134,3 +136,73 @@ def test_invalid_signature_returns_401() -> None:
     bus = _bus()
     result = bus.dispatch(headers=headers, body=body, now=ts)
     assert result.status == 401
+
+
+# ---- Issue #117: handler exceptions must not propagate to dispatch ----
+
+def test_publish_absorbs_handler_exception_with_logger() -> None:
+    """A handler that raises must NOT propagate; the bus logs and continues."""
+    class FakeLogger:
+        def __init__(self) -> None: self.errors: list[dict] = []
+        def error(self, msg: str, /, **fields) -> None:
+            self.errors.append({"msg": msg, **fields})
+        def info(self, *a, **k) -> None: ...
+        def warn(self, *a, **k) -> None: ...
+        def debug(self, *a, **k) -> None: ...
+
+    fake = FakeLogger()
+    bus = SlackWebhookEventBus(signing_secret=SIGNING_SECRET, logger=fake)
+    bus.subscribe("slack.boom", lambda e: (_ for _ in ()).throw(ValueError("kaboom")))
+
+    # Should NOT raise.
+    bus.publish("slack.boom", {"x": 1})
+
+    assert len(fake.errors) == 1
+    err = fake.errors[0]
+    assert err["msg"] == "events_slack_webhook.handler_exception"
+    assert err["event_type"] == "slack.boom"
+    assert err["error_type"] == "ValueError"
+    assert err["error"] == "kaboom"
+    assert "kaboom" in err["traceback"]
+
+
+def test_publish_continues_to_next_handler_after_exception() -> None:
+    """One failing handler must not block siblings on the same event."""
+    bus = SlackWebhookEventBus(signing_secret=SIGNING_SECRET)
+    received: list[str] = []
+    bus.subscribe("slack.boom", lambda e: (_ for _ in ()).throw(RuntimeError("first")))
+    bus.subscribe("slack.boom", lambda e: received.append("second"))
+    bus.subscribe("slack.boom", lambda e: (_ for _ in ()).throw(RuntimeError("third")))
+    bus.subscribe("slack.boom", lambda e: received.append("fourth"))
+
+    bus.publish("slack.boom", {})
+
+    assert received == ["second", "fourth"]
+
+
+def test_dispatch_returns_200_when_handler_raises() -> None:
+    """The Slack-facing HTTP contract: always 200, never 5xx from a bug."""
+    bus = SlackWebhookEventBus(signing_secret=SIGNING_SECRET)
+    bus.subscribe("slack.slash_command",
+                  lambda e: (_ for _ in ()).throw(ValueError("downstream API failed")))
+
+    body = b"command=%2Fintake&user_id=U1&trigger_id=trig.x&channel_id=C1"
+    ts = int(time.time())
+    headers = {**_sign(body, ts),
+               "content-type": "application/x-www-form-urlencoded"}
+    result = bus.dispatch(headers=headers, body=body, now=ts)
+    assert result.status == 200, f"expected 200 even on handler crash, got {result.status}"
+
+
+def test_publish_without_logger_falls_back_to_stderr(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """When no logger is attached, errors land on stderr — still no propagation."""
+    bus = SlackWebhookEventBus(signing_secret=SIGNING_SECRET)
+    bus.subscribe("slack.boom", lambda e: (_ for _ in ()).throw(KeyError("nope")))
+
+    bus.publish("slack.boom", {})  # must not raise
+
+    captured = capsys.readouterr()
+    assert "events_slack_webhook.handler_exception" in captured.err
+    assert "KeyError" in captured.err

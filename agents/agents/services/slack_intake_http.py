@@ -44,6 +44,13 @@ def build_app(*, runtime: Runtime) -> Any:
     slack_bus = _ensure_slack_bus(runtime)
     github_bus = _ensure_github_bus(runtime)
 
+    # Attach the runtime logger to each bus so handler exceptions land as
+    # structured log lines (issue #117). Without this, exceptions either
+    # propagate to FastAPI as a 500 or go to stderr — both make debugging
+    # harder than it needs to be.
+    slack_bus.set_logger(runtime.logger)
+    github_bus.set_logger(runtime.logger)
+
     # Subscribe handlers to the actual buses serving each platform — we own
     # two independent EventBus instances (Slack v0 HMAC + GitHub
     # HMAC-SHA256), so passing only `runtime` would subscribe to the wrong

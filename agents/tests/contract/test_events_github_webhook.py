@@ -75,3 +75,52 @@ def test_unrelated_event_still_routes() -> None:
     result = bus.dispatch(headers=headers, body=body)
     assert result.status == 200
     assert len(seen) == 1
+
+
+# ---- Issue #117: handler exceptions must not propagate to dispatch ----
+
+def test_gh_publish_absorbs_handler_exception() -> None:
+    """GitHub retries on 5xx; absorbing handler errors keeps the budget."""
+    class FakeLogger:
+        def __init__(self) -> None: self.errors: list[dict] = []
+        def error(self, msg: str, /, **fields) -> None:
+            self.errors.append({"msg": msg, **fields})
+        def info(self, *a, **k) -> None: ...
+        def warn(self, *a, **k) -> None: ...
+        def debug(self, *a, **k) -> None: ...
+
+    fake = FakeLogger()
+    bus = GitHubWebhookEventBus(webhook_secret=WEBHOOK_SECRET, logger=fake)
+    bus.subscribe("github.boom",
+                  lambda e: (_ for _ in ()).throw(RuntimeError("downstream 404")))
+
+    bus.publish("github.boom", {"x": 1})  # must not raise
+
+    assert len(fake.errors) == 1
+    assert fake.errors[0]["msg"] == "events_github_webhook.handler_exception"
+    assert fake.errors[0]["error_type"] == "RuntimeError"
+
+
+def test_gh_dispatch_returns_200_when_handler_raises() -> None:
+    """Webhook contract: never 5xx from a downstream bug."""
+    bus = GitHubWebhookEventBus(webhook_secret=WEBHOOK_SECRET)
+    bus.subscribe("github.issue_comment.created",
+                  lambda e: (_ for _ in ()).throw(ValueError("downstream API failed")))
+
+    payload = {
+        "action": "created",
+        "issue": {"number": 42, "labels": [{"name": "source:slack"}]},
+        "comment": {"id": 1, "body": "hi", "user": {"login": "spec-generator-bot"}},
+        "repository": {"full_name": "org/repo"},
+    }
+    body = json.dumps(payload).encode("utf-8")
+    headers = {
+        "x-hub-signature-256": _sign(body),
+        "x-github-event": "issue_comment",
+        "x-github-delivery": "deliv-boom",
+    }
+    result = bus.dispatch(headers=headers, body=body)
+    assert result.status == 200, (
+        f"expected 200 even on handler crash, got {result.status}; "
+        "GitHub retries on 5xx and we'd burn our webhook budget"
+    )

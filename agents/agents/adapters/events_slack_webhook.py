@@ -47,11 +47,16 @@ class SlackWebhookEventBus:
         *,
         signing_secret: str,
         max_age_seconds: int = _MAX_AGE_SECONDS,
+        logger: Any = None,
     ) -> None:
         self._signing_secret = signing_secret.encode("utf-8")
         self._max_age = max_age_seconds
         self._subs: dict[str, list[Callable[[Event], Any]]] = {}
         self._next_sub_id = 0
+        # When unset, publish() falls back to stderr so the bus is still
+        # usable in tests without a runtime logger. set_logger() lets the
+        # HTTP service attach the real logger after bootstrap.
+        self._logger = logger
 
     @classmethod
     def from_config(cls, config: Config) -> SlackWebhookEventBus:
@@ -63,6 +68,10 @@ class SlackWebhookEventBus:
                 cfg.get("signing_secret_name", "SLACK_SIGNING_SECRET")
             ),
         )
+
+    def set_logger(self, logger: Any) -> None:
+        """Attach a runtime Logger so handler exceptions land as structured logs."""
+        self._logger = logger
 
     # ---- EventBus protocol ----
 
@@ -77,9 +86,48 @@ class SlackWebhookEventBus:
         return Subscription(id=sub_id, event_type=event_type)
 
     def publish(self, event_type: str, payload: dict[str, Any]) -> None:
+        """Deliver an event to every subscribed handler.
+
+        Handler exceptions are caught and logged — never re-raised. Slack
+        gives us a 3-second budget to ack the webhook; a propagating
+        exception turns into a 500 and Slack reports
+        "/<command> failed because the app did not respond" to the user.
+        Always returning cleanly preserves the user-visible UX and gives
+        us a structured log line to debug from.
+        """
         event = Event(type=event_type, actor="slack", payload=payload)
         for handler in self._subs.get(event_type, []):
-            handler(event)
+            try:
+                handler(event)
+            except Exception as exc:  # noqa: BLE001 — bus must absorb handler errors
+                self._report_handler_error(event_type, handler, exc)
+
+    def _report_handler_error(
+        self,
+        event_type: str,
+        handler: Callable[[Event], Any],
+        exc: BaseException,
+    ) -> None:
+        import traceback
+        handler_name = getattr(handler, "__qualname__", repr(handler))
+        if self._logger is not None:
+            self._logger.error(
+                "events_slack_webhook.handler_exception",
+                event_type=event_type,
+                handler=handler_name,
+                error_type=type(exc).__name__,
+                error=str(exc),
+                traceback=traceback.format_exc(),
+            )
+            return
+        # Fallback when no logger has been attached (tests, smoke probes).
+        import sys
+        print(
+            f"events_slack_webhook.handler_exception event_type={event_type} "
+            f"handler={handler_name} error={type(exc).__name__}: {exc}",
+            file=sys.stderr,
+        )
+        traceback.print_exc(file=sys.stderr)
 
     # ---- HTTP entry point ----
 
