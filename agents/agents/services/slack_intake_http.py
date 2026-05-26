@@ -19,6 +19,14 @@ from __future__ import annotations
 
 from typing import Any
 
+# FastAPI symbols must be importable at module scope: combined with
+# `from __future__ import annotations`, FastAPI resolves route handler
+# parameter types via `eval_forward_ref` in the MODULE's globals. If
+# `Request` is only available inside `build_app()`, FastAPI sees the
+# string "Request", can't resolve it, and treats `request` as a query
+# parameter — every POST returns 422 with "loc":["query","request"].
+from fastapi import FastAPI, Request, Response  # noqa: E402
+
 from ..adapters.events_github_webhook import GitHubWebhookEventBus
 from ..adapters.events_slack_webhook import SlackWebhookEventBus
 from ..bootstrap import Runtime
@@ -31,8 +39,6 @@ def build_app(*, runtime: Runtime) -> Any:
     Kept separate from `serve()` so tests can drive the app via TestClient
     without binding a real port.
     """
-    from fastapi import FastAPI, Request, Response
-
     app = FastAPI(title="odoo-saas-slack-intake")
 
     slack_bus = _ensure_slack_bus(runtime)
