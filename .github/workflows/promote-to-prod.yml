@@ -393,6 +393,15 @@ jobs:
       && needs.resolve-digest.result == 'success'
       && (needs.approval.result == 'success' || needs.approval.result == 'skipped')
     runs-on: ubuntu-latest
+    # Job-level permission elevation (workflow-default is contents:read).
+    # `Push git tag pointing at the promoted SHA` runs `git push origin
+    # refs/tags/...` against the repo; without this the push fails with
+    # HTTP 403. Scoped narrowly to this job — the rest of the workflow
+    # keeps the read-only default.
+    permissions:
+      contents: write
+      packages: write       # buildx imagetools create writes new GHCR tags
+      id-token: write       # not used here but matches workflow header
     outputs:
       prod_tag: ${{ steps.compute.outputs.prod_tag }}
     steps:
