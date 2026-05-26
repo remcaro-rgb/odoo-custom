@@ -280,27 +280,35 @@ def _finalize_ok(cur, plan: RollbackPlan) -> None:
         """,
         (f'rolled back to {plan.previous_sha[:7]} by {plan.actor}', plan.job_id),
     )
+    # Build the payload as a JSON string in Python and cast to jsonb
+    # in the SQL — jsonb_build_object with bare %s params trips
+    # psycopg's type inference ("could not determine data type of
+    # parameter $N") because Postgres can't statically resolve each
+    # member's type without explicit casts on every argument. Building
+    # the string client-side sidesteps the whole problem.
+    import json as _json
+
+    payload_str = _json.dumps(
+        {
+            'job_id': plan.job_id,
+            'snapshot_id': plan.snapshot_id,
+            'previous_sha': plan.previous_sha,
+            'outcome': 'ok',
+        }
+    )
     cur.execute(
         """
         INSERT INTO saas_audit.event
             (actor_kind, actor_name, action, target_kind, target_id, sha, reason, payload)
         VALUES
-            ('human', %s, 'tenant.migration_rolled_back', 'tenant', %s, %s, %s,
-             jsonb_build_object(
-                'job_id', %s,
-                'snapshot_id', %s,
-                'previous_sha', %s,
-                'outcome', 'ok'
-             ))
+            ('human', %s, 'tenant.migration_rolled_back', 'tenant', %s, %s, %s, %s::jsonb)
         """,
         (
             plan.actor,
             plan.tenant_id,
             plan.previous_sha,
             plan.reason,
-            plan.job_id,
-            plan.snapshot_id,
-            plan.previous_sha,
+            payload_str,
         ),
     )
 
