@@ -52,6 +52,7 @@ jobs:
     outputs:
       target_tenants: ${{ steps.tenants.outputs.target_tenants }}
       destructive_tenants: ${{ steps.impact.outputs.destructive_tenants }}
+      target_sha: ${{ steps.resolve.outputs.target_sha }}
     steps:
       - name: Verify paste-back
         env:
@@ -79,10 +80,28 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: Resolve target SHA to canonical 40-char form
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # `actions/checkout@v4` with `ref:` set to a short SHA treats
+          # it as a branch/tag pattern and fails the fetch. Expand once
+          # here so downstream jobs (deploy-railway, deploy-fly) get the
+          # canonical 40-char SHA.
+          sha=$(gh api "repos/${{ github.repository }}/commits/${{ inputs.target_sha }}" --jq '.sha')
+          if [ "${#sha}" -ne 40 ]; then
+              echo "::error::Failed to resolve to a 40-char SHA (got: '$sha')." >&2
+              exit 1
+          fi
+          echo "target_sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "::notice::Resolved target SHA: $sha"
+
       - name: Verify target SHA was previously a prod tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SHA: ${{ inputs.target_sha }}
+          SHA: ${{ steps.resolve.outputs.target_sha }}
         run: |
           set -euo pipefail
           # Accept either short (≥7 chars) or full 40-char SHAs by
@@ -116,7 +135,9 @@ jobs:
         id: impact
         env:
           PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
-          TARGET_SHA: ${{ inputs.target_sha }}
+          # Resolved SHA — DB rows store the 40-char form, so an
+          # equality filter against a short input would silently miss.
+          TARGET_SHA: ${{ steps.resolve.outputs.target_sha }}
         run: |
           set -euo pipefail
           # Per tenant in the wave: any tenant_migration_jobs row applied
@@ -281,14 +302,14 @@ jobs:
 
   deploy-railway:
     name: Roll back Railway
-    needs: [tag-rollback, resolve-digest]
+    needs: [tag-rollback, resolve-digest, preflight]
     if: contains(inputs.platforms, 'railway')
     runs-on: ubuntu-latest
     environment: prod-railway
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.target_sha }}
+          ref: ${{ needs.preflight.outputs.target_sha }}
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
       - run: npm install -g @railway/cli
@@ -310,14 +331,14 @@ jobs:
 
   deploy-fly:
     name: Roll back Fly
-    needs: [tag-rollback, resolve-digest]
+    needs: [tag-rollback, resolve-digest, preflight]
     if: contains(inputs.platforms, 'fly')
     runs-on: ubuntu-latest
     environment: prod-fly
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.target_sha }}
+          ref: ${{ needs.preflight.outputs.target_sha }}
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Login to GHCR for image pull
         if: inputs.dry_run == 'false'
@@ -380,7 +401,8 @@ jobs:
       PG_DSN: ${{ secrets.CONTROL_PLANE_PG_DSN }}
       DRY_RUN: ${{ inputs.dry_run }}
       WAVE: ${{ inputs.wave }}
-      TARGET_SHA: ${{ inputs.target_sha }}
+      # Resolved SHA — see preflight's resolve step.
+      TARGET_SHA: ${{ needs.preflight.outputs.target_sha }}
     steps:
       - uses: actions/checkout@v4
       - name: Install flyctl
