@@ -32,47 +32,97 @@ from .ports import (
 
 @dataclass
 class Runtime:
-    """All adapter instances, wired and ready."""
+    """All adapter instances, wired and ready.
 
-    llm: LLMProvider
-    repo: Repo
-    issues: IssueTracker
-    notifier: Notifier
-    chat: ChatOps
-    secrets: SecretStore
-    artifacts: ArtifactStore
-    compute: ComputeEnv
-    kb: KnowledgeBase
-    events: EventBus
-    state: StateStore
+    Any port can be None if its adapter module isn't installed or its
+    `from_config` raises (missing secrets, missing optional deps). Agents
+    that touch a None port crash at use-time with a clear error; agents
+    that never touch it start cleanly. This keeps the runtime usable
+    while the broader adapter library is still being filled in.
+    """
+
+    llm: LLMProvider | None
+    repo: Repo | None
+    issues: IssueTracker | None
+    notifier: Notifier | None
+    chat: ChatOps | None
+    secrets: SecretStore | None
+    artifacts: ArtifactStore | None
+    compute: ComputeEnv | None
+    kb: KnowledgeBase | None
+    events: EventBus | None
+    state: StateStore | None
     logger: Logger
     config: Config
 
 
 def bootstrap(config: Config) -> Runtime:
-    """Instantiate adapters per config.bindings and return a Runtime."""
+    """Instantiate adapters per config.bindings and return a Runtime.
+
+    Ports whose adapter is missing or fails to initialise are set to None
+    and logged to stderr. The Logger port is the one exception: it MUST
+    initialise, otherwise the runtime has no way to report anything.
+    """
 
     # Production-safety: refuse non-allow-listed adapters
     _enforce_allowlist(config)
 
-    notifier = _make_notifier(config)
+    # Logger first — every other failure should be reported through it.
+    logger = _make_logger(config)
+
+    notifier = _safe_make("notifier", _make_notifier, config, logger)
     return Runtime(
-        llm=_make_llm(config),
-        repo=_make_repo(config),
-        issues=_make_issues(config),
+        llm=_safe_make("llm", _make_llm, config, logger),
+        repo=_safe_make("repo", _make_repo, config, logger),
+        issues=_safe_make("issues", _make_issues, config, logger),
         notifier=notifier,
-        # When the notifier is Slack, the same instance also implements ChatOps.
-        # Otherwise spin up a dedicated Slack ChatOps adapter.
-        chat=_make_chat(config, fallback=notifier),
-        secrets=_make_secrets(config),
-        artifacts=_make_artifacts(config),
-        compute=_make_compute(config),
-        kb=_make_kb(config),
-        events=_make_events(config),
-        state=_make_state(config),
-        logger=_make_logger(config),
+        chat=_safe_make_chat(config, fallback=notifier, logger=logger),
+        secrets=_safe_make("secrets", _make_secrets, config, logger),
+        artifacts=_safe_make("artifacts", _make_artifacts, config, logger),
+        compute=_safe_make("compute", _make_compute, config, logger),
+        kb=_safe_make("kb", _make_kb, config, logger),
+        events=_safe_make("events", _make_events, config, logger),
+        state=_safe_make("state", _make_state, config, logger),
+        logger=logger,
         config=config,
     )
+
+
+def _safe_make(
+    name: str,
+    fn,           # type: ignore[no-untyped-def]
+    config: Config,
+    logger,       # type: ignore[no-untyped-def]
+):
+    """Call fn(config); if it raises, log it and return None."""
+    try:
+        return fn(config)
+    except Exception as exc:  # noqa: BLE001 — bootstrap must not crash on optional ports
+        logger.warn(
+            "bootstrap.port_unavailable",
+            port=name,
+            error_type=type(exc).__name__,
+            error=str(exc),
+        )
+        return None
+
+
+def _safe_make_chat(
+    config: Config,
+    *,
+    fallback: Any,
+    logger,       # type: ignore[no-untyped-def]
+):
+    try:
+        return _make_chat(config, fallback=fallback)
+    except Exception as exc:  # noqa: BLE001
+        logger.warn(
+            "bootstrap.port_unavailable",
+            port="chat",
+            error_type=type(exc).__name__,
+            error=str(exc),
+        )
+        return None
 
 
 def _enforce_allowlist(config: Config) -> None:
