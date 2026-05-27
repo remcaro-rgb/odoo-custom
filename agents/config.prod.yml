@@ -13,12 +13,13 @@
 
 agents:
   slack_intake:
-    # Phase B starts in shadow mode — bot files issues but does NOT relay
-    # GH comments back to Slack. Flip to false at the end of the 1-week
-    # soak (see docs/runbooks/slack-intake-rollout.md).
-    shadow_mode: true
-    # Channels where /intake is allowed. Phase B starts with one test
-    # channel; Phase C widens to a single team channel; Phase D rolls
-    # workspace-wide via ["*"].
+    # Phase C: bidirectional relay enabled. The bot now forwards Spec
+    # Generator's comments from the GitHub issue into the originating
+    # Slack thread, and syncs reporter replies back as attributed GitHub
+    # comments. The "Confirm intent ✓" button posts `/confirm` on click.
+    # Channel scope is still limited to the test channel below.
+    shadow_mode: false
+    # Channels where /intake is allowed. Phase C stays on the single test
+    # channel for soak; Phase D rolls workspace-wide via ["*"].
     allowed_channels:
       - C0B6A815JN6
