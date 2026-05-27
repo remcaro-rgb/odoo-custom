@@ -62,6 +62,79 @@ class RollbackResult:
     status: str  # 'ok' | 'snapshot_missing' | 'restore_failed'
 
 
+def _pgrestore_argv(snapshot_key: str, db_name: str) -> list[str]:
+    """Wrap pgrestore-snapshot.sh in flyctl-ssh to the Postgres app.
+
+    Mirrors :func:`_pgbackrest_argv`'s pattern — the wrapper script
+    lives on the Postgres machine (where pg_restore + S3 creds are);
+    we delegate execution via SSH.
+    """
+    pg_app = os.environ.get('PGBACKREST_SSH_APP', 'odoo-saas-postgres')
+    remote_cmd = f'/usr/local/bin/pgrestore-snapshot.sh {snapshot_key} {db_name}'
+    return ['flyctl', 'ssh', 'console', '--app', pg_app, '--command', remote_cmd]
+
+
+def _rollback_via_pgrestore(
+    plan: 'RollbackPlan',
+    *,
+    dry_run: bool,
+    subprocess_runner=subprocess.run,
+) -> 'RollbackResult':
+    """Per-tenant rollback via pg_restore from an S3 dump.
+
+    The snapshot_id is an S3 key produced by ``pgdump-snapshot.sh``.
+    We delegate the restore to the Postgres machine, which streams the
+    dump from S3 into ``pg_restore --clean --if-exists -d <db>``. Only
+    the target tenant's database is rewritten — other tenants on the
+    same cluster are untouched (Tier 5 Item 2 acceptance property).
+
+    PGBACKREST_DRY_RUN=true short-circuits the destructive restore but
+    still logs the would-be argv — same gating discipline as the
+    cluster-wide pgbackrest path so drills exercise the orchestration
+    without touching tenant data.
+    """
+    argv = _pgrestore_argv(plan.snapshot_id, plan.tenant_db_name)
+    if dry_run:
+        logger.info(
+            'PGBACKREST_DRY_RUN=true; skipping destructive pg_restore. '
+            'Would have run: %s',
+            ' '.join(argv),
+        )
+        return RollbackResult(
+            job_id=plan.job_id,
+            snapshot_id=plan.snapshot_id,
+            status='ok',
+        )
+    try:
+        subprocess_runner(
+            argv,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=2 * 60 * 60,  # 2h cap; restore can be slow on large tenants
+        )
+    except subprocess.CalledProcessError as exc:
+        logger.error(
+            'pg_restore failed exit=%d stderr=%s',
+            exc.returncode,
+            (exc.stderr or '')[-2000:],
+        )
+        return RollbackResult(
+            job_id=plan.job_id,
+            snapshot_id=plan.snapshot_id,
+            status='restore_failed',
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RollbackError(f'pg_restore timed out after 2h: {exc}') from exc
+
+    logger.info('rollback complete (pgdump) job=%s dry_run=%s', plan.job_id, dry_run)
+    return RollbackResult(
+        job_id=plan.job_id,
+        snapshot_id=plan.snapshot_id,
+        status='ok',
+    )
+
+
 def _pgbackrest_argv(*args: str) -> list[str]:
     """Wrap a pgbackrest command in flyctl-ssh to odoo-saas-postgres.
 
@@ -123,6 +196,13 @@ def run(
         plan.snapshot_id,
         dry_run,
     )
+
+    # Tier 5 Item 2: per-tenant pg_restore path. Selected by
+    # snapshot_id prefix (`pgdump/<slug>/...`). Restores only the
+    # target tenant's DB; other tenants on the cluster untouched.
+    # Spec: docs/superpowers/specs/2026-05-27-per-tenant-restore-design.md
+    if plan.snapshot_id.startswith('pgdump/'):
+        return _rollback_via_pgrestore(plan, dry_run=dry_run, subprocess_runner=subprocess_runner)
 
     # Detect the sentinel-snapshot case (SNAPSHOT_MODE was 'skip' when
     # the migration ran). Need a target-time fallback or we can't

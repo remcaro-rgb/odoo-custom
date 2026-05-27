@@ -1,15 +1,25 @@
 """Unit tests for migration_runner.snapshot — specifically the
-``_parse_backup_label`` parser which decodes pgbackrest stdout.
+``_parse_backup_label`` parser which decodes pgbackrest stdout, the
+``_parse_snapshot_key`` parser for pgdump output, and the
+``_snapshot_via_pgdump`` SSH wrapper invocation.
 
-Discovered during Tier 5 Item 3 validation that pgbackrest 2.50+
-emits a different label-announcement format than the parser
-recognized. Real production stdout from pgbackrest 2.57 was
-parsed as None → snapshot job failed even though the backup
-itself succeeded. Both formats now coexist."""
+Originally added during Tier 5 Item 3 validation when pgbackrest 2.50+
+"new backup label" format wasn't recognized; extended for Tier 5
+Item 2 (per-tenant pgdump path)."""
 
 from __future__ import annotations
 
-from migration_runner.snapshot import _parse_backup_label
+import subprocess
+from unittest.mock import patch
+
+import pytest
+
+from migration_runner.snapshot import (
+    SnapshotError,
+    _parse_backup_label,
+    _parse_snapshot_key,
+    _snapshot_via_pgdump,
+)
 
 
 class TestParseBackupLabelNewFormat:
@@ -76,3 +86,79 @@ class TestParseBackupLabelEmptyOrMissing:
     def test_returns_none_when_no_label_line(self) -> None:
         stdout = 'INFO: backup command begin\nINFO: backup command end\n'
         assert _parse_backup_label(stdout) is None
+
+
+class TestParseSnapshotKey:
+    """pgdump-snapshot.sh prints SNAPSHOT_KEY=<key> on its last line."""
+
+    def test_parses_well_formed_key(self) -> None:
+        stdout = (
+            'upload: ./- to s3://goliatt-odoo-saas-hot/pgdump/acmesas2/20260527T120000Z.dump\n'
+            'SNAPSHOT_KEY=pgdump/acmesas2/20260527T120000Z.dump\n'
+        )
+        assert _parse_snapshot_key(stdout) == 'pgdump/acmesas2/20260527T120000Z.dump'
+
+    def test_returns_none_when_missing(self) -> None:
+        stdout = 'aws: command not found\n'
+        assert _parse_snapshot_key(stdout) is None
+
+    def test_returns_none_on_empty(self) -> None:
+        assert _parse_snapshot_key('') is None
+
+
+class TestSnapshotViaPgdump:
+    """SSH-invocation argv shape + output parsing."""
+
+    def test_invokes_pgdump_wrapper_with_db_and_slug(self) -> None:
+        ok = subprocess.CompletedProcess(
+            args=[],
+            returncode=0,
+            stdout='SNAPSHOT_KEY=pgdump/acmesas2/20260527T120000Z.dump\n',
+            stderr='',
+        )
+        with patch('migration_runner.snapshot.subprocess.run', return_value=ok) as mock_run:
+            key = _snapshot_via_pgdump(tenant_slug='acmesas2', db_name='acmesas2')
+        assert key == 'pgdump/acmesas2/20260527T120000Z.dump'
+        # Argv must SSH-delegate to odoo-saas-postgres + call the wrapper.
+        argv = mock_run.call_args.args[0]
+        assert argv[0] == 'flyctl'
+        assert argv[1:5] == ['ssh', 'console', '--app', 'odoo-saas-postgres']
+        assert argv[5] == '--command'
+        assert argv[6] == '/usr/local/bin/pgdump-snapshot.sh acmesas2 acmesas2'
+
+    def test_uses_PGBACKREST_SSH_APP_override(self, monkeypatch) -> None:
+        monkeypatch.setenv('PGBACKREST_SSH_APP', 'odoo-saas-postgres-staging')
+        ok = subprocess.CompletedProcess(
+            args=[], returncode=0,
+            stdout='SNAPSHOT_KEY=pgdump/x/y.dump\n', stderr='',
+        )
+        with patch('migration_runner.snapshot.subprocess.run', return_value=ok) as mock_run:
+            _snapshot_via_pgdump(tenant_slug='x', db_name='x')
+        argv = mock_run.call_args.args[0]
+        assert '--app' in argv
+        assert argv[argv.index('--app') + 1] == 'odoo-saas-postgres-staging'
+
+    def test_raises_on_missing_snapshot_key_line(self) -> None:
+        # Wrapper failed silently — no SNAPSHOT_KEY line. Treat as error.
+        ok = subprocess.CompletedProcess(
+            args=[], returncode=0, stdout='some random output\n', stderr='',
+        )
+        with patch('migration_runner.snapshot.subprocess.run', return_value=ok):
+            with pytest.raises(SnapshotError, match='pgdump produced no SNAPSHOT_KEY'):
+                _snapshot_via_pgdump(tenant_slug='x', db_name='x')
+
+    def test_raises_on_nonzero_exit(self) -> None:
+        exc = subprocess.CalledProcessError(
+            returncode=2, cmd=[], output='', stderr='aws: NoSuchBucket'
+        )
+        with patch('migration_runner.snapshot.subprocess.run', side_effect=exc):
+            with pytest.raises(SnapshotError, match='pgdump-snapshot exit 2'):
+                _snapshot_via_pgdump(tenant_slug='x', db_name='x')
+
+    def test_raises_on_flyctl_missing(self) -> None:
+        with patch(
+            'migration_runner.snapshot.subprocess.run',
+            side_effect=FileNotFoundError('flyctl'),
+        ):
+            with pytest.raises(SnapshotError, match='flyctl not on PATH'):
+                _snapshot_via_pgdump(tenant_slug='x', db_name='x')

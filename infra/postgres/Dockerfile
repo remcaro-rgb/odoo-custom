@@ -5,8 +5,13 @@ LABEL org.opencontainers.image.description="Postgres 16 + pgBackRest, self-manag
 
 # pgBackRest for continuous WAL archiving + base backups.
 # Alpine package tracks upstream Postgres minor releases reasonably well.
+# aws-cli is for per-tenant pg_dump / pg_restore (Tier 5 Item 2) — uploads
+# the dump to the same S3 bucket pgbackrest uses, under a separate
+# `pgdump/` prefix. The wrapper scripts below read PGBACKREST_REPO1_S3_*
+# env to authenticate.
 RUN apk add --no-cache \
         pgbackrest \
+        aws-cli \
         bash \
         ca-certificates \
         tzdata \
@@ -20,6 +25,12 @@ RUN apk add --no-cache \
         /var/log/pgbackrest \
         /var/lib/pgbackrest \
         /var/spool/pgbackrest
+
+# Per-tenant pg_dump / pg_restore wrappers. SSH-invoked by the
+# migration-runner daemon when SNAPSHOT_MODE=pgdump.
+COPY infra/postgres/pgdump-snapshot.sh /usr/local/bin/pgdump-snapshot.sh
+COPY infra/postgres/pgrestore-snapshot.sh /usr/local/bin/pgrestore-snapshot.sh
+RUN chmod +x /usr/local/bin/pgdump-snapshot.sh /usr/local/bin/pgrestore-snapshot.sh
 
 # Tuned Postgres config. The official postgres:16 image runs initdb on an empty
 # PGDATA, then loads /etc/postgresql/postgresql.conf if you point at it via the

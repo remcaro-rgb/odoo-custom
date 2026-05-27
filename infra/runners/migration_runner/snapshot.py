@@ -1,24 +1,33 @@
 """Snapshot helper — wraps pgBackRest for the pre-migration safety net.
 
-Three implementation strategies, selected via SNAPSHOT_MODE env:
+Four implementation strategies, selected via SNAPSHOT_MODE env:
 
 - ``cli`` — call ``pgbackrest --stanza=<stanza> backup --type=incr``
   directly. Used when the runner has direct shell access to a node where
   pgbackrest is configured (Railway: backups run inside the postgres
-  service; Fly: a sidecar).
+  service; Fly: a sidecar). Cluster-wide backup.
 - ``ssh`` — flyctl-ssh into ``odoo-saas-postgres`` and run the same
   ``pgbackrest backup`` command there. Used when the runner runs on a
   *different* Fly app than Postgres (the common prod case — the
   migration-runner image does NOT bundle pgbackrest or the stanza
   config; SSH-delegation keeps that surface on Postgres alone).
   Requires ``flyctl`` on PATH and ``FLY_API_TOKEN`` with ssh
-  permission on ``odoo-saas-postgres``.
+  permission on ``odoo-saas-postgres``. Cluster-wide backup.
+- ``pgdump`` — flyctl-ssh into the Postgres machine and run the
+  ``/usr/local/bin/pgdump-snapshot.sh`` wrapper. Logical, *per-tenant*
+  dump uploaded to S3 under ``pgdump/<tenant>/<ts>.dump``. Rollback
+  via the matching ``pgrestore-snapshot.sh`` wrapper drops + reloads
+  only the target tenant's database, leaving other tenants untouched.
+  This is the Tier 5 Item 2 path (selective rollback).
+  Spec: docs/superpowers/specs/2026-05-27-per-tenant-restore-design.md
 - ``http`` — POST to the existing ``saas_filestore_backup`` HTTP
   endpoint (HMAC-signed). Used when there's a dedicated backup
   service.
 
-All three return a ``snapshot_id`` (the pgBackRest tag) that the
-rollback path (Tier 5) consumes.
+All four return a ``snapshot_id`` (an opaque token — for ``cli``/
+``ssh`` it's the pgbackrest backup label; for ``pgdump`` it's the S3
+key under ``pgdump/...``) that the rollback path consumes and
+dispatches by shape.
 
 If ``SNAPSHOT_MODE=skip`` the call is a no-op returning a sentinel
 ``no-snapshot-<timestamp>`` string — used in tests and in CI smokes
@@ -83,6 +92,14 @@ def take_snapshot(
         # creds on the Postgres node, not duplicated to the runner.
         stanza = pgbackrest_stanza or os.environ.get('PGBACKREST_STANZA', 'shared')
         snapshot_id = _snapshot_via_ssh(stanza)
+        return SnapshotResult(snapshot_id=snapshot_id, elapsed_seconds=time.monotonic() - started)
+    if mode == 'pgdump':
+        # Per-tenant logical dump → S3. SSH-delegated to the Postgres
+        # machine where the wrapper script reads the existing pgbackrest
+        # S3 creds. Returns an S3 key the rollback path uses to find +
+        # replay the dump (drops + reloads only this tenant's DB, no
+        # cluster-wide impact).
+        snapshot_id = _snapshot_via_pgdump(tenant_slug=tenant_slug, db_name=db_name)
         return SnapshotResult(snapshot_id=snapshot_id, elapsed_seconds=time.monotonic() - started)
     if mode == 'http':
         url = backup_service_url or os.environ.get('BACKUP_SERVICE_URL')
@@ -161,6 +178,55 @@ def _snapshot_via_ssh(stanza: str) -> str:
             f'pgbackrest produced no backup label in stdout; tail={result.stdout[-2000:]}'
         )
     return label
+
+
+def _snapshot_via_pgdump(*, tenant_slug: str, db_name: str) -> str:
+    """SSH-invoke the per-tenant pg_dump → S3 wrapper.
+
+    The wrapper script lives in the Postgres image at
+    ``/usr/local/bin/pgdump-snapshot.sh`` and prints
+    ``SNAPSHOT_KEY=<s3-key>`` on its last line. We parse that key and
+    return it as the snapshot_id.
+
+    Tier 5 Item 2 path: returns an S3-key shape (``pgdump/<slug>/...``)
+    that rollback.run() routes to the per-tenant pg_restore branch.
+    """
+    pg_app = os.environ.get('PGBACKREST_SSH_APP', 'odoo-saas-postgres')
+    remote_cmd = f'/usr/local/bin/pgdump-snapshot.sh {db_name} {tenant_slug}'
+    try:
+        result = subprocess.run(  # noqa: S603 — args are controlled
+            ['flyctl', 'ssh', 'console', '--app', pg_app, '--command', remote_cmd],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=30 * 60,  # 30 min cap — pg_dump streaming for large tenants
+        )
+    except subprocess.CalledProcessError as exc:
+        raise SnapshotError(
+            f'pgdump-snapshot exit {exc.returncode}: {(exc.stderr or "")[-2000:]}'
+        ) from exc
+    except subprocess.TimeoutExpired as exc:
+        raise SnapshotError('pgdump-snapshot timed out after 30 min') from exc
+    except FileNotFoundError as exc:
+        raise SnapshotError(
+            'flyctl not on PATH — install in migration-runner Dockerfile'
+        ) from exc
+    key = _parse_snapshot_key(result.stdout)
+    if not key:
+        raise SnapshotError(
+            f'pgdump produced no SNAPSHOT_KEY line; tail={result.stdout[-2000:]}'
+        )
+    return key
+
+
+def _parse_snapshot_key(stdout: str) -> Optional[str]:
+    # Wrapper prints `SNAPSHOT_KEY=<key>` on the last line. Scan
+    # bottom-up so any earlier diagnostic output doesn't confuse us.
+    for line in reversed(stdout.splitlines()):
+        marker = 'SNAPSHOT_KEY='
+        if line.startswith(marker):
+            return line[len(marker) :].strip()
+    return None
 
 
 def _parse_backup_label(stdout: str) -> Optional[str]:

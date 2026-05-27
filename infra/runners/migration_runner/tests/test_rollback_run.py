@@ -195,3 +195,72 @@ class TestRunRestoreFailed:
         )
         result = run(plan, subprocess_runner=runner)
         assert result.status == 'restore_failed'
+
+
+class TestRunPgdumpPath:
+    """Tier 5 Item 2: per-tenant pg_restore branch, selected when
+    snapshot_id starts with `pgdump/`. Does NOT call pgbackrest at all;
+    only one subprocess call (the pgrestore-snapshot.sh wrapper)."""
+
+    def _pgdump_plan(self) -> RollbackPlan:
+        return RollbackPlan(
+            job_id='job-uuid',
+            tenant_id='tenant-uuid',
+            tenant_db_name='acmesas2',
+            snapshot_id='pgdump/acmesas2/20260527T120000Z.dump',
+            previous_sha='886bf8b',
+            reason='operator rollback',
+            actor='octocat',
+        )
+
+    def test_dry_run_logs_but_does_not_call_wrapper(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv('PGBACKREST_DRY_RUN', 'true')
+        runner = _ScriptedRunner()
+        result = run(self._pgdump_plan(), subprocess_runner=runner)
+        assert result.status == 'ok'
+        # Dry-run gates BEFORE any subprocess call.
+        assert runner.seen == []
+
+    def test_invokes_pgrestore_wrapper_with_key_and_db(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.delenv('PGBACKREST_DRY_RUN', raising=False)
+        runner = _ScriptedRunner(scripted=[_ok()])
+        result = run(self._pgdump_plan(), subprocess_runner=runner)
+        assert result.status == 'ok'
+        assert len(runner.seen) == 1
+        argv = runner.seen[0]
+        # flyctl-ssh wrap to the postgres app.
+        assert argv[0] == 'flyctl'
+        assert argv[1:5] == ['ssh', 'console', '--app', 'odoo-saas-postgres']
+        assert argv[5] == '--command'
+        # Wrapper invocation with key + db_name.
+        assert argv[6] == (
+            '/usr/local/bin/pgrestore-snapshot.sh '
+            'pgdump/acmesas2/20260527T120000Z.dump acmesas2'
+        )
+        # We never touched pgbackrest in this branch.
+        assert 'pgbackrest' not in ' '.join(argv)
+
+    def test_uses_PGBACKREST_SSH_APP_override(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv('PGBACKREST_SSH_APP', 'odoo-saas-postgres-staging')
+        monkeypatch.delenv('PGBACKREST_DRY_RUN', raising=False)
+        runner = _ScriptedRunner(scripted=[_ok()])
+        run(self._pgdump_plan(), subprocess_runner=runner)
+        argv = runner.seen[0]
+        assert argv[argv.index('--app') + 1] == 'odoo-saas-postgres-staging'
+
+    def test_nonzero_exit_returns_restore_failed(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.delenv('PGBACKREST_DRY_RUN', raising=False)
+        exc = subprocess.CalledProcessError(
+            returncode=2, cmd='pgrestore', stderr='pg_restore: error: ...'
+        )
+        runner = _ScriptedRunner(scripted=[exc])
+        result = run(self._pgdump_plan(), subprocess_runner=runner)
+        assert result.status == 'restore_failed'
