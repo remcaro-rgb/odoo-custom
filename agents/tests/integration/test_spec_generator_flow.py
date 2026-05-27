@@ -276,6 +276,62 @@ def test_feature_request_opens_pr_and_comments_issue(runtime: FakeRuntime) -> No
     assert "#126" in runtime.notifier.sent[0]["summary"]
 
 
+def test_bug_request_carries_repro_label_and_evidence(runtime: FakeRuntime) -> None:
+    """PR4 acceptance: bug intakes get a repro:<outcome> label on the PR
+    plus a follow-up sentence on the issue comment that matches the
+    classifier's verdict."""
+    runtime.llm = FakeLLM(canned={
+        "symptom": "Filter breaks search.",
+        "repro": "1. Open Catalog.\n2. Apply filter.",
+        "affected_tenants": "All; severity medium.",
+        "root_cause": "TBD",
+        "proposed_fix": "Replace == with is None.",
+        "regression_test": "Test empty filter.",
+        "rollout": "Hotfix.",
+    })
+    payload = _payload_for_issue(
+        number=140, title="Search broken with filter",
+        body=(
+            "Steps:\n1. Open Catalog\n2. Type 'foo'\n3. Apply filter X=Y\n"
+            "Error: ValueError, traceback below.\nOdoo 19, Chrome."
+        ),
+        labels=["bug"],
+    )
+    core.run(runtime, payload)
+    pr = runtime.repo.prs[0]
+    assert "repro:repro-confirmed" in pr.labels
+    # And the issue comment carries the matching follow-up.
+    assert any("enough detail" in c["body"]
+               for c in runtime.issues.comments_posted)
+
+
+def test_bug_request_with_tenant_reference_gets_needs_fixture_label(
+    runtime: FakeRuntime,
+) -> None:
+    runtime.llm = FakeLLM(canned={
+        "symptom": "Wrong totals.",
+        "repro": "1. Open invoice.\n2. Check totals.",
+        "affected_tenants": "Specific.",
+        "root_cause": "TBD",
+        "proposed_fix": "TBD",
+        "regression_test": "TBD",
+        "rollout": "Hotfix.",
+    })
+    payload = _payload_for_issue(
+        number=141, title="Wrong total on the sales order",
+        body=(
+            "Steps:\n1. Open SO12345 for customer Acme.\n"
+            "2. Look at totals — wrong.\nOdoo 19, Chrome."
+        ),
+        labels=["bug"],
+    )
+    core.run(runtime, payload)
+    pr = runtime.repo.prs[0]
+    assert "repro:needs-fixture" in pr.labels
+    assert any("sanitised agentlab fixture" in c["body"]
+               for c in runtime.issues.comments_posted)
+
+
 def test_bug_request_drafts_a_fix_brief(runtime: FakeRuntime) -> None:
     runtime.llm = FakeLLM(canned={
         "symptom": "Search returns no results when filter is set.",

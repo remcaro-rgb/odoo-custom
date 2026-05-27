@@ -18,7 +18,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from ..ports import GitIdentity, Issue, PullRequest
-from . import drafter, intake, refiner
+from . import bug_repro, drafter, intake, refiner
 
 _DESIGN_SPEC = "docs/superpowers/specs/2026-05-16-spec-generator-agent-design.md"
 
@@ -78,6 +78,17 @@ def run(runtime, payload: dict[str, Any]) -> None:
                   reason="One or more required ports unbound — see config.bindings.")
         return
 
+    # For bug intakes, classify the repro state BEFORE we draft. Drives both
+    # the PR label set and the follow-up sentence on the issue comment.
+    repro: bug_repro.ReproClassification | None = None
+    if ix.classification == "bug":
+        repro = bug_repro.classify(title=ix.issue_title, body=ix.issue_body)
+        log.info("spec_generator.bug_repro",
+                 issue=ix.issue_number,
+                 outcome=repro.outcome,
+                 confidence=repro.confidence,
+                 reasons=list(repro.reasons))
+
     with log.span("spec_generator.draft", issue=ix.issue_number, kind=ix.spec_kind):
         drafted = drafter.draft(
             llm=runtime.llm,
@@ -109,13 +120,15 @@ def run(runtime, payload: dict[str, Any]) -> None:
         spec_path=drafted.file_path,
         open_questions=drafted.open_questions,
         kind=ix.spec_kind,
+        repro=repro,
     )
+    pr_labels = _DRAFT_LABELS + ((repro.label,) if repro else ())
     pr: PullRequest = runtime.repo.open_pr(
         head=branch,
         base="main",
         title=pr_title,
         body=pr_body,
-        labels=_DRAFT_LABELS,
+        labels=pr_labels,
     )
     log.info("spec_generator.pr_opened",
              issue=ix.issue_number, pr=pr.number, branch=branch)
@@ -131,7 +144,7 @@ def run(runtime, payload: dict[str, Any]) -> None:
         url=ix.issue_url,
     )
     runtime.issues.comment(issue_handle, _issue_comment_body(
-        pr=pr, drafted_questions=drafted.open_questions,
+        pr=pr, drafted_questions=drafted.open_questions, repro=repro,
     ))
     log.info("spec_generator.issue_commented", issue=ix.issue_number, pr=pr.number)
 
@@ -454,14 +467,24 @@ def _pr_body(
     spec_path: str,
     open_questions: tuple[str, ...],
     kind: str,
+    repro: bug_repro.ReproClassification | None = None,
 ) -> str:
     questions_md = "\n".join(f"- {q}" for q in open_questions) or "- (none surfaced)"
+    repro_block = ""
+    if repro is not None:
+        evidence = ", ".join(repro.reasons) or "none"
+        repro_block = (
+            f"\n## Bug repro classifier\n\n"
+            f"Outcome: `{repro.outcome}` (confidence {repro.confidence:.2f})\n"
+            f"Evidence: {evidence}\n"
+        )
     return (
         f"Drafted from issue #{issue_number} ({issue_url}).\n\n"
         f"Kind: {kind} spec\n"
         f"Spec: {spec_path}\n\n"
         f"## Open questions for the reporter\n\n"
-        f"{questions_md}\n\n"
+        f"{questions_md}\n"
+        f"{repro_block}\n"
         f"This PR is `awaiting-reporter-confirm`. Comment `/confirm` on the "
         f"linked issue (or stay silent 24h) to flip the `intent-confirmed` "
         f"label and trigger the Implementation Agent.\n"
@@ -472,6 +495,7 @@ def _issue_comment_body(
     *,
     pr: PullRequest,
     drafted_questions: tuple[str, ...],
+    repro: bug_repro.ReproClassification | None = None,
 ) -> str:
     if drafted_questions:
         q_block = "\n".join(f"{i + 1}. {q}" for i, q in enumerate(drafted_questions))
@@ -481,9 +505,12 @@ def _issue_comment_body(
         )
     else:
         ask = "Please confirm the intent by commenting `/confirm`."
+    repro_line = ""
+    if repro is not None:
+        repro_line = "\n\n" + bug_repro.comment_for_outcome(repro.outcome)
     return (
         f":memo: I drafted a spec for this issue at {pr.url}.\n\n"
-        f"{ask}\n\n"
+        f"{ask}{repro_line}\n\n"
         f"_If you don't reply within 24h I'll auto-confirm and start "
         f"implementation. Comment `/reopen` within 7 days of that to halt._"
     )
