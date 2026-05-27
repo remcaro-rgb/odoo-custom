@@ -19,6 +19,16 @@ agents:
     # comments. The "Confirm intent ✓" button posts `/confirm` on click.
     # Channel scope is still limited to the test channel below.
     shadow_mode: false
+    # GitHub authors whose issue comments get relayed to Slack. Steady
+    # state is just `spec-generator-bot` (once that service account exists
+    # and the Spec Generator agent is deployed). For Phase C smoke
+    # testing we also relay comments from the human operator so we can
+    # exercise the loop without a live Spec Generator. Remove the human
+    # entry before Phase D rollout to avoid noisy relays of routine
+    # comments.
+    relay_authors:
+      - spec-generator-bot
+      - remcaro-rgb
     # Channels where /intake is allowed. Phase C stays on the single test
     # channel for soak; Phase D rolls workspace-wide via ["*"].
     allowed_channels:
