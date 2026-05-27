@@ -409,6 +409,12 @@ def main() -> None:  # pragma: no cover — integration entry
         logger.error('CONTROL_PLANE_PG_DSN unset — refusing to start')
         sys.exit(1)
     _install_sigterm_handler()
+    # Fly's [checks.daemon_alive] probes tcp/9999 every 30s. Without a
+    # listener bound the check has been failing on every deploy of this
+    # app since launch (cosmetic noise on flyctl status + makes
+    # flyctl deploy --wait-timeout time out waiting for "healthy").
+    from migration_runner.health_listener import start_health_listener
+    start_health_listener()
     store = JobStore(dsn=dsn)
     runner = Runner(store)
     runner.run_forever()

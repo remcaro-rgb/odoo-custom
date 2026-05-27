@@ -60,12 +60,14 @@ kill_timeout   = "120s"     # allow an in-flight odoo -u all to finish
   memory = "4gb"             # bumped from backup-runner's 2gb — Odoo init
 
 [checks]
-  # No HTTP surface, but a TCP check on the heartbeat fd keeps Fly's
-  # health system happy (machine is restarted if the daemon dies and
-  # the process doesn't exit cleanly).
+  # No HTTP surface, but a TCP check on the runner's liveness listener
+  # keeps Fly's health system happy (machine is restarted if the
+  # daemon process dies). Port 9999 is bound at startup by
+  # migration_runner.health_listener.start_health_listener (called
+  # from runner.main).
   [checks.daemon_alive]
     type         = "tcp"
-    port         = 9999    # netcat listener inside the container (NOT bound yet — TODO)
+    port         = 9999
     interval     = "30s"
     timeout      = "5s"
     grace_period = "120s"
