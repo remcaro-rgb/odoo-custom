@@ -85,6 +85,16 @@ agents:
   spec_generator:
     spend_cap_weekly_usd: 50
     max_open_prs: 3
+    # PR1 intake+drafter rollout flag — when true, the agent parses the issue,
+    # drafts a spec, but DOES NOT push the branch, open a PR, or comment.
+    # Flip off after the shadow soak per docs/runbooks/spec-generator-rollout.md.
+    shadow_mode: true
+    # Slack channel for intake pings (drafted, awaiting confirm, escalated).
+    notifier_channel: "#devops-intake"
+    # GitHub bot identity attached to draft commits and the PR. Override the
+    # commit author when wiring the spec-generator-bot GitHub App.
+    bot_login: spec-generator-bot
+    bot_email: spec-generator-bot@goliatt.co
   implementation:
     spend_cap_weekly_usd: 100
     spend_cap_per_pr_usd: 20
