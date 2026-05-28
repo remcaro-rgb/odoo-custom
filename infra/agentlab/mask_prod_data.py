@@ -87,9 +87,9 @@ _PG_TYPE_TO_DATA_TYPE = {
 }
 
 # Odoo ttypes that never carry PII — masking them would corrupt referential
-# integrity (FKs) or break enum/boolean semantics.
+# integrity (FKs / reference pointers) or break enum/boolean semantics.
 _PASSTHROUGH_TTYPES = frozenset({
-    "many2one", "one2many", "many2many",
+    "many2one", "one2many", "many2many", "reference",
     "selection", "boolean", "integer", "date", "datetime",
 })
 
@@ -124,7 +124,15 @@ _MONETARY_HINTS = (
 # `ir_*` skip: other ir_ tables DO carry PII or secrets and must stay masked
 # (ir_attachment file blobs/names, ir_mail_server smtp_user/smtp_pass,
 # ir_config_parameter values, ir_logging messages, ...).
+#
+# The ir_ui_* / ir_act* group below holds UI + action *definitions* that
+# `odoo -u all` rewrites from each module's XML. Masking them corrupts the
+# load — e.g. a hashed ir.ui.menu.action reference ("MASKED:<hash>,5") fails
+# with `ValueError: Wrong value for ir.ui.menu.action` (see issue #142).
+# These are framework/config definitions (menus, views, window/server/report
+# actions), not tenant business PII.
 _STRUCTURAL_TABLES = frozenset({
+    # Core ORM metadata (#140).
     "ir_model_data",
     "ir_model",
     "ir_model_fields",
@@ -133,6 +141,17 @@ _STRUCTURAL_TABLES = frozenset({
     "ir_model_constraint",
     "ir_module_module",
     "ir_module_module_dependency",
+    # UI + action definitions rewritten by `-u all` (#142).
+    "ir_ui_menu",
+    "ir_ui_view",
+    "ir_ui_view_custom",
+    "ir_actions_actions",
+    "ir_act_window",
+    "ir_act_window_view",
+    "ir_act_url",
+    "ir_act_server",
+    "ir_act_report_xml",
+    "ir_act_client",
 })
 
 
@@ -241,7 +260,11 @@ def classify_column(
 
     # Step 2: Odoo ttype.
     if odoo_ttype:
-        if odoo_ttype in ("many2one", "one2many", "many2many"):
+        if odoo_ttype in ("many2one", "one2many", "many2many", "reference"):
+            # `reference` is a typed pointer stored as "model,id" — a
+            # polymorphic FK. Masking it corrupts the pointer and breaks
+            # `odoo -u all` (e.g. ir.ui.menu.action), and it never carries
+            # PII. Passthrough, same as the relational ttypes. See #142.
             return "foreign_key"
         if odoo_ttype == "selection":
             return "selection"
@@ -249,8 +272,8 @@ def classify_column(
             return "text"
         if odoo_ttype == "char":
             return "string"
-        # binary/json ttype but a textual physical column, or
-        # reference/other — redact via the long-string path.
+        # binary/json ttype but a textual physical column, or any other
+        # ttype — redact via the long-string path. (reference handled above.)
         return "text"
 
     # Step 3: no Odoo metadata — size-based split on the text column.

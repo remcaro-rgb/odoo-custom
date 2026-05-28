@@ -43,6 +43,7 @@ def test_is_allowed_empty_allowlist():
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("table", [
+    # Core ORM metadata (#140).
     "ir_model_data",
     "ir_model",
     "ir_model_fields",
@@ -51,6 +52,17 @@ def test_is_allowed_empty_allowlist():
     "ir_model_constraint",
     "ir_module_module",
     "ir_module_module_dependency",
+    # UI + action definitions rewritten by `-u all` (#142).
+    "ir_ui_menu",
+    "ir_ui_view",
+    "ir_ui_view_custom",
+    "ir_actions_actions",
+    "ir_act_window",
+    "ir_act_window_view",
+    "ir_act_url",
+    "ir_act_server",
+    "ir_act_report_xml",
+    "ir_act_client",
 ])
 def test_is_structural_table_true(table):
     assert m.is_structural_table(table) is True
@@ -60,6 +72,13 @@ def test_is_structural_table_ir_model_data_specifically():
     # The exact table whose masked `model` column produced
     # `KeyError: 'MASKED:...'` during `odoo -u all` (#140).
     assert m.is_structural_table("ir_model_data") is True
+
+
+def test_is_structural_table_ir_ui_menu_specifically():
+    # The table behind layer 2: its `action` reference column masked to
+    # "MASKED:<hash>,5" produced `ValueError: Wrong value for
+    # ir.ui.menu.action` during `odoo -u all` (#142).
+    assert m.is_structural_table("ir_ui_menu") is True
 
 
 @pytest.mark.parametrize("table", [
@@ -90,6 +109,39 @@ def test_structural_table_short_string_would_otherwise_be_masked():
         odoo_ttype="char", data_type="character varying", char_max_len=64,
     ) == "string"
     assert m.is_structural_table("ir_model_data") is True
+
+
+# --------------------------------------------------------------------------
+# classify_column — reference ttype is a typed pointer → passthrough (#142)
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("data_type", ["character varying", "text", "character"])
+def test_classify_reference_ttype_is_passthrough(data_type):
+    # A `reference` field stores "model,id" — a polymorphic FK. Masking it
+    # corrupts the pointer and breaks `-u all`; it never carries PII.
+    assert m.classify_column(
+        "some_table", "resource_ref",
+        odoo_ttype="reference", data_type=data_type, char_max_len=None,
+    ) == "foreign_key"
+
+
+def test_classify_reference_strategy_is_none():
+    # foreign_key → no masking SQL (passthrough).
+    semantic = m.classify_column(
+        "some_table", "resource_ref",
+        odoo_ttype="reference", data_type="character varying", char_max_len=None,
+    )
+    assert m.strategy_sql(semantic, '"resource_ref"', {}) is None
+
+
+def test_ir_ui_menu_action_doubly_protected():
+    # Layer 2 (#142): protected both by the structural-table skip AND by
+    # reference being a passthrough ttype.
+    assert m.is_structural_table("ir_ui_menu") is True
+    assert m.classify_column(
+        "ir_ui_menu", "action",
+        odoo_ttype="reference", data_type="character varying", char_max_len=None,
+    ) == "foreign_key"
 
 
 # --------------------------------------------------------------------------
