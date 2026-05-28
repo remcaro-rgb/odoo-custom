@@ -10,6 +10,15 @@
 #   - PR review by 2 security-leads.
 #   - Justification in the PR body: why is this column non-PII?
 #   - Pass the weekly random-row audit.
+#
+# NOTE — structural exclusions live in code, not here. A small set of Odoo
+# ORM-framework metadata tables (ir_model_data, ir_model, ir_model_fields,
+# ir_module_module, …) is skipped wholesale by `_STRUCTURAL_TABLES` in
+# mask_prod_data.py. Those tables hold framework definitions (not tenant
+# PII), and masking them corrupts model / xml-id resolution → breaks
+# `odoo -u all` (see issue #140). That skip is table-level (covers every
+# column, including ones future Odoo versions add), so it is expressed in
+# code rather than enumerated column-by-column here.
 
 allowed:
 
