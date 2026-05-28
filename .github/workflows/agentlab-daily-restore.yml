@@ -229,14 +229,20 @@ jobs:
       - name: Apply masking pipeline + sample-row PII audit
         if: env.DRY_RUN == 'false'
         run: |
+          set -euo pipefail
+          # `pipefail` is REQUIRED: without it the `| tee` below takes tee's
+          # exit code (0) and the masker's non-zero exit is SWALLOWED — a
+          # failed/rolled-back tenant mask would pass CI and leave unmasked
+          # data in agentlab (see issue #143).
+          #
           # mask_prod_data.py applies type-based masking + the deny-list
           # pass to every database in the agentlab cluster, then samples
-          # rows and asserts no PII pattern survives. It exits:
-          #   0  masked + audit clean
+          # rows for surviving PII and smoke-checks structural tables. It exits:
+          #   0  masked + audit + structural smoke clean
           #   1  config/connection error
-          #   2  sample audit found surviving PII  → this step (and the
-          #      whole restore) fails, and agentlab is NOT redeployed with
-          #      unmasked data.
+          #   2  surviving PII, OR a structural table was masked  → this step
+          #      (and the whole restore) fails, and agentlab is NOT redeployed
+          #      with unmasked / unloadable data.
           # AGENTLAB_DSN here is the proxied 127.0.0.1 form.
           python3 infra/agentlab/mask_prod_data.py \
             --allowlist infra/agentlab/mask-allowlist.yml \
@@ -246,6 +252,8 @@ jobs:
       - name: Masking dry-run check
         if: env.DRY_RUN == 'true'
         run: |
+          set -euo pipefail
+          # pipefail so a masker error isn't swallowed by `| tee` (#143).
           # In dry-run we only confirm the masker connects (over the
           # proxy) and classifies; no UPDATEs are applied.
           python3 infra/agentlab/mask_prod_data.py --dry-run \

@@ -447,6 +447,10 @@ def test_scan_for_pii_empty(deny_patterns):
 
 @pytest.mark.parametrize("value", [
     "MASKED:abcdef012345",
+    # A masked reference value ("MASKED:<hash>,id") — the #142 token shape.
+    # The structural smoke (verify_structural_integrity) relies on
+    # is_masked_value to flag exactly this if a framework table regresses.
+    "MASKED:d04ef9d99cd0,5",
     "[REDACTED]",
     "[REDACTED text length=42]",
     "+57XXXXXXXXXX",
