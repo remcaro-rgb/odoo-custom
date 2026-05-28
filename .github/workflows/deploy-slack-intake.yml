@@ -85,17 +85,22 @@ jobs:
         run: |
           # Build context = agents/ (where the Dockerfile + its COPY-relative
           # files all live). Config + dockerfile addressed from the repo root.
+          #
+          # No --strategy flag: let flyctl pick the default (immediate on a
+          # first deploy when no machines exist yet, rolling for subsequent
+          # updates). Pinning --strategy rolling broke the first deploy with
+          # "could not create a fly.toml from any machines".
           flyctl deploy agents \
             --app odoo-saas-slack-intake \
             --config infra/fly/slack-intake/fly.toml \
             --dockerfile agents/Dockerfile \
-            --remote-only \
-            --strategy rolling
+            --remote-only
 
       - name: Smoke check /healthz
         run: |
-          # Fly's status endpoint is /healthz; the deploy is "rolling" so
-          # the new machine takes the routing before the old one is gone.
+          # Fly's status endpoint is /healthz. On an update flyctl rolls the
+          # new machine into routing before the old one is gone; on a first
+          # deploy the machine is created fresh.
           for i in 1 2 3 4 5; do
               sleep 6
               code=$(curl -s -o /dev/null -w '%{http_code}' \
