@@ -65,7 +65,7 @@ jobs:
     timeout-minutes: 25
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:17-alpine
         env:
           POSTGRES_USER: odoo
           POSTGRES_PASSWORD: odoo
@@ -73,7 +73,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U odoo"
+          --health-cmd="pg_isready -U odoo -d postgres"
           --health-interval=5s
           --health-timeout=5s
           --health-retries=10
@@ -104,6 +104,22 @@ jobs:
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: steps.preflight.outputs.skip != 'true'
+
+      - name: Install PostgreSQL 17 client (match agentlab server major)
+        if: steps.preflight.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          # The agentlab source DB is Postgres 17.x; ubuntu-latest ships
+          # pg_dump 16, which refuses to dump a newer server ("aborting
+          # because of server version mismatch"). Install the v17 client
+          # from PGDG and put it ahead of the runner's v16 on PATH so both
+          # psql and pg_dump are v17 for the steps below.
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+          /usr/lib/postgresql/17/bin/pg_dump --version
 
       - name: Open flyctl proxy to agentlab Postgres
         if: steps.preflight.outputs.skip != 'true'
