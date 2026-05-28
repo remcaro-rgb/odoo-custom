@@ -84,16 +84,21 @@ jobs:
       - name: Deploy
         run: |
           # Build context = agents/ (where the Dockerfile + its COPY-relative
-          # files all live). Config + dockerfile addressed from the repo root.
+          # files all live). Context, config and dockerfile are passed as
+          # ABSOLUTE paths ($GITHUB_WORKSPACE): recent flyctl resolves a
+          # relative --dockerfile against the positional working-dir, which
+          # made it look for agents/agents/Dockerfile and fail with
+          # "dockerfile '/home/runner/work/agents/Dockerfile' not found".
+          # Absolute paths remove that ambiguity across flyctl versions.
           #
           # No --strategy flag: let flyctl pick the default (immediate on a
           # first deploy when no machines exist yet, rolling for subsequent
           # updates). Pinning --strategy rolling broke the first deploy with
           # "could not create a fly.toml from any machines".
-          flyctl deploy agents \
+          flyctl deploy "$GITHUB_WORKSPACE/agents" \
             --app odoo-saas-slack-intake \
-            --config infra/fly/slack-intake/fly.toml \
-            --dockerfile agents/Dockerfile \
+            --config "$GITHUB_WORKSPACE/infra/fly/slack-intake/fly.toml" \
+            --dockerfile "$GITHUB_WORKSPACE/agents/Dockerfile" \
             --remote-only
 
       - name: Smoke check /healthz
