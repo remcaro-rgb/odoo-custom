@@ -18,7 +18,12 @@ Pipeline, per database in the agentlab Postgres cluster:
   4. Run the universal deny-list regexp pass over non-allowlisted
      text/char columns as a safety net for classifier gaps.
   5. Sample rows and assert no deny-list PII pattern survives.
-  6. Emit structured JSON metrics on stdout.
+  6. Smoke-check that the structural tables carry no masker markers (a
+     masked framework table would break `odoo -u all`); fail if any do.
+  7. Emit structured JSON metrics on stdout.
+
+Transient connection drops over the flyctl-proxy tunnel are retried per
+database (TCP keepalives + bounded retry), since they roll back cleanly.
 
 Masking is done with set-based SQL UPDATEs (not row-by-row in Python)
 so a 5 GB database completes in minutes, not hours. The pure helper
@@ -27,9 +32,10 @@ scan_for_pii — carry no DB dependency and are unit-tested in
 tests/test_masking.py.
 
 Exit codes:
-  0  masking applied, sample audit clean
+  0  masking applied, sample audit + structural smoke clean
   1  configuration / connection error
-  2  sample audit found surviving PII (masking incomplete)
+  2  surviving PII in the sample audit, OR a structural table was masked
+     (either way the masked snapshot is not safe to trust / can't load)
 """
 
 from __future__ import annotations
@@ -401,6 +407,25 @@ def _quote_ident(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
 
 
+# libpq TCP keepalives. Masking runs for minutes per database over a
+# `flyctl proxy` tunnel to the agentlab Postgres; without keepalives the
+# socket can be torn down mid-run and the next statement fails with
+# "connection already closed" (see issue #143). These keep the kernel
+# probing the peer so a transient idle/NAT drop is detected + kept alive.
+_KEEPALIVE_KW = {
+    "keepalives": 1,
+    "keepalives_idle": 30,
+    "keepalives_interval": 10,
+    "keepalives_count": 5,
+}
+
+
+def _connect(dsn: str):
+    """psycopg2.connect with TCP keepalives applied (see _KEEPALIVE_KW)."""
+    import psycopg2
+    return psycopg2.connect(dsn, **_KEEPALIVE_KW)
+
+
 # Databases that must never be masked:
 #   postgres / template0 / template1 — Postgres-internal.
 #   repmgr — Fly flex-Postgres's replication-metadata DB. Running mask
@@ -412,8 +437,7 @@ _INTERNAL_DATABASES = ("postgres", "template0", "template1", "repmgr")
 
 def list_databases(admin_dsn: str) -> list[str]:
     """Every database in the cluster except internal ones + templates."""
-    import psycopg2
-    conn = psycopg2.connect(admin_dsn)
+    conn = _connect(admin_dsn)
     try:
         with conn.cursor() as cur:
             cur.execute(
@@ -524,8 +548,8 @@ def mask_database(
 
     Returns a metrics dict.
     """
-    import psycopg2
-    conn = psycopg2.connect(db_dsn)
+    import psycopg2  # noqa: F401  (used by the per-column SAVEPOINT handler)
+    conn = _connect(db_dsn)
     conn.autocommit = False
     masked_cols = 0
     passthrough_cols = 0
@@ -681,8 +705,7 @@ def sample_audit(
 
     Returns a list of violation dicts (empty == clean).
     """
-    import psycopg2
-    conn = psycopg2.connect(db_dsn)
+    conn = _connect(db_dsn)
     violations: list[dict[str, Any]] = []
     try:
         columns = [
@@ -721,6 +744,55 @@ def sample_audit(
     return violations
 
 
+def verify_structural_integrity(
+    db_dsn: str, *, sample_size: int, log,
+) -> list[dict[str, Any]]:
+    """Post-mask smoke: structural ORM tables must contain NO masker output.
+
+    The structural-table skip (#140) is supposed to leave these framework
+    tables untouched; if masker markers ("MASKED:", "[REDACTED") show up
+    here, the skip regressed and `odoo -u all` will fail to load the masked
+    snapshot (#140/#142). Cheap — only the (small) structural tables are
+    sampled. Returns a list of violation dicts (empty == clean).
+
+    Scope note: only structural *tables* are checked here. Reference-typed
+    columns elsewhere are validated once reference passthrough lands (#142).
+    """
+    conn = _connect(db_dsn)
+    violations: list[dict[str, Any]] = []
+    try:
+        columns = [
+            (t, c) for (t, c, dt, _l) in _list_columns(conn)
+            if dt in _TEXT_DATA_TYPES and is_structural_table(t)
+        ]
+        with conn.cursor() as cur:
+            for table, column in columns:
+                cur.execute(
+                    f"SELECT {_quote_ident(column)}::text "
+                    f"FROM {_quote_ident(table)} "
+                    f"WHERE {_quote_ident(column)} IS NOT NULL "
+                    f"ORDER BY random() LIMIT %s",
+                    (sample_size,),
+                )
+                for (value,) in cur.fetchall():
+                    if is_masked_value(value):
+                        violations.append({
+                            "table": table, "column": column,
+                            "excerpt": value[:80],
+                        })
+                        break  # one hit per column is enough
+    finally:
+        conn.close()
+    if violations:
+        log("mask.structural.corrupted", count=len(violations))
+        for v in violations:
+            log("mask.structural.violation",
+                table=v["table"], column=v["column"], excerpt=v["excerpt"])
+    else:
+        log("mask.structural.clean")
+    return violations
+
+
 # --------------------------------------------------------------------------
 # Entry point
 # --------------------------------------------------------------------------
@@ -742,6 +814,34 @@ def _db_dsn(admin_dsn: str, dbname: str) -> str:
         _olddb, _, query = _old.partition("?")
         query = "?" + query
     return f"{base}/{dbname}{query}"
+
+
+def _mask_database_with_retry(
+    db_dsn: str, allowlist: dict, rules: dict, *,
+    deny_patterns: list[tuple[str, re.Pattern]], log, dbname: str, attempts: int = 3,
+) -> dict[str, Any]:
+    """Run mask_database, retrying transient connection drops.
+
+    A torn-down `flyctl proxy` tunnel surfaces as psycopg2
+    OperationalError/InterfaceError ("connection already closed", #143). It's
+    transient, and mask_database rolls the whole DB transaction back on
+    failure, so a retry re-masks cleanly from the restored data. Deterministic
+    failures (RuntimeError from a column clash) are NOT retried — they
+    re-raise immediately for the caller to record.
+    """
+    import psycopg2
+    for attempt in range(1, attempts + 1):
+        try:
+            return mask_database(
+                db_dsn, allowlist, rules,
+                deny_patterns=deny_patterns, log=log,
+            )
+        except (psycopg2.OperationalError, psycopg2.InterfaceError) as exc:
+            if attempt >= attempts:
+                raise
+            first = (str(exc).strip().splitlines() or [exc.__class__.__name__])[0]
+            log("mask.database.retry", db=dbname, attempt=attempt, error=first)
+            time.sleep(2 ** attempt)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -791,15 +891,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     total_violations: list[dict[str, Any]] = []
+    structural_violations: list[dict[str, Any]] = []
     failed_databases: list[str] = []
     for dbname in databases:
         db_dsn = _db_dsn(admin_dsn, dbname)
         started = time.time()
         log("mask.database.start", db=dbname)
         try:
-            metrics = mask_database(
+            metrics = _mask_database_with_retry(
                 db_dsn, allowlist, rules,
-                deny_patterns=deny_patterns, log=log,
+                deny_patterns=deny_patterns, log=log, dbname=dbname,
             )
         except (psycopg2.Error, RuntimeError) as exc:
             # Keep going so a single run surfaces every failing column
@@ -807,11 +908,13 @@ def main(argv: list[str] | None = None) -> int:
             log("mask.error", db=dbname, msg=f"masking failed: {exc}")
             failed_databases.append(dbname)
             continue
-        violations = sample_audit(
+        total_violations.extend(sample_audit(
             db_dsn, deny_patterns,
             sample_size=args.sample_size, log=log,
-        )
-        total_violations.extend(violations)
+        ))
+        structural_violations.extend(verify_structural_integrity(
+            db_dsn, sample_size=args.sample_size, log=log,
+        ))
         log("mask.database.end", db=dbname,
             duration_s=round(time.time() - started, 1), **metrics)
 
@@ -819,6 +922,13 @@ def main(argv: list[str] | None = None) -> int:
         log("mask.fail", msg="masking failed for one or more databases",
             databases=failed_databases)
         return 1
+
+    if structural_violations:
+        log("mask.fail",
+            msg="structural/framework tables contain masked values "
+                "(would break `odoo -u all`)",
+            violations=structural_violations[:20])
+        return 2
 
     if total_violations:
         log("mask.fail", msg="sample audit found surviving PII",
