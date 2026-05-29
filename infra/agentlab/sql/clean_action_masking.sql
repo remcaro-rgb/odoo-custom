@@ -42,4 +42,22 @@ UPDATE ir_act_server     SET binding_view_types = 'list,form' WHERE binding_view
 UPDATE ir_act_report_xml SET binding_view_types = 'list,form' WHERE binding_view_types LIKE 'MASKED:%' OR binding_view_types LIKE '[REDACTED%';
 UPDATE ir_act_url        SET binding_view_types = 'list,form' WHERE binding_view_types LIKE 'MASKED:%' OR binding_view_types LIKE '[REDACTED%';
 
+-- Base ir_actions table. `type` here holds the concrete action's model name,
+-- so it varies per row and can't be a single constant. Derive it from the
+-- concrete table that shares the row id (discover_action_masking.sql confirms
+-- the 1:1 mapping first). This is the column the ir.ui.menu.action reference
+-- is built from, so it is the actual `odoo -u all` breaker. Masked rows only.
+UPDATE ir_actions a SET type = 'ir.actions.act_window' FROM ir_act_window     w WHERE w.id = a.id AND (a.type LIKE 'MASKED:%' OR a.type LIKE '[REDACTED%');
+UPDATE ir_actions a SET type = 'ir.actions.client'     FROM ir_act_client     c WHERE c.id = a.id AND (a.type LIKE 'MASKED:%' OR a.type LIKE '[REDACTED%');
+UPDATE ir_actions a SET type = 'ir.actions.server'     FROM ir_act_server     s WHERE s.id = a.id AND (a.type LIKE 'MASKED:%' OR a.type LIKE '[REDACTED%');
+UPDATE ir_actions a SET type = 'ir.actions.report'     FROM ir_act_report_xml r WHERE r.id = a.id AND (a.type LIKE 'MASKED:%' OR a.type LIKE '[REDACTED%');
+UPDATE ir_actions a SET type = 'ir.actions.act_url'    FROM ir_act_url        u WHERE u.id = a.id AND (a.type LIKE 'MASKED:%' OR a.type LIKE '[REDACTED%');
+
+-- ir_actions.binding_type: 'report' for report actions, 'action' for the rest
+-- (run the report join first so the catch-all doesn't clobber it).
+UPDATE ir_actions a SET binding_type = 'report' FROM ir_act_report_xml r WHERE r.id = a.id AND (a.binding_type LIKE 'MASKED:%' OR a.binding_type LIKE '[REDACTED%');
+UPDATE ir_actions   SET binding_type = 'action' WHERE binding_type LIKE 'MASKED:%' OR binding_type LIKE '[REDACTED%';
+
+UPDATE ir_actions   SET binding_view_types = 'list,form' WHERE binding_view_types LIKE 'MASKED:%' OR binding_view_types LIKE '[REDACTED%';
+
 COMMIT;
