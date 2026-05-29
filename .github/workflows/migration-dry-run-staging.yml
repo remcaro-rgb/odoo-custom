@@ -182,10 +182,31 @@ jobs:
           # --no-owner / --no-privileges avoid pg_restore complaints
           # against the job-local odoo role. --no-tablespaces too —
           # tablespaces are platform-specific (agentlab uses Fly volumes).
-          pg_dump --no-owner --no-privileges --no-tablespaces \
-            --format=plain \
-            --dbname="$tenant" \
-            --file=/tmp/snapshot.sql
+          #
+          # The dump streams over the flyctl proxy to agentlab, which has
+          # been observed to drop mid-COPY ("server closed the connection
+          # unexpectedly"). Add libpq TCP keepalives via a conninfo string
+          # (host/user/password still come from the PG* env vars, so no
+          # secret lands in argv) and retry up to 3x on a transient drop —
+          # the same resilience the masker got in #143.
+          dump_conn="dbname=$tenant keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=5"
+          attempt=1
+          max=3
+          while true; do
+            if pg_dump --no-owner --no-privileges --no-tablespaces \
+                --format=plain \
+                --dbname="$dump_conn" \
+                --file=/tmp/snapshot.sql; then
+              break
+            fi
+            if [ "$attempt" -ge "$max" ]; then
+              echo "::error::pg_dump failed after ${max} attempts (agentlab proxy drops)" >&2
+              exit 1
+            fi
+            echo "pg_dump attempt ${attempt}/${max} failed (transient proxy drop?); retrying…"
+            attempt=$((attempt + 1))
+            sleep $((attempt * 5))
+          done
           echo "Snapshot size: $(wc -c < /tmp/snapshot.sql) bytes"
 
       - uses: docker/setup-buildx-action@v3
