@@ -142,23 +142,32 @@ jobs:
                   AND datname NOT IN ('postgres','template0','template1','repmgr','agentlab_meta');" \
               > /tmp/dbs.txt
           fi
-          echo "::notice::target DB(s):"
-          cat /tmp/dbs.txt
+          dbs=$(cat /tmp/dbs.txt)
+          printf 'target DB(s):\n%s\n' "$dbs"
+          # Surface as an annotation too: log-zip download is unavailable from
+          # some runners, but annotations are readable via the API.
+          echo "::notice title=target DBs::${dbs//$'\n'/%0A}"
 
       - name: Discover + (optionally) clean
         run: |
           set -euo pipefail
+          # Run a psql script, echo its output to the log AND mirror it into a
+          # single annotation (newlines -> %0A) so results are retrievable via
+          # the API even when the log archive can't be downloaded.
+          run_sql() {
+            local db="$1" phase="$2" sql="$3" conn out
+            conn="dbname=$db keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=5"
+            out=$(psql "$conn" -v ON_ERROR_STOP=1 -f "$sql" 2>&1)
+            printf -- '--- %s: %s ---\n%s\n' "$phase" "$db" "$out"
+            echo "::notice title=${phase} ${db}::${out//$'\n'/%0A}"
+          }
           while read -r db; do
             [ -z "$db" ] && continue
             echo "::group::$db"
-            conn="dbname=$db keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=5"
-            echo "--- discovery: $db ---"
-            psql "$conn" -v ON_ERROR_STOP=1 -f infra/agentlab/sql/discover_action_masking.sql
+            run_sql "$db" "discovery" infra/agentlab/sql/discover_action_masking.sql
             if [ "$DRY_RUN" != "true" ]; then
-              echo "--- applying reset: $db ---"
-              psql "$conn" -v ON_ERROR_STOP=1 -f infra/agentlab/sql/clean_action_masking.sql
-              echo "--- verify (expect all clean): $db ---"
-              psql "$conn" -v ON_ERROR_STOP=1 -f infra/agentlab/sql/discover_action_masking.sql
+              run_sql "$db" "applied-reset" infra/agentlab/sql/clean_action_masking.sql
+              run_sql "$db" "verify" infra/agentlab/sql/discover_action_masking.sql
             fi
             echo "::endgroup::"
           done < /tmp/dbs.txt
