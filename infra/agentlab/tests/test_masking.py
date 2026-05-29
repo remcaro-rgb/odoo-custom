@@ -56,7 +56,7 @@ def test_is_allowed_empty_allowlist():
     "ir_ui_menu",
     "ir_ui_view",
     "ir_ui_view_custom",
-    "ir_actions_actions",
+    "ir_actions",
     "ir_act_window",
     "ir_act_window_view",
     "ir_act_url",

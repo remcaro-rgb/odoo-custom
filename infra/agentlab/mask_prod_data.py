@@ -145,7 +145,7 @@ _STRUCTURAL_TABLES = frozenset({
     "ir_ui_menu",
     "ir_ui_view",
     "ir_ui_view_custom",
-    "ir_actions_actions",
+    "ir_actions",  # base ir.actions.actions table (real name; NOT ir_actions_actions)
     "ir_act_window",
     "ir_act_window_view",
     "ir_act_url",

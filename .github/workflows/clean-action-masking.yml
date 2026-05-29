@@ -1,0 +1,171 @@
+# clean-action-masking — one-shot remediation of masker pollution in the
+# Odoo action-definition tables (ir_act_*), per issue #142.
+#
+# Snapshots restored from a source that was masked BEFORE the framework-table
+# skip existed carry "MASKED:<hash>" values in ir_act_*.type, which break
+# `odoo -u all` (ir.ui.menu.action = "<action.type>,<id>"). The masker now
+# skips these tables but can't un-hash existing values — this job resets the
+# constant-valued columns deterministically (see infra/agentlab/sql/*.sql).
+#
+# Manual only. Defaults to a READ-ONLY discovery (dry_run=true). To apply,
+# set dry_run=false AND confirm=<target>. Reuses the agentlab restore's
+# connectivity (flyctl proxy + FLY_AGENTLAB_TOKEN + the DSN secrets).
+
+name: clean-action-masking
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Which cluster to clean'
+        type: choice
+        options: ['agentlab', 'staging']
+        required: true
+      tenant_filter:
+        description: 'Single tenant DB to clean (blank = every tenant DB)'
+        required: false
+      dry_run:
+        description: 'true = report polluted columns only; false = apply the reset'
+        type: choice
+        options: ['true', 'false']
+        default: 'true'
+      confirm:
+        description: 'To APPLY (dry_run=false) type the target name exactly: agentlab | staging'
+        required: false
+
+concurrency:
+  group: clean-action-masking-${{ inputs.target }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  AGENTLAB_PROXY_PORT: '15432'
+  STAGING_PROXY_PORT: '15433'
+
+jobs:
+  clean:
+    name: Reset ir_act_* masker pollution (${{ inputs.target }}, dry_run=${{ inputs.dry_run }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_AGENTLAB_TOKEN }}
+      AGENTLAB_DSN: ${{ secrets.AGENTLAB_DSN }}
+      STAGING_PG_DSN: ${{ secrets.STAGING_PG_DSN }}
+      STAGING_PG_FLY_APP: ${{ vars.STAGING_PG_FLY_APP }}
+      TARGET: ${{ inputs.target }}
+      TENANT_FILTER: ${{ inputs.tenant_filter }}
+      DRY_RUN: ${{ inputs.dry_run || 'true' }}
+      CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Preflight + confirm gate
+        run: |
+          set -euo pipefail
+          : "${FLY_API_TOKEN:?FLY_AGENTLAB_TOKEN required}"
+          if [ "$TARGET" = "agentlab" ]; then
+            : "${AGENTLAB_DSN:?AGENTLAB_DSN required}"
+          else
+            : "${STAGING_PG_DSN:?STAGING_PG_DSN required}"
+          fi
+          if [ "$DRY_RUN" != "true" ]; then
+            if [ "${CONFIRM:-}" != "$TARGET" ]; then
+              echo "::error::APPLY refused — set confirm=${TARGET} to mutate ${TARGET} (got '${CONFIRM:-}')." >&2
+              exit 1
+            fi
+            echo "::warning::APPLY mode — will UPDATE ${TARGET} action-definition tables."
+          else
+            echo "::notice::dry-run — discovery only, no writes."
+          fi
+
+      - name: Open Fly proxy
+        run: |
+          set -euo pipefail
+          if [ "$TARGET" = "agentlab" ]; then
+            port="$AGENTLAB_PROXY_PORT"; app="odoo-saas-odoo-agentlab-db"
+          else
+            # staging: proxy only if it's a Fly app; else the DSN is public.
+            if [ -z "${STAGING_PG_FLY_APP:-}" ]; then
+              echo "::notice::STAGING_PG_FLY_APP unset — using STAGING_PG_DSN as-is (no proxy)."
+              echo "NO_PROXY=1" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            port="$STAGING_PROXY_PORT"; app="$STAGING_PG_FLY_APP"
+          fi
+          echo "PROXY_PORT=$port" >> "$GITHUB_ENV"
+          nohup flyctl proxy "${port}:5432" -a "$app" > /tmp/proxy.log 2>&1 &
+          echo $! > /tmp/proxy.pid
+          for _ in $(seq 1 30); do
+            if pg_isready -h 127.0.0.1 -p "$port" >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          if ! pg_isready -h 127.0.0.1 -p "$port" >/dev/null 2>&1; then
+            echo "::error::proxy never became reachable on 127.0.0.1:${port}" >&2
+            cat /tmp/proxy.log
+            exit 1
+          fi
+          echo "::notice::proxy up on 127.0.0.1:${port}"
+
+      - name: Resolve admin connection
+        run: |
+          set -euo pipefail
+          if [ "$TARGET" = "agentlab" ]; then base="$AGENTLAB_DSN"; else base="$STAGING_PG_DSN"; fi
+          if [ "${NO_PROXY:-0}" = "1" ]; then
+            admin="$base"
+          else
+            admin=$(python3 infra/scripts/dsn_rewrite_host.py "$base" "127.0.0.1:${PROXY_PORT}")
+          fi
+          # Connection parts go to PG* env so no credential lands in argv.
+          py() { python3 -c "from urllib.parse import urlparse;u=urlparse('$admin');print($1)"; }
+          {
+            echo "PGHOST=$(py 'u.hostname or "127.0.0.1"')"
+            echo "PGPORT=$(py 'u.port or 5432')"
+            echo "PGUSER=$(py 'u.username or ""')"
+          } >> "$GITHUB_ENV"
+          pgpw=$(py 'u.password or ""')
+          echo "::add-mask::${pgpw}"
+          echo "PGPASSWORD=${pgpw}" >> "$GITHUB_ENV"
+
+      - name: List target tenant DBs
+        run: |
+          set -euo pipefail
+          if [ -n "${TENANT_FILTER:-}" ]; then
+            printf '%s\n' "$TENANT_FILTER" > /tmp/dbs.txt
+          else
+            psql "dbname=postgres keepalives=1 keepalives_idle=30" -tA -c \
+              "SELECT datname FROM pg_database
+                WHERE NOT datistemplate
+                  AND datname NOT IN ('postgres','template0','template1','repmgr','agentlab_meta');" \
+              > /tmp/dbs.txt
+          fi
+          echo "::notice::target DB(s):"
+          cat /tmp/dbs.txt
+
+      - name: Discover + (optionally) clean
+        run: |
+          set -euo pipefail
+          while read -r db; do
+            [ -z "$db" ] && continue
+            echo "::group::$db"
+            conn="dbname=$db keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=5"
+            echo "--- discovery: $db ---"
+            psql "$conn" -v ON_ERROR_STOP=1 -f infra/agentlab/sql/discover_action_masking.sql
+            if [ "$DRY_RUN" != "true" ]; then
+              echo "--- applying reset: $db ---"
+              psql "$conn" -v ON_ERROR_STOP=1 -f infra/agentlab/sql/clean_action_masking.sql
+              echo "--- verify (expect all clean): $db ---"
+              psql "$conn" -v ON_ERROR_STOP=1 -f infra/agentlab/sql/discover_action_masking.sql
+            fi
+            echo "::endgroup::"
+          done < /tmp/dbs.txt
+
+      - name: Close proxy
+        if: always()
+        run: |
+          if [ -f /tmp/proxy.pid ]; then
+            kill "$(cat /tmp/proxy.pid)" 2>/dev/null || true
+          fi
