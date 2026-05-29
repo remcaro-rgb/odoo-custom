@@ -64,3 +64,40 @@ BEGIN
   RAISE NOTICE 'ir_actions type-mask id-mapping: masked=% unique=% unmapped=% multi=%',
     masked, uniq, unmapped, multi;
 END $$;
+
+-- ir_actions.name blanked-jsonb check. In Odoo 18 `name` is a translated
+-- field stored as jsonb; the masker blanks jsonb columns to '{}' (NULL-read as
+-- False by the ORM). That is invisible to the text-column scan above but
+-- breaks `ir_module._get_views` (`"\n".join(sorted(r.name ...))` ->
+-- "expected str instance, bool found") at `-u all`. Report the scope and
+-- whether the value is empty-object vs genuinely null, since blanked free text
+-- is not deterministically recoverable.
+DO $$
+DECLARE
+  is_json bool;
+  empty_or_null bigint := 0;
+  reports_empty bigint := 0;
+BEGIN
+  SELECT data_type IN ('jsonb','json') INTO is_json
+  FROM information_schema.columns
+  WHERE table_schema='public' AND table_name='ir_actions' AND column_name='name';
+
+  IF is_json THEN
+    EXECUTE $q$
+      SELECT count(*) FROM ir_actions
+       WHERE name IS NULL OR name = '{}'::jsonb
+         OR coalesce(trim(name->>'en_US'), '') = ''
+    $q$ INTO empty_or_null;
+    EXECUTE $q$
+      SELECT count(*) FROM ir_actions a JOIN ir_act_report_xml r ON r.id=a.id
+       WHERE a.name IS NULL OR a.name = '{}'::jsonb
+         OR coalesce(trim(a.name->>'en_US'), '') = ''
+    $q$ INTO reports_empty;
+    RAISE NOTICE 'ir_actions.name(jsonb) blank-or-null: total=% (of which report-actions=%)',
+      empty_or_null, reports_empty;
+  ELSE
+    EXECUTE 'SELECT count(*) FROM ir_actions WHERE coalesce(trim(name),'''')='''''
+      INTO empty_or_null;
+    RAISE NOTICE 'ir_actions.name(text) blank-or-null: total=%', empty_or_null;
+  END IF;
+END $$;
